@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "808707795977",
+    "project_id": "stock-managament-4ab89",
+    "storage_bucket": "stock-managament-4ab89.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:808707795977:android:a56ff87f44d59b0a9a5cd8",
+        "android_client_info": {
+          "package_name": "com.gurbanow.stockmanagamentapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAqW9gdT5oBCCtyZu_6LTdQzGlYp1lahEw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
