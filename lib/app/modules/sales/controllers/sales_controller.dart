@@ -1,112 +1,42 @@
 import 'package:get/get.dart';
+import 'package:stock_managament_app/app/data/models/product_model.dart';
 
 class SalesController extends GetxController {
   RxList selectedProductsList = [].obs;
   RxList productList = [].obs;
-  addProduct(
-      {required String name,
-      required String brand,
-      required String category,
-      required String location,
-      required String material,
-      required String note,
-      required String package,
-      required int quantity,
-      required int cost,
-      required int gramm,
-      required String image,
-      required String price,
-      required int count,
-      required String id}) {
-    productList.add({
-      'id': id,
-      'brand': brand,
-      'category': category,
-      'cost': cost,
-      'gramm': gramm,
-      'image': image,
-      'location': location,
-      'material': material,
-      'name': name,
-      'note': note,
-      'package': package,
-      'quantity': quantity,
-      'sell_price': price,
-      'count': count,
-    });
+  addProduct({required ProductModel product, required int count}) {
+    productList.add({'product': product, 'count': count});
   }
 
   upgradeCount(int id, int count) {
     for (var element in productList) {
-      if (element['id'].toString() == id.toString()) {
+      final ProductModel product = element['product'];
+      if (product.documentID.toString() == id.toString()) {
         element['count'] = count.toString();
       }
     }
+
     productList.refresh();
   }
 
-  addProductMain(
-      {required String name,
-      required String brand,
-      required String category,
-      required String location,
-      required String material,
-      required String note,
-      required String package,
-      required int quantity,
-      required int cost,
-      required int gramm,
-      required String image,
-      required String price,
-      required int count,
-      required String id}) {
+  addProductMain({required int count, required ProductModel product}) {
     if (selectedProductsList.isEmpty) {
-      selectedProductsList.add({
-        'id': id,
-        'brand': brand,
-        'category': category,
-        'cost': cost,
-        'gramm': gramm,
-        'image': image,
-        'location': location,
-        'material': material,
-        'name': name,
-        'note': note,
-        'package': package,
-        'quantity': quantity,
-        'sell_price': price,
-        'count': count,
-      });
+      selectedProductsList.add({'product': product, 'count': count});
     } else {
       bool value = false;
 
       for (var element in selectedProductsList) {
-        if (element['id'] == id) {
+        final ProductModel productMine = element['product'];
+        if (product.documentID.toString() == productMine.documentID) {
           element['count'] = count;
           value = true;
         }
       }
       if (!value) {
-        selectedProductsList.add({
-          'id': id,
-          'brand': brand,
-          'category': category,
-          'cost': cost,
-          'gramm': gramm,
-          'image': image,
-          'location': location,
-          'material': material,
-          'name': name,
-          'note': note,
-          'package': package,
-          'quantity': quantity,
-          'sell_price': price,
-          'count': count,
-        });
+        selectedProductsList.add({'product': product, 'count': count});
       }
     }
-    selectedProductsList.refresh();
-    print("[[[[[[[[object]]]]]]]]");
     print(selectedProductsList);
+    selectedProductsList.refresh();
   }
 }

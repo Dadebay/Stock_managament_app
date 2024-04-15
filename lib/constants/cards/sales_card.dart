@@ -1,92 +1,22 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_iconly/flutter_iconly.dart';
-
 import 'package:get/get.dart';
+import 'package:stock_managament_app/app/data/models/order_model.dart';
 import 'package:stock_managament_app/app/modules/sales/views/sales_products_view.dart';
 import 'package:stock_managament_app/constants/constants.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:stock_managament_app/constants/widgets.dart';
 
 class SalesCard extends StatelessWidget {
-  const SalesCard({super.key, required this.date, required this.status, required this.productCount, required this.clientNumber, required this.orderSum, required this.orderID});
-  final String date;
-  final String status;
-  final String productCount;
-  final String clientNumber;
-  final String orderSum;
-  final String orderID;
-  Column textWidget({
-    required String text1,
-    required String text2,
-  }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          text1,
-          overflow: TextOverflow.ellipsis,
-          style: TextStyle(color: Colors.black, fontFamily: gilroySemiBold, fontSize: 14.sp),
-        ),
-        Text(
-          text2,
-          overflow: TextOverflow.ellipsis,
-          style: TextStyle(color: Colors.grey, fontFamily: gilroyMedium, fontSize: 14.sp),
-        )
-      ],
-    );
-  }
+  final OrderModel order;
 
-  Container bottomPart() {
-    return Container(
-      width: Get.size.width,
-      padding: EdgeInsets.only(bottom: 6.h, left: 10.w, right: 10.2),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            "Order sum:",
-            style: TextStyle(color: Colors.grey, fontSize: 14.sp, fontFamily: gilroySemiBold),
-          ),
-          Text(
-            "$orderSum TMT",
-            style: TextStyle(color: Colors.black, fontSize: 14.sp, fontFamily: gilroyBold),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Container topPart() {
-    return Container(
-      width: Get.size.width,
-      padding: EdgeInsets.symmetric(vertical: 6.h, horizontal: 10.w),
-      decoration: const BoxDecoration(
-          color: kPrimaryColor2,
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(15),
-            topRight: Radius.circular(15),
-          )),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            "Order ID",
-            style: TextStyle(color: Colors.white, fontSize: 14.sp, fontFamily: gilroySemiBold),
-          ),
-          Text(
-            orderID,
-            style: TextStyle(color: Colors.white, fontSize: 14.sp, fontFamily: gilroySemiBold),
-          ),
-        ],
-      ),
-    );
-  }
-
+  const SalesCard({super.key, required this.order});
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        Get.to(const SalesProductView(orderID: "#24TRHY%QD"));
+        Get.to(SalesProductView(
+          order: order,
+        ));
       },
       child: Container(
         height: 200,
@@ -96,7 +26,7 @@ class SalesCard extends StatelessWidget {
         ]),
         child: Column(
           children: [
-            topPart(),
+            topPart(order.orderID!),
             Expanded(
                 child: Padding(
               padding: EdgeInsets.symmetric(vertical: 6.h, horizontal: 10.w),
@@ -107,8 +37,8 @@ class SalesCard extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
-                        textWidget(text1: "Date order", text2: date),
-                        textWidget(text1: "Status", text2: status),
+                        textWidget(text1: "Date order", text2: order.date!),
+                        textWidget(text1: "Status", text2: order.status!),
                       ],
                     ),
                   ),
@@ -117,8 +47,8 @@ class SalesCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
-                      textWidget(text1: "Client number", text2: '+993$clientNumber'),
-                      textWidget(text1: "Products count", text2: productCount),
+                      textWidget(text1: "Client number", text2: '+993${order.clientNumber}'),
+                      textWidget(text1: "Products count", text2: order.products.toString()),
                     ],
                   ))
                 ],
@@ -128,7 +58,7 @@ class SalesCard extends StatelessWidget {
               color: Colors.grey,
               thickness: 1,
             ),
-            bottomPart(),
+            bottomPart(order.sumPrice!),
           ],
         ),
       ),

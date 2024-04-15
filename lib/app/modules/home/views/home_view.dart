@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -36,7 +34,7 @@ class _HomeViewState extends State<HomeView> {
           backgroundColor: Colors.white,
           actions: [
             IconButton(
-                onPressed: () async {
+                onPressed: () {
                   Get.to(() => SearchView());
                 },
                 icon: const Icon(IconlyLight.search))
@@ -102,10 +100,7 @@ class _HomeViewState extends State<HomeView> {
                               package: snapshot.data!.docs[index]['package'].toString(),
                               documentID: snapshot.data!.docs[index].id,
                             );
-
-                            return ProductCard(
-                              product: product,
-                            );
+                            return ProductCard(product: product, orderView: false);
                           },
                         );
                       }

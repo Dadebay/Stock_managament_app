@@ -11,22 +11,22 @@ class CustomTextField extends StatelessWidget {
   final TextEditingController controller;
   final FocusNode focusNode;
   final FocusNode requestfocusNode;
-  final bool isNumber;
   final bool unFocus;
   final bool? borderRadius;
-  final bool? isLabel;
   final bool? readOnly;
+  final bool? tmtValueShow;
+  final bool? isNumber;
 
   const CustomTextField({
     required this.labelName,
     required this.controller,
     required this.focusNode,
     required this.requestfocusNode,
-    required this.isNumber,
     required this.unFocus,
-    this.isLabel = false,
     this.maxline,
+    this.isNumber,
     this.borderRadius,
+    this.tmtValueShow,
     super.key,
     required this.readOnly,
   });
@@ -47,25 +47,28 @@ class CustomTextField extends StatelessWidget {
         onEditingComplete: () {
           unFocus ? FocusScope.of(context).unfocus() : requestfocusNode.requestFocus();
         },
-        keyboardType: isNumber ? TextInputType.number : TextInputType.text,
         maxLines: maxline ?? 1,
         focusNode: focusNode,
+        keyboardType: isNumber == true ? TextInputType.number : TextInputType.text,
         enabled: readOnly,
         decoration: InputDecoration(
           errorMaxLines: 2,
+          suffix: tmtValueShow == true
+              ? Text(
+                  "TMT",
+                  style: TextStyle(color: Colors.grey.shade400, fontSize: 16.sp),
+                )
+              : const SizedBox.shrink(),
           errorStyle: const TextStyle(fontFamily: gilroyMedium),
           hintMaxLines: 5,
           helperMaxLines: 5,
-          hintText: isLabel! ? labelName.tr : '',
           hintStyle: TextStyle(color: Colors.grey.shade300, fontFamily: gilroyMedium),
-          label: isLabel!
-              ? null
-              : Text(
-                  labelName.tr,
-                  maxLines: 5,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(color: Colors.grey.shade400, fontFamily: gilroyMedium),
-                ),
+          label: Text(
+            labelName.tr,
+            maxLines: 5,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(color: Colors.grey.shade400, fontFamily: gilroyMedium),
+          ),
           contentPadding: const EdgeInsets.only(left: 25, top: 20, bottom: 20, right: 10),
           border: OutlineInputBorder(
             borderRadius: borderRadius == null

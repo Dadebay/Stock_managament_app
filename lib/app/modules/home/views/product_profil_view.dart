@@ -4,10 +4,13 @@ import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
+import 'package:http/http.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart';
 import 'package:stock_managament_app/app/data/models/product_model.dart';
+import 'package:stock_managament_app/app/modules/home/controllers/home_controller.dart';
 import 'package:stock_managament_app/constants/buttons/agree_button_view.dart';
 import 'package:stock_managament_app/constants/constants.dart';
 import 'package:flutter_iconly/flutter_iconly.dart';
@@ -26,98 +29,31 @@ class ProductProfilView extends StatefulWidget {
 }
 
 class _ProductProfilViewState extends State<ProductProfilView> {
-  TextEditingController textEditingController = TextEditingController();
-
-  TextEditingController textEditingController1 = TextEditingController();
-
-  TextEditingController textEditingController2 = TextEditingController();
-
-  TextEditingController textEditingController3 = TextEditingController();
-
-  TextEditingController textEditingController4 = TextEditingController();
-
-  TextEditingController textEditingController5 = TextEditingController();
-
-  TextEditingController textEditingController6 = TextEditingController();
-
-  TextEditingController textEditingController7 = TextEditingController();
-
-  TextEditingController textEditingController8 = TextEditingController();
-
-  FocusNode focusNode = FocusNode();
-
-  FocusNode focusNode1 = FocusNode();
-
-  FocusNode focusNode2 = FocusNode();
-
-  FocusNode focusNode3 = FocusNode();
-
-  FocusNode focusNode4 = FocusNode();
-
-  FocusNode focusNode5 = FocusNode();
-
-  FocusNode focusNode6 = FocusNode();
-
-  FocusNode focusNode7 = FocusNode();
-
-  FocusNode focusNode8 = FocusNode();
+  List<TextEditingController> textControllers = List.generate(9, (_) => TextEditingController());
+  List<FocusNode> focusNodes = List.generate(9, (_) => FocusNode());
+  List<bool> readOnlyStates = List.generate(9, (_) => false);
+  List<String> fieldLabels = ['Product Name', 'Category', 'Brand', 'Gramm', 'Material', 'Sell Price', 'Location', 'Quantity'];
   String imageURL = "";
-  bool readOnly = false;
-  bool readOnly1 = false;
-  bool readOnly2 = false;
-  bool readOnly3 = false;
-  bool readOnly4 = false;
-  bool readOnly5 = false;
-  bool readOnly6 = false;
-  bool readOnly7 = false;
-  bool readOnly8 = false;
+
   void changeData() {
     imageURL = widget.product.image!;
-    // if (widget.name.isEmpty || widget.name == "") {
-    //   readOnly = true;
-    // } else {
-    //   textEditingController.text = widget.name.toString();
-    // }
-    // if (widget.category.isEmpty || widget.category == "") {
-    //   readOnly1 = true;
-    // } else {
-    //   textEditingController1.text = widget.category.toString();
-    // }
-    // if (widget.brandName.isEmpty || widget.brandName == "") {
-    //   readOnly2 = true;
-    // } else {
-    //   textEditingController2.text = widget.brandName.toString();
-    // }
-    // if (widget.gramm == 0) {
-    //   readOnly3 = true;
-    // } else {
-    //   textEditingController3.text = widget.gramm.toString();
-    // }
-    // if (widget.material.isEmpty || widget.material == "") {
-    //   readOnly4 = true;
-    // } else {
-    //   textEditingController4.text = widget.material.toString();
-    // }
-    // if (widget.cost == 0) {
-    //   readOnly5 = true;
-    // } else {
-    //   textEditingController5.text = widget.cost.toString();
-    // }
-    // if (widget.sellPrice.isEmpty || widget.sellPrice == "") {
-    //   readOnly6 = true;
-    // } else {
-    //   textEditingController6.text = widget.sellPrice.toString();
-    // }
-    // if (widget.location.isEmpty || widget.location == "") {
-    //   readOnly7 = true;
-    // } else {
-    //   textEditingController7.text = widget.location.toString();
-    // }
-    // if (widget.quantity == 0) {
-    //   readOnly8 = true;
-    // } else {
-    //   textEditingController8.text = widget.quantity.toString();
-    // }
+    updateFieldIfNotEmpty(widget.product.name, 0);
+    updateFieldIfNotEmpty(widget.product.category, 1);
+    updateFieldIfNotEmpty(widget.product.brandName, 2);
+    updateFieldIfNotEmpty(widget.product.gramm.toString(), 3);
+    updateFieldIfNotEmpty(widget.product.material.toString(), 4);
+    updateFieldIfNotEmpty(widget.product.sellPrice.toString(), 5);
+    updateFieldIfNotEmpty(widget.product.location.toString(), 6);
+    updateFieldIfNotEmpty(widget.product.quantity.toString(), 7);
+  }
+
+  void updateFieldIfNotEmpty(String? value, int index) {
+    if (value!.isNotEmpty) {
+      textControllers[index].text = value;
+    } else {
+      readOnlyStates[index] = true;
+    }
+
     setState(() {});
   }
 
@@ -129,44 +65,34 @@ class _ProductProfilViewState extends State<ProductProfilView> {
 
   File? _photo;
   final ImagePicker _picker = ImagePicker();
-
   Future imgFromGallery() async {
     final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
-
     setState(() {
       if (pickedFile != null) {
         _photo = File(pickedFile.path);
         showImageUploadDialog();
-      } else {
-        print('No image selected.');
       }
     });
   }
 
   Future imgFromCamera() async {
     final pickedFile = await _picker.pickImage(source: ImageSource.camera);
-
     setState(() {
       if (pickedFile != null) {
         _photo = File(pickedFile.path);
         showImageUploadDialog();
-      } else {
-        print('No image selected.');
       }
     });
   }
 
   Future uploadFile() async {
     if (_photo == null) return;
-
     try {
       DateTime now = DateTime.now();
       final storageRef = FirebaseStorage.instance.ref().child('images/$now.png');
       List<int> imageBytes = _photo!.readAsBytesSync();
       String base64Image = base64Encode(imageBytes);
       await storageRef.putString(base64Image, format: PutStringFormat.base64, metadata: SettableMetadata(contentType: 'image/png')).then((p0) async {
-        Get.back();
-
         showSnackBar("Uploaded", "Image succefully uploaded", Colors.green);
         var dowurl = await storageRef.getDownloadURL();
         String url = dowurl.toString();
@@ -176,46 +102,54 @@ class _ProductProfilViewState extends State<ProductProfilView> {
       });
     } catch (e) {
       Get.back();
-
       showSnackBar("Error", e.toString(), Colors.red);
-
-      print('error occured');
     }
   }
 
   showImageUploadDialog() {
-    Get.dialog(Column(
-      children: [
-        _photo != null
-            ? Image.file(
-                _photo!,
-                width: 100,
-                height: 100,
-                fit: BoxFit.fitHeight,
-              )
-            : Container(
-                decoration: BoxDecoration(color: Colors.grey[200], borderRadius: BorderRadius.circular(50)),
-                width: 100,
-                height: 100,
-                child: Icon(
-                  Icons.camera_alt,
-                  color: Colors.grey[800],
+    Get.defaultDialog(
+      title: 'Selected Image',
+      content: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          _photo != null
+              ? ClipRRect(
+                  borderRadius: borderRadius20,
+                  child: Image.file(
+                    _photo!,
+                    width: 300,
+                    height: 300,
+                    fit: BoxFit.fill,
+                  ),
+                )
+              : Container(
+                  decoration: BoxDecoration(color: Colors.grey[200], borderRadius: BorderRadius.circular(50)),
+                  width: 100,
+                  height: 100,
+                  child: Icon(
+                    Icons.camera_alt,
+                    color: Colors.grey[800],
+                  ),
                 ),
-              ),
-        AgreeButton(
-          onTap: () {
-            uploadFile();
-          },
-          text: "Upload Image",
-        ),
-      ],
-    ));
+          AgreeButton(
+            onTap: () {
+              uploadFile();
+            },
+            text: "Upload Image",
+          ),
+        ],
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        foregroundColor: Colors.white,
+        scrolledUnderElevation: 0,
+        backgroundColor: Colors.white,
         title: Text(
           widget.product.name!,
           style: TextStyle(color: Colors.black, fontFamily: gilroyBold, fontSize: 18.sp),
@@ -303,29 +237,26 @@ class _ProductProfilViewState extends State<ProductProfilView> {
     return Column(
       children: [
         CustomTextField(
-            readOnly: readOnly,
+            readOnly: readOnlyStates[0],
             labelName: 'Product Name',
             maxline: 3,
             borderRadius: true,
-            controller: textEditingController,
-            focusNode: focusNode,
-            requestfocusNode: focusNode8,
-            isNumber: false,
+            controller: textControllers[0],
+            focusNode: focusNodes[0],
+            requestfocusNode: focusNodes[1],
             unFocus: true),
         CustomTextField(
-            readOnly: readOnly1, labelName: 'Category', borderRadius: true, controller: textEditingController1, focusNode: focusNode1, requestfocusNode: focusNode2, isNumber: false, unFocus: true),
+            readOnly: readOnlyStates[1], labelName: 'Category', borderRadius: true, controller: textControllers[1], focusNode: focusNodes[1], requestfocusNode: focusNodes[2], unFocus: true),
+        CustomTextField(readOnly: readOnlyStates[2], labelName: 'Brand', borderRadius: true, controller: textControllers[2], focusNode: focusNodes[2], requestfocusNode: focusNodes[3], unFocus: true),
+        CustomTextField(readOnly: readOnlyStates[3], labelName: 'Gramm', borderRadius: true, controller: textControllers[3], focusNode: focusNodes[3], requestfocusNode: focusNodes[4], unFocus: true),
         CustomTextField(
-            readOnly: readOnly2, labelName: 'Brand', borderRadius: true, controller: textEditingController2, focusNode: focusNode2, requestfocusNode: focusNode3, isNumber: false, unFocus: true),
+            readOnly: readOnlyStates[4], labelName: 'Material', borderRadius: true, controller: textControllers[4], focusNode: focusNodes[4], requestfocusNode: focusNodes[5], unFocus: true),
         CustomTextField(
-            readOnly: readOnly3, labelName: 'Gramm', borderRadius: true, controller: textEditingController3, focusNode: focusNode3, requestfocusNode: focusNode4, isNumber: false, unFocus: true),
+            readOnly: readOnlyStates[5], labelName: 'Sell Price', borderRadius: true, controller: textControllers[5], focusNode: focusNodes[5], requestfocusNode: focusNodes[6], unFocus: true),
         CustomTextField(
-            readOnly: readOnly4, labelName: 'Material', borderRadius: true, controller: textEditingController4, focusNode: focusNode4, requestfocusNode: focusNode6, isNumber: false, unFocus: true),
+            readOnly: readOnlyStates[6], labelName: 'Location', borderRadius: true, controller: textControllers[6], focusNode: focusNodes[6], requestfocusNode: focusNodes[7], unFocus: true),
         CustomTextField(
-            readOnly: readOnly6, labelName: 'Sell Price', borderRadius: true, controller: textEditingController6, focusNode: focusNode6, requestfocusNode: focusNode7, isNumber: false, unFocus: true),
-        CustomTextField(
-            readOnly: readOnly7, labelName: 'Location', borderRadius: true, controller: textEditingController7, focusNode: focusNode7, requestfocusNode: focusNode8, isNumber: false, unFocus: true),
-        CustomTextField(
-            readOnly: readOnly8, labelName: 'Quantity', borderRadius: true, controller: textEditingController8, focusNode: focusNode8, requestfocusNode: focusNode, isNumber: false, unFocus: true),
+            readOnly: readOnlyStates[7], labelName: 'Quantity', borderRadius: true, controller: textControllers[7], focusNode: focusNodes[7], requestfocusNode: focusNodes[1], unFocus: true),
         AgreeButton(
           onTap: () {
             _showPicker(context);
@@ -333,18 +264,22 @@ class _ProductProfilViewState extends State<ProductProfilView> {
           text: "Upload Image",
         ),
         AgreeButton(
-          onTap: () {
-            FirebaseFirestore.instance.collection('products').doc(widget.product.documentID).update({
-              "name": textEditingController.text,
-              "category": textEditingController1.text,
-              "brand": textEditingController2.text,
-              "gramm": int.parse(textEditingController3.text.toString()),
-              "material": textEditingController4.text,
-              "sell_price": textEditingController6.text,
-              "location": textEditingController7.text,
-              "quantity": int.parse(textEditingController8.text.toString()),
+          onTap: () async {
+            print(readOnlyStates);
+            await FirebaseFirestore.instance.collection('products').doc(widget.product.documentID).update({
+              "name": textControllers[0].text,
+              "category": textControllers[1].text,
+              "brand": textControllers[2].text,
+              "gramm": int.parse(textControllers[3].text.toString()),
+              "material": textControllers[4].text,
+              "sell_price": textControllers[5].text,
+              "location": textControllers[6].text,
+              "quantity": int.parse(textControllers[7].text.toString()),
+            }).then((value) {
+              showSnackBar("Done", "All missing fields changed", Colors.green);
+
+              return value;
             });
-            showSnackBar("Done", "All missing fields changed", Colors.green);
           },
           text: "agree",
         ),

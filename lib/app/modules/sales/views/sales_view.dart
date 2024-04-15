@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_iconly/flutter_iconly.dart';
 
 import 'package:get/get.dart';
+import 'package:stock_managament_app/app/data/models/order_model.dart';
 import 'package:stock_managament_app/app/modules/sales/views/create_order.dart';
 import 'package:stock_managament_app/constants/cards/sales_card.dart';
 import 'package:stock_managament_app/constants/constants.dart';
@@ -112,20 +113,27 @@ class _SalesViewState extends State<SalesView> {
         body: StreamBuilder(
             stream: FirebaseFirestore.instance.collection('sales').snapshots(),
             builder: (context, snapshot) {
-              print(snapshot.hasData);
-              print(snapshot.data);
               if (snapshot.hasData) {
                 return ListView.builder(
                   itemCount: snapshot.data!.docs.length,
                   physics: const BouncingScrollPhysics(),
                   itemBuilder: (BuildContext context, int index) {
+                    final order = OrderModel(
+                        orderID: snapshot.data!.docs[index].id,
+                        clientAddress: snapshot.data!.docs[index]['client_address'],
+                        clientName: snapshot.data!.docs[index]['client_name'],
+                        clientNumber: snapshot.data!.docs[index]['client_number'],
+                        coupon: snapshot.data!.docs[index]['coupon'],
+                        date: snapshot.data!.docs[index]['date'],
+                        discount: snapshot.data!.docs[index]['discount'],
+                        note: snapshot.data!.docs[index]['note'],
+                        package: snapshot.data!.docs[index]['package'],
+                        status: snapshot.data!.docs[index]['status'],
+                        sumCost: snapshot.data!.docs[index]['sum_cost'],
+                        sumPrice: snapshot.data!.docs[index]['sum_price'],
+                        products: snapshot.data!.docs[index]['product_count']);
                     return SalesCard(
-                      date: snapshot.data!.docs[index]['date'],
-                      status: snapshot.data!.docs[index]['status'],
-                      productCount: snapshot.data!.docs[index]['date'],
-                      clientNumber: snapshot.data!.docs[index]['client_number'],
-                      orderSum: snapshot.data!.docs[index]['sum_price'],
-                      orderID: snapshot.data!.docs[index].id,
+                      order: order,
                     );
                   },
                 );

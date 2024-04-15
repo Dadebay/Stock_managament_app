@@ -1,42 +1,18 @@
-import 'package:cached_network_image/cached_network_image.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_iconly/flutter_iconly.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:stock_managament_app/app/data/models/product_model.dart';
 import 'package:stock_managament_app/app/modules/sales/controllers/sales_controller.dart';
 import 'package:stock_managament_app/constants/constants.dart';
+import 'package:stock_managament_app/constants/widgets.dart';
 
 class ProductCardMine extends StatefulWidget {
-  final String name;
-  final String image;
-  final String price;
-  final String id;
   final int count;
-  final String brand;
-  final String category;
-  final String location;
-  final String material;
-  final String note;
-  final String package;
-  final int quantity;
-  final int cost;
-  final int gramm;
-  const ProductCardMine(
-      {super.key,
-      required this.name,
-      required this.image,
-      required this.price,
-      required this.id,
-      required this.count,
-      required this.brand,
-      required this.category,
-      required this.location,
-      required this.material,
-      required this.note,
-      required this.package,
-      required this.quantity,
-      required this.cost,
-      required this.gramm});
+
+  final ProductModel product;
+  const ProductCardMine({super.key, required this.count, required this.product});
 
   @override
   State<ProductCardMine> createState() => _ProductCardMineState();
@@ -59,43 +35,37 @@ class _ProductCardMineState extends State<ProductCardMine> {
   @override
   Widget build(BuildContext context) {
     return Card(
+      shape: const RoundedRectangleBorder(borderRadius: borderRadius15),
+      elevation: 0.5,
       child: ListTile(
+        onTap: () {},
         title: Text(
-          widget.name,
+          widget.product.name!,
           maxLines: 2,
-          style: TextStyle(color: Colors.black, fontSize: 12.sp),
+          style: TextStyle(color: Colors.black, fontSize: 15.sp),
         ),
-        leading: SizedBox(
-          width: 70,
-          height: 70,
-          child: CachedNetworkImage(
-            fadeInCurve: Curves.ease,
-            imageUrl: widget.image,
-            useOldImageOnUrlChange: true,
-            imageBuilder: (context, imageProvider) => Container(
-              width: Get.size.width,
-              decoration: BoxDecoration(
-                borderRadius: borderRadius15,
-                image: DecorationImage(
-                  image: imageProvider,
-                  fit: BoxFit.cover,
-                ),
-              ),
+        dense: true,
+        visualDensity: const VisualDensity(vertical: 3),
+        contentPadding: EdgeInsets.only(left: 10.w),
+        leading: SizedBox(width: 70, height: 70, child: imageView(imageURl: widget.product.image!)),
+        subtitle: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              '${widget.product.sellPrice!} TMT',
+              style: TextStyle(color: Colors.grey, fontFamily: gilroyRegular, fontSize: 14.sp),
             ),
-            placeholder: (context, url) => const Center(
-              child: CircularProgressIndicator(),
+            Text(
+              'Count : ${widget.product.quantity!}',
+              style: TextStyle(color: Colors.grey, fontFamily: gilroyRegular, fontSize: 14.sp),
             ),
-            errorWidget: (context, url, error) => const Center(
-              child: Text('No Image'),
-            ),
-          ),
+          ],
         ),
-        subtitle: Text('\$${widget.price}'),
         trailing: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
             IconButton(
-              icon: const Icon(Icons.remove),
+              icon: const Icon(CupertinoIcons.minus_circle, color: Colors.black),
               onPressed: () {
                 setState(() {
                   if (selectedCount > 0) {
@@ -106,29 +76,21 @@ class _ProductCardMineState extends State<ProductCardMine> {
             ),
             Text(
               selectedCount.toString(),
+              style: TextStyle(color: Colors.black, fontFamily: gilroySemiBold, fontSize: 18.sp),
               maxLines: 1,
             ), // Yeni: Sayıcıyı göster
             IconButton(
-              icon: const Icon(Icons.add),
+              icon: const Icon(CupertinoIcons.add_circled, color: Colors.black),
               onPressed: () {
-                selectedCount++;
-                salesController.upgradeCount(int.parse(widget.id.toString()), selectedCount);
-                salesController.addProductMain(
-                    name: widget.name,
-                    image: widget.image,
-                    price: widget.price,
-                    count: selectedCount,
-                    id: widget.id,
-                    brand: widget.brand,
-                    category: widget.category,
-                    location: widget.location,
-                    material: widget.material,
-                    note: widget.note,
-                    package: widget.package,
-                    quantity: widget.quantity,
-                    cost: widget.cost,
-                    gramm: widget.gramm);
-                setState(() {});
+                print(widget.product.quantity!);
+                if (selectedCount >= widget.product.quantity!) {
+                  showSnackBar("Error", "We dont have to much item ", Colors.red);
+                } else {
+                  selectedCount++;
+                  salesController.upgradeCount(int.parse(widget.product.documentID.toString()), selectedCount);
+                  salesController.addProductMain(product: widget.product, count: selectedCount);
+                  setState(() {});
+                }
               },
             ),
           ],

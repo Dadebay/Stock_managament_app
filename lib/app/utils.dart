@@ -6,6 +6,8 @@ class MyTranslations extends Translations {
   @override
   Map<String, Map<String, String>> get keys => {
         'tm': {
+          'totalProducts': 'Hemme harytlar',
+          'stockInHand': 'Elimizdaki harytlar',
           'deleteAccount': 'Hasaby pozmak',
           'deleteAccountTitle': 'Pozuldy',
           'deleteAccountSubtitle': 'Hasabyňyza degişli hemme maglumatlar pozuldy !',
@@ -206,10 +208,12 @@ class MyTranslations extends Translations {
           'appColor2': 'Reňk 1',
           'appColor3': 'Reňk 2',
           'appColor4': 'Reňk 3',
-          'waitMyMan':'Garaşyň',
-          'waitMyManSubtitle':'Maglumat ýüklenýänça garaşyň',
+          'waitMyMan': 'Garaşyň',
+          'waitMyManSubtitle': 'Maglumat ýüklenýänça garaşyň',
         },
         'ru': {
+          'totalProducts': 'Все товары',
+          'stockInHand': 'Запасы в наличии',
           'deleteAccountTitle': 'Удалено',
           'deleteAccountSubtitle': 'Вся информация, связанная с вашей учетной записью, была скомпрометирована!',
           'deleteAccount': 'Удалить аккаунт',
@@ -411,6 +415,8 @@ class MyTranslations extends Translations {
           'appColor4': 'Цвет  3',
         },
         'en': {
+          'totalProducts': 'Total Product',
+          'stockInHand': 'Stock In Hand',
           'deleteAccountTitle': 'Deleted',
           'deleteAccountSubtitle': 'All information associated with your account has been deleted!',
           'deleteAccount': 'Delete account',

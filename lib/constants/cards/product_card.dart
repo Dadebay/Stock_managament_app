@@ -9,13 +9,14 @@ import 'package:stock_managament_app/constants/widgets.dart';
 
 class ProductCard extends StatelessWidget {
   final ProductModel product;
-  const ProductCard({super.key, required this.product});
+  final bool orderView;
+  const ProductCard({super.key, required this.product, required this.orderView});
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        Get.to(() => ProductProfilView(product: product));
+        if (!orderView) Get.to(() => ProductProfilView(product: product));
       },
       child: Container(
         margin: EdgeInsets.only(top: 10.h),
@@ -43,14 +44,14 @@ class ProductCard extends StatelessWidget {
                     style: TextStyle(color: Colors.grey, fontFamily: gilroyRegular, fontSize: 14.sp),
                   ),
                   Text(
-                    "Sell price: ${product.sellPrice} \$",
+                    "Sell price: ${product.sellPrice} TMT",
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(color: Colors.grey, fontFamily: gilroyRegular, fontSize: 14.sp),
                   ),
                 ],
               ),
             ),
-            IconButton(onPressed: () {}, icon: const Icon(IconlyLight.arrowRightCircle))
+            orderView ? const SizedBox.shrink() : IconButton(onPressed: () {}, icon: const Icon(IconlyLight.arrowRightCircle))
           ],
         ),
       ),

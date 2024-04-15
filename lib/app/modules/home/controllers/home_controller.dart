@@ -5,13 +5,17 @@ class HomeController extends GetxController {
   RxInt stockInHand = 0.obs;
   RxInt totalProductCount = 0.obs;
   List productList = [];
-  changeValues(List productList) {
+  void updateStock(int quantity) {
+    stockInHand.value += quantity;
+  }
+
+  changeValues(List productsList) {
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      stockInHand.value = 0;
-      productList = productList;
-      totalProductCount.value = productList.length;
+      productList = productsList;
+      totalProductCount.value = productsList.length;
       for (var element in productList) {
-        stockInHand.value += int.parse(element['quantity'].toString());
+        // updateStock(int.parse(element['quantity'].toString()));
+        // stockInHand.value += int.parse(element['quantity'].toString());
       }
     });
   }

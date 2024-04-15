@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:stock_managament_app/constants/constants.dart';
 
@@ -17,7 +18,7 @@ class PhoneNumber extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(top: 15),
+      padding: EdgeInsets.only(top: 15.h),
       child: TextFormField(
         enabled: disabled ?? true,
         style: const TextStyle(color: Colors.black, fontSize: 18, fontFamily: gilroyMedium),
@@ -59,7 +60,7 @@ class PhoneNumber extends StatelessWidget {
           isDense: true,
           hintText: '65 656565 ',
           filled: style,
-          fillColor: kPrimaryColor2,
+          fillColor: kPrimaryColor,
           alignLabelWithHint: true,
           hintStyle: TextStyle(color: Colors.grey.shade400, fontFamily: gilroyMedium),
           border: OutlineInputBorder(
@@ -79,14 +80,14 @@ class PhoneNumber extends StatelessWidget {
           focusedBorder: OutlineInputBorder(
             borderRadius: style ? borderRadius10 : borderRadius20,
             borderSide: const BorderSide(
-              color: kPrimaryColor2,
+              color: kPrimaryColor,
               width: 2,
             ),
           ),
           focusedErrorBorder: OutlineInputBorder(
             borderRadius: style ? borderRadius10 : borderRadius20,
             borderSide: const BorderSide(
-              color: kPrimaryColor2,
+              color: kPrimaryColor,
               width: 2,
             ),
           ),

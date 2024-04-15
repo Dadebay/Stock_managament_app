@@ -90,6 +90,70 @@ Expanded homePageTopWidget({required String stockInHand, required String totalPr
   );
 }
 
+Container bottomPart(String orderSum) {
+  return Container(
+    width: Get.size.width,
+    padding: EdgeInsets.only(bottom: 6.h, left: 10.w, right: 10.2),
+    child: Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          "Order sum:",
+          style: TextStyle(color: Colors.grey, fontSize: 14.sp, fontFamily: gilroySemiBold),
+        ),
+        Text(
+          "$orderSum TMT",
+          style: TextStyle(color: Colors.black, fontSize: 14.sp, fontFamily: gilroyBold),
+        ),
+      ],
+    ),
+  );
+}
+
+Container topPart(String text) {
+  return Container(
+    width: Get.size.width,
+    padding: EdgeInsets.symmetric(vertical: 6.h, horizontal: 10.w),
+    decoration: const BoxDecoration(
+        color: kPrimaryColor2,
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(15),
+          topRight: Radius.circular(15),
+        )),
+    child: Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          "Order ID",
+          style: TextStyle(color: Colors.white, fontSize: 14.sp, fontFamily: gilroySemiBold),
+        ),
+        Text(
+          text,
+          style: TextStyle(color: Colors.white, fontSize: 14.sp, fontFamily: gilroySemiBold),
+        ),
+      ],
+    ),
+  );
+}
+
+Column textWidget({required String text1, required String text2}) {
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Text(
+        text1,
+        overflow: TextOverflow.ellipsis,
+        style: TextStyle(color: Colors.black, fontFamily: gilroySemiBold, fontSize: 14.sp),
+      ),
+      Text(
+        text2,
+        overflow: TextOverflow.ellipsis,
+        style: TextStyle(color: Colors.grey, fontFamily: gilroyMedium, fontSize: 14.sp),
+      )
+    ],
+  );
+}
+
 CachedNetworkImage imageView({required String imageURl}) {
   return CachedNetworkImage(
     fadeInCurve: Curves.ease,
