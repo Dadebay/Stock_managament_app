@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:stock_managament_app/app/modules/home/views/bottom_nav_bar.dart';
 import 'package:stock_managament_app/app/modules/home/views/home_view.dart';
+import 'package:stock_managament_app/app/modules/home/views/login_view.dart';
 import 'package:stock_managament_app/constants/constants.dart';
 
 import '../../../../constants/widgets.dart';

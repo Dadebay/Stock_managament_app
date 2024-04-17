@@ -134,7 +134,7 @@ class _SelectProductsViewState extends State<SelectProductsView> {
                         itemBuilder: (context, i) {
                           return ProductCardMine(
                             product: _searchResult[i]['product'],
-                            count: int.parse(_searchResult[i]['count'].toString()),
+                            // count: int.parse(_searchResult[i]['count'].toString()),
                           );
                         },
                       )
@@ -145,7 +145,7 @@ class _SelectProductsViewState extends State<SelectProductsView> {
                         itemBuilder: (BuildContext context, int index) {
                           return ProductCardMine(
                             product: salesController.productList[index]['product'],
-                            count: int.parse(salesController.productList[index]['count'].toString()),
+                            // count: int.parse(salesController.productList[index]['count'].toString()),
                           );
                         },
                       ),

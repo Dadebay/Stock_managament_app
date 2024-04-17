@@ -1,10 +1,12 @@
 import 'dart:ui';
 
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:stock_managament_app/constants/constants.dart';
+import 'package:stock_managament_app/constants/custom_text_field.dart';
 
 SnackbarController showSnackBar(String title, String subtitle, Color color) {
   if (SnackbarController.isSnackbarBeingShown) {
@@ -98,7 +100,7 @@ Container bottomPart(String orderSum) {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text(
-          "Order sum:",
+          "priceProduct".tr,
           style: TextStyle(color: Colors.grey, fontSize: 14.sp, fontFamily: gilroySemiBold),
         ),
         Text(
@@ -110,13 +112,14 @@ Container bottomPart(String orderSum) {
   );
 }
 
-Container topPart(String text) {
+Container topPart(String text, String status) {
+  Map<String, Color> colorMapping = {"shipped": Colors.green, "canceled": Colors.red, "refund": Colors.red, "preparing": kPrimaryColor2, "ready to ship": Colors.purple};
   return Container(
     width: Get.size.width,
     padding: EdgeInsets.symmetric(vertical: 6.h, horizontal: 10.w),
-    decoration: const BoxDecoration(
-        color: kPrimaryColor2,
-        borderRadius: BorderRadius.only(
+    decoration: BoxDecoration(
+        color: colorMapping[status.toLowerCase()],
+        borderRadius: const BorderRadius.only(
           topLeft: Radius.circular(15),
           topRight: Radius.circular(15),
         )),
@@ -124,7 +127,7 @@ Container topPart(String text) {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text(
-          "Order ID",
+          "${"order".tr} ID",
           style: TextStyle(color: Colors.white, fontSize: 14.sp, fontFamily: gilroySemiBold),
         ),
         Text(
@@ -141,7 +144,7 @@ Column textWidget({required String text1, required String text2}) {
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
       Text(
-        text1,
+        text1.tr,
         overflow: TextOverflow.ellipsis,
         style: TextStyle(color: Colors.black, fontFamily: gilroySemiBold, fontSize: 14.sp),
       ),
@@ -151,6 +154,107 @@ Column textWidget({required String text1, required String text2}) {
         style: TextStyle(color: Colors.grey, fontFamily: gilroyMedium, fontSize: 14.sp),
       )
     ],
+  );
+}
+
+Widget textWidgetOrderedPage(
+    {required bool ontap, required String status, required BuildContext context, required String text1, required String text2, required String labelName, required String documentID}) {
+  FocusNode focusNode = FocusNode();
+  final TextEditingController textEditingController = TextEditingController();
+  textEditingController.text = text2;
+  Map<String, bool> statusMapping = {"Shipped": false, "Canceled": false, "Refund": false, "Preparing": true, "Ready to ship": true};
+
+  return GestureDetector(
+    onTap: () {
+      if (ontap) {
+        if (statusMapping[status] == true) {
+          showDialog(
+            context: context,
+            barrierDismissible: true,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                alignment: Alignment.center,
+                title: Text(
+                  text1.tr,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(color: Colors.black, fontFamily: gilroyBold, fontSize: 20.sp),
+                ),
+                backgroundColor: Colors.white,
+                shadowColor: Colors.red,
+                content: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [CustomTextField(labelName: text1.toString(), controller: textEditingController, focusNode: focusNode, requestfocusNode: focusNode, unFocus: false, readOnly: true)],
+                ),
+                actionsAlignment: MainAxisAlignment.center,
+                actions: <Widget>[
+                  TextButton(
+                    child: Text(
+                      'no'.tr,
+                      style: TextStyle(fontFamily: gilroyMedium, fontSize: 18.sp),
+                    ),
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                  TextButton(
+                    child: Text(
+                      'yes'.tr,
+                      style: TextStyle(fontFamily: gilroyBold, fontSize: 18.sp),
+                    ),
+                    onPressed: () {
+                      FirebaseFirestore.instance.collection('sales').doc(documentID).update({
+                        labelName: textEditingController.text,
+                      }).then((value) {
+                        showSnackBar("copySucces", "changesUpdated", Colors.green);
+                      });
+                      Navigator.of(context).pop();
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                ],
+              );
+            },
+          );
+        } else {
+          showSnackBar("Error", "You cannot change order status", Colors.red);
+        }
+      }
+    },
+    child: Container(
+      color: Colors.white,
+      child: Column(
+        children: [
+          Padding(
+            padding: EdgeInsets.only(top: 10.h, bottom: 8.h),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  text1.tr,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(color: Colors.grey, fontFamily: gilroyMedium, fontSize: 14.sp),
+                ),
+                Text(
+                  text1 == "Client number"
+                      ? "+993 $text2"
+                      : text1 == "Sum Price"
+                          ? "$text2 TMT"
+                          : text1 == "Discount"
+                              ? "$text2 TMT"
+                              : text2,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(color: Colors.black, fontFamily: gilroySemiBold, fontSize: 14.sp),
+                )
+              ],
+            ),
+          ),
+          Divider(
+            color: Colors.grey.shade200,
+          )
+        ],
+      ),
+    ),
   );
 }
 
@@ -170,8 +274,8 @@ CachedNetworkImage imageView({required String imageURl}) {
       ),
     ),
     placeholder: (context, url) => spinKit(),
-    errorWidget: (context, url, error) => const Center(
-      child: Text('No Image'),
+    errorWidget: (context, url, error) => Center(
+      child: Text('noImage'.tr),
     ),
   );
 }

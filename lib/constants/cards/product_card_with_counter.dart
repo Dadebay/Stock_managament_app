@@ -1,6 +1,5 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_iconly/flutter_iconly.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:stock_managament_app/app/data/models/product_model.dart';
@@ -9,10 +8,8 @@ import 'package:stock_managament_app/constants/constants.dart';
 import 'package:stock_managament_app/constants/widgets.dart';
 
 class ProductCardMine extends StatefulWidget {
-  final int count;
-
   final ProductModel product;
-  const ProductCardMine({super.key, required this.count, required this.product});
+  const ProductCardMine({super.key, required this.product});
 
   @override
   State<ProductCardMine> createState() => _ProductCardMineState();
@@ -20,20 +17,22 @@ class ProductCardMine extends StatefulWidget {
 
 class _ProductCardMineState extends State<ProductCardMine> {
   int selectedCount = 0;
-  @override
-  void initState() {
-    super.initState();
-    changeData();
-  }
+  final SalesController salesController = Get.put(SalesController());
 
   changeData() {
-    selectedCount = widget.count;
+    for (var element in salesController.selectedProductsList) {
+      final ProductModel product = element['product'];
+      if (widget.product.documentID == product.documentID) {
+        selectedCount = element['count'];
+      }
+    }
     setState(() {});
   }
 
-  final SalesController salesController = Get.put(SalesController());
   @override
   Widget build(BuildContext context) {
+    changeData();
+
     return Card(
       shape: const RoundedRectangleBorder(borderRadius: borderRadius15),
       elevation: 0.5,
@@ -71,6 +70,7 @@ class _ProductCardMineState extends State<ProductCardMine> {
                   if (selectedCount > 0) {
                     selectedCount--;
                   }
+                  salesController.decreaseCount(int.parse(widget.product.documentID.toString()), selectedCount);
                 });
               },
             ),
@@ -82,7 +82,6 @@ class _ProductCardMineState extends State<ProductCardMine> {
             IconButton(
               icon: const Icon(CupertinoIcons.add_circled, color: Colors.black),
               onPressed: () {
-                print(widget.product.quantity!);
                 if (selectedCount >= widget.product.quantity!) {
                   showSnackBar("Error", "We dont have to much item ", Colors.red);
                 } else {

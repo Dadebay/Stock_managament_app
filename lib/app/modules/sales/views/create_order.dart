@@ -49,7 +49,7 @@ class _CreateOrderViewState extends State<CreateOrderView> {
               color: Colors.black,
             )),
         title: Text(
-          'Create order'.tr,
+          'creatOrder'.tr,
           style: TextStyle(color: Colors.black, fontFamily: gilroyMedium, fontSize: 18.sp),
         ),
         centerTitle: true,
@@ -62,7 +62,7 @@ class _CreateOrderViewState extends State<CreateOrderView> {
         child: ListView(
           padding: EdgeInsets.symmetric(horizontal: 10.w),
           children: [
-            CustomTextField(labelName: "Date", borderRadius: true, controller: textControllers[0], focusNode: focusNodes[0], requestfocusNode: focusNodes[1], unFocus: false, readOnly: false),
+            CustomTextField(labelName: "date", borderRadius: true, controller: textControllers[0], focusNode: focusNodes[0], requestfocusNode: focusNodes[1], unFocus: false, readOnly: false),
             Container(
               margin: EdgeInsets.only(top: 15.h),
               padding: EdgeInsets.symmetric(vertical: 10.h, horizontal: 20.w),
@@ -86,7 +86,7 @@ class _CreateOrderViewState extends State<CreateOrderView> {
                 ),
               ),
             ),
-            CustomTextField(labelName: "Package", borderRadius: true, controller: textControllers[1], focusNode: focusNodes[1], requestfocusNode: focusNodes[2], unFocus: false, readOnly: true),
+            CustomTextField(labelName: "package", borderRadius: true, controller: textControllers[1], focusNode: focusNodes[1], requestfocusNode: focusNodes[2], unFocus: false, readOnly: true),
             PhoneNumber(mineFocus: focusNodes[2], controller: textControllers[2], requestFocus: focusNodes[3], style: false, unFocus: true),
             CustomTextField(labelName: "Client Name", borderRadius: true, controller: textControllers[3], focusNode: focusNodes[3], requestfocusNode: focusNodes[4], unFocus: false, readOnly: true),
             CustomTextField(labelName: "Client Address", borderRadius: true, controller: textControllers[4], focusNode: focusNodes[4], requestfocusNode: focusNodes[5], unFocus: false, readOnly: true),
@@ -115,16 +115,26 @@ class _CreateOrderViewState extends State<CreateOrderView> {
             Obx(() {
               return salesController.selectedProductsList.isEmpty
                   ? const SizedBox.shrink()
-                  : ListView.builder(
-                      itemCount: salesController.selectedProductsList.length,
-                      shrinkWrap: true,
-                      itemBuilder: (BuildContext context, int index) {
-                        final ProductModel product = salesController.selectedProductsList[index]['product'];
-                        return ProductCardMine(
-                          count: int.parse(salesController.selectedProductsList[index]['count'].toString()),
-                          product: product,
-                        );
-                      },
+                  : Wrap(
+                      children: [
+                        Padding(
+                          padding: EdgeInsets.only(top: 10.h, left: 10.w, bottom: 10.h),
+                          child: Text(
+                            "Selected products",
+                            style: TextStyle(color: Colors.black, fontFamily: gilroySemiBold, fontSize: 22.sp),
+                          ),
+                        ),
+                        ListView.builder(
+                          itemCount: salesController.selectedProductsList.length,
+                          shrinkWrap: true,
+                          itemBuilder: (BuildContext context, int index) {
+                            final ProductModel product = salesController.selectedProductsList[index]['product'];
+                            return ProductCardMine(
+                              product: product,
+                            );
+                          },
+                        ),
+                      ],
                     );
             }),
             AgreeButton(
@@ -135,66 +145,22 @@ class _CreateOrderViewState extends State<CreateOrderView> {
             AgreeButton(
                 onTap: () {
                   if (_formKey.currentState!.validate()) {
-                    sumbitSale();
+                    if (salesController.selectedProductsList.isEmpty) {
+                      showSnackBar('Error', 'Please select one or more products', Colors.red);
+                    } else {
+                      salesController.sumbitSale(textControllers: textControllers, status: selectedStatus);
+                    }
                   } else {
                     showSnackBar('Error', 'Please fill the blanks', Colors.red);
                   }
-
-                  showSnackBar("Done", "All missing fields changed", Colors.green);
                 },
-                text: 'Submit')
+                text: 'Submit'),
+            SizedBox(
+              height: 30.h,
+            )
           ],
         ),
       ),
     );
-  }
-
-  sumbitSale() {
-    double sumCost = 0.0;
-    double sumPrice = 0.0;
-    for (var element in salesController.selectedProductsList) {
-      final ProductModel product = element['product'];
-      sumCost += double.parse(product.cost.toString()).toDouble() * int.parse(element['count'].toString());
-      sumPrice += double.parse(product.sellPrice.toString()).toDouble() * int.parse(element['count'].toString());
-      int.parse(product.quantity.toString()) - int.parse(element['count'].toString());
-      FirebaseFirestore.instance.collection('products').doc(product.documentID).update({'quantity': int.parse(product.quantity.toString()) - int.parse(element['count'].toString())});
-    }
-    sumPrice -= double.parse(textControllers[7].text.toString());
-    FirebaseFirestore.instance.collection('sales').add({
-      'client_address': textControllers[4].text,
-      'client_name': textControllers[3].text,
-      'client_number': textControllers[2].text,
-      'coupon': textControllers[5].text,
-      'date': textControllers[0].text,
-      'discount': textControllers[7].text,
-      'note': textControllers[6].text,
-      'package': textControllers[1].text,
-      'status': selectedStatus,
-      'product_count': salesController.selectedProductsList.length.toString(),
-      'sum_price': sumPrice.toString(),
-      'sum_cost': sumCost.toString(),
-    }).then((value) {
-      for (var element in salesController.selectedProductsList) {
-        final ProductModel product = element['product'];
-        FirebaseFirestore.instance.collection('sales').doc(value.id).collection('products').add({
-          'brand': product.brandName,
-          'category': product.category,
-          'cost': product.cost,
-          'gramm': product.gramm,
-          'image': product.image,
-          'location': product.location,
-          'material': product.material,
-          'name': product.name,
-          'note': product.note,
-          'package': product.package,
-          'quantity': element['count'],
-          'sell_price': product.sellPrice,
-        });
-      }
-
-      // for (var controller in textControllers) {
-      //   controller.clear();
-      // }
-    });
   }
 }

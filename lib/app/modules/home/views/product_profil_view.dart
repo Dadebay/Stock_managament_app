@@ -4,17 +4,14 @@ import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
-import 'package:http/http.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:path/path.dart';
 import 'package:stock_managament_app/app/data/models/product_model.dart';
 import 'package:stock_managament_app/app/modules/home/controllers/home_controller.dart';
 import 'package:stock_managament_app/constants/buttons/agree_button_view.dart';
 import 'package:stock_managament_app/constants/constants.dart';
-import 'package:flutter_iconly/flutter_iconly.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:stock_managament_app/constants/custom_app_bar.dart';
 import 'package:stock_managament_app/constants/custom_text_field.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:stock_managament_app/constants/widgets.dart';
@@ -34,7 +31,7 @@ class _ProductProfilViewState extends State<ProductProfilView> {
   List<bool> readOnlyStates = List.generate(9, (_) => false);
   List<String> fieldLabels = ['Product Name', 'Category', 'Brand', 'Gramm', 'Material', 'Sell Price', 'Location', 'Quantity'];
   String imageURL = "";
-
+  final HomeController _homeController = Get.put(HomeController());
   void changeData() {
     imageURL = widget.product.image!;
     updateFieldIfNotEmpty(widget.product.name, 0);
@@ -93,12 +90,14 @@ class _ProductProfilViewState extends State<ProductProfilView> {
       List<int> imageBytes = _photo!.readAsBytesSync();
       String base64Image = base64Encode(imageBytes);
       await storageRef.putString(base64Image, format: PutStringFormat.base64, metadata: SettableMetadata(contentType: 'image/png')).then((p0) async {
-        showSnackBar("Uploaded", "Image succefully uploaded", Colors.green);
+        showSnackBar("copySucces", "uploadImageProcessDone", Colors.green);
         var dowurl = await storageRef.getDownloadURL();
         String url = dowurl.toString();
         FirebaseFirestore.instance.collection('products').doc(widget.product.documentID).update({'image': url});
         imageURL = url;
         setState(() {});
+        _homeController.collectionReference.get();
+        Get.back();
       });
     } catch (e) {
       Get.back();
@@ -108,7 +107,7 @@ class _ProductProfilViewState extends State<ProductProfilView> {
 
   showImageUploadDialog() {
     Get.defaultDialog(
-      title: 'Selected Image',
+      title: 'selectedImage'.tr,
       content: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisAlignment: MainAxisAlignment.center,
@@ -136,7 +135,7 @@ class _ProductProfilViewState extends State<ProductProfilView> {
             onTap: () {
               uploadFile();
             },
-            text: "Upload Image",
+            text: "uploadImage",
           ),
         ],
       ),
@@ -146,24 +145,7 @@ class _ProductProfilViewState extends State<ProductProfilView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        foregroundColor: Colors.white,
-        scrolledUnderElevation: 0,
-        backgroundColor: Colors.white,
-        title: Text(
-          widget.product.name!,
-          style: TextStyle(color: Colors.black, fontFamily: gilroyBold, fontSize: 18.sp),
-        ),
-        centerTitle: true,
-        leading: IconButton(
-            onPressed: () {
-              Get.back();
-            },
-            icon: const Icon(
-              IconlyLight.arrowLeftCircle,
-              color: Colors.black,
-            )),
-      ),
+      appBar: CustomAppBar(backArrow: true, actionIcon: false, name: widget.product.name!),
       body: SingleChildScrollView(
         child: Padding(
           padding: EdgeInsets.symmetric(horizontal: 15.w),
@@ -190,8 +172,8 @@ class _ProductProfilViewState extends State<ProductProfilView> {
                   placeholder: (context, url) => const Center(
                     child: CircularProgressIndicator(),
                   ),
-                  errorWidget: (context, url, error) => const Center(
-                    child: Text('No Image'),
+                  errorWidget: (context, url, error) => Center(
+                    child: Text('noImage'.tr),
                   ),
                 ),
               ),
@@ -238,7 +220,7 @@ class _ProductProfilViewState extends State<ProductProfilView> {
       children: [
         CustomTextField(
             readOnly: readOnlyStates[0],
-            labelName: 'Product Name',
+            labelName: 'productName',
             maxline: 3,
             borderRadius: true,
             controller: textControllers[0],
@@ -246,40 +228,43 @@ class _ProductProfilViewState extends State<ProductProfilView> {
             requestfocusNode: focusNodes[1],
             unFocus: true),
         CustomTextField(
-            readOnly: readOnlyStates[1], labelName: 'Category', borderRadius: true, controller: textControllers[1], focusNode: focusNodes[1], requestfocusNode: focusNodes[2], unFocus: true),
-        CustomTextField(readOnly: readOnlyStates[2], labelName: 'Brand', borderRadius: true, controller: textControllers[2], focusNode: focusNodes[2], requestfocusNode: focusNodes[3], unFocus: true),
-        CustomTextField(readOnly: readOnlyStates[3], labelName: 'Gramm', borderRadius: true, controller: textControllers[3], focusNode: focusNodes[3], requestfocusNode: focusNodes[4], unFocus: true),
+            readOnly: readOnlyStates[1], labelName: 'category', borderRadius: true, controller: textControllers[1], focusNode: focusNodes[1], requestfocusNode: focusNodes[2], unFocus: true),
+        CustomTextField(readOnly: readOnlyStates[2], labelName: 'brand', borderRadius: true, controller: textControllers[2], focusNode: focusNodes[2], requestfocusNode: focusNodes[3], unFocus: true),
+        CustomTextField(readOnly: readOnlyStates[3], labelName: 'gramm', borderRadius: true, controller: textControllers[3], focusNode: focusNodes[3], requestfocusNode: focusNodes[4], unFocus: true),
         CustomTextField(
-            readOnly: readOnlyStates[4], labelName: 'Material', borderRadius: true, controller: textControllers[4], focusNode: focusNodes[4], requestfocusNode: focusNodes[5], unFocus: true),
+            readOnly: readOnlyStates[4], labelName: 'material', borderRadius: true, controller: textControllers[4], focusNode: focusNodes[4], requestfocusNode: focusNodes[5], unFocus: true),
+        CustomTextField(readOnly: readOnlyStates[5], labelName: 'price', borderRadius: true, controller: textControllers[5], focusNode: focusNodes[5], requestfocusNode: focusNodes[6], unFocus: true),
         CustomTextField(
-            readOnly: readOnlyStates[5], labelName: 'Sell Price', borderRadius: true, controller: textControllers[5], focusNode: focusNodes[5], requestfocusNode: focusNodes[6], unFocus: true),
+            readOnly: readOnlyStates[6], labelName: 'location', borderRadius: true, controller: textControllers[6], focusNode: focusNodes[6], requestfocusNode: focusNodes[7], unFocus: true),
         CustomTextField(
-            readOnly: readOnlyStates[6], labelName: 'Location', borderRadius: true, controller: textControllers[6], focusNode: focusNodes[6], requestfocusNode: focusNodes[7], unFocus: true),
-        CustomTextField(
-            readOnly: readOnlyStates[7], labelName: 'Quantity', borderRadius: true, controller: textControllers[7], focusNode: focusNodes[7], requestfocusNode: focusNodes[1], unFocus: true),
-        AgreeButton(
-          onTap: () {
-            _showPicker(context);
-          },
-          text: "Upload Image",
-        ),
+            readOnly: readOnlyStates[7], labelName: 'quantity', borderRadius: true, controller: textControllers[7], focusNode: focusNodes[7], requestfocusNode: focusNodes[1], unFocus: true),
+        widget.product.image!.isEmpty || widget.product.image == ''
+            ? AgreeButton(
+                onTap: () {
+                  _showPicker(context);
+                },
+                text: "uploadImage",
+              )
+            : const SizedBox.shrink(),
         AgreeButton(
           onTap: () async {
-            print(readOnlyStates);
-            await FirebaseFirestore.instance.collection('products').doc(widget.product.documentID).update({
-              "name": textControllers[0].text,
-              "category": textControllers[1].text,
-              "brand": textControllers[2].text,
-              "gramm": int.parse(textControllers[3].text.toString()),
-              "material": textControllers[4].text,
-              "sell_price": textControllers[5].text,
-              "location": textControllers[6].text,
-              "quantity": int.parse(textControllers[7].text.toString()),
-            }).then((value) {
-              showSnackBar("Done", "All missing fields changed", Colors.green);
-
-              return value;
-            });
+            for (var element in readOnlyStates) {
+              if (element == true) {
+                await FirebaseFirestore.instance.collection('products').doc(widget.product.documentID).update({
+                  "name": textControllers[0].text,
+                  "category": textControllers[1].text,
+                  "brand": textControllers[2].text,
+                  "gramm": int.parse(textControllers[3].text.toString()),
+                  "material": textControllers[4].text,
+                  "sell_price": textControllers[5].text,
+                  "location": textControllers[6].text,
+                  "quantity": int.parse(textControllers[7].text.toString()),
+                }).then((value) {
+                  showSnackBar("copySucces", "changesUpdated", Colors.green);
+                  return value;
+                });
+              }
+            }
           },
           text: "agree",
         ),

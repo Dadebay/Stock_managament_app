@@ -19,6 +19,7 @@ class ProductCard extends StatelessWidget {
         if (!orderView) Get.to(() => ProductProfilView(product: product));
       },
       child: Container(
+        color: Colors.white,
         margin: EdgeInsets.only(top: 10.h),
         padding: EdgeInsets.symmetric(vertical: 8.h),
         child: Row(
@@ -39,12 +40,12 @@ class ProductCard extends StatelessWidget {
                     style: TextStyle(color: Colors.black, fontFamily: gilroySemiBold, fontSize: 16.sp),
                   ),
                   Text(
-                    "Quantity: ${product.quantity}",
+                    "${"quantity".tr}: ${product.quantity}",
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(color: Colors.grey, fontFamily: gilroyRegular, fontSize: 14.sp),
                   ),
                   Text(
-                    "Sell price: ${product.sellPrice} TMT",
+                    "${"price".tr} ${product.sellPrice} TMT",
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(color: Colors.grey, fontFamily: gilroyRegular, fontSize: 14.sp),
                   ),

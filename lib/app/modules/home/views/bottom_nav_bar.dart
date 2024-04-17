@@ -3,7 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_iconly/flutter_iconly.dart';
 import 'package:get/get.dart';
-import 'package:stock_managament_app/app/modules/sales/views/sales_view.dart';
+import 'package:stock_managament_app/app/modules/sales/views/ordered_cards_view.dart';
 import 'package:stock_managament_app/constants/constants.dart';
 
 import 'home_view.dart';

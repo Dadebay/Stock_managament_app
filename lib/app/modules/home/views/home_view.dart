@@ -8,6 +8,7 @@ import 'package:stock_managament_app/constants/cards/product_card.dart';
 import 'package:stock_managament_app/constants/constants.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_iconly/flutter_iconly.dart';
+import 'package:stock_managament_app/constants/custom_app_bar.dart';
 import 'package:stock_managament_app/constants/widgets.dart';
 
 class HomeView extends StatefulWidget {
@@ -19,26 +20,33 @@ class HomeView extends StatefulWidget {
 
 class _HomeViewState extends State<HomeView> {
   final HomeController _homeController = Get.put(HomeController());
-  int sum = 0;
+  @override
+  void initState() {
+    super.initState();
+    _homeController.collectionReference.get().then((value) {
+      _homeController.productsListHomeView = value.docs;
+      setState(() {});
+      _homeController.stockInHand.value = 0;
+      _homeController.totalProductCount.value = value.docs.length;
+      for (var element in value.docs) {
+        _homeController.updateStock(int.parse(element['quantity'].toString()));
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         backgroundColor: Colors.white,
-        appBar: AppBar(
-          title: Text(
-            'products'.tr,
-            style: TextStyle(color: Colors.black, fontFamily: gilroyBold, fontSize: 20.sp),
-          ),
-          centerTitle: false,
-          backgroundColor: Colors.white,
-          actions: [
-            IconButton(
-                onPressed: () {
-                  Get.to(() => SearchView());
-                },
-                icon: const Icon(IconlyLight.search))
-          ],
+        appBar: CustomAppBar(
+          backArrow: false,
+          actionIcon: true,
+          icon: IconButton(
+              onPressed: () {
+                Get.to(() => SearchView(orderedProductsSearch: false, productList: _homeController.productsListHomeView));
+              },
+              icon: const Icon(IconlyLight.search)),
+          name: "products",
         ),
         body: Padding(
           padding: EdgeInsets.symmetric(horizontal: 15.w),
@@ -70,43 +78,32 @@ class _HomeViewState extends State<HomeView> {
               ],
             ),
             Expanded(
-                child: StreamBuilder(
-                    stream: FirebaseFirestore.instance.collection('products').snapshots(),
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return spinKit();
-                      } else if (snapshot.hasError) {
-                        return errorData();
-                      } else if (snapshot.data!.docs.isEmpty) {
-                        return emptyData();
-                      } else if (snapshot.hasData) {
-                        _homeController.changeValues(snapshot.data!.docs);
-                        return ListView.builder(
-                          itemCount: snapshot.data!.docs.length,
-                          physics: const BouncingScrollPhysics(),
-                          itemBuilder: (BuildContext context, int index) {
-                            final product = ProductModel(
-                              name: snapshot.data!.docs[index]['name'],
-                              brandName: snapshot.data!.docs[index]['brand'].toString(),
-                              category: snapshot.data!.docs[index]['category'].toString(),
-                              cost: snapshot.data!.docs[index]['cost'],
-                              gramm: snapshot.data!.docs[index]['gramm'],
-                              image: snapshot.data!.docs[index]['image'].toString(),
-                              location: snapshot.data!.docs[index]['location'].toString(),
-                              material: snapshot.data!.docs[index]['material'].toString(),
-                              quantity: snapshot.data!.docs[index]['quantity'],
-                              sellPrice: snapshot.data!.docs[index]['sell_price'].toString(),
-                              note: snapshot.data!.docs[index]['note'].toString(),
-                              package: snapshot.data!.docs[index]['package'].toString(),
-                              documentID: snapshot.data!.docs[index].id,
-                            );
-                            return ProductCard(product: product, orderView: false);
-                          },
-                        );
-                      }
-
-                      return const Text("No data");
-                    }))
+                child: _homeController.productsListHomeView.isEmpty
+                    ? _homeController.stockInHand.value == 0
+                        ? spinKit()
+                        : emptyData()
+                    : ListView.builder(
+                        itemCount: _homeController.productsListHomeView.length,
+                        physics: const BouncingScrollPhysics(),
+                        itemBuilder: (BuildContext context, int index) {
+                          final product = ProductModel(
+                            name: _homeController.productsListHomeView[index]['name'],
+                            brandName: _homeController.productsListHomeView[index]['brand'].toString(),
+                            category: _homeController.productsListHomeView[index]['category'].toString(),
+                            cost: _homeController.productsListHomeView[index]['cost'],
+                            gramm: _homeController.productsListHomeView[index]['gramm'],
+                            image: _homeController.productsListHomeView[index]['image'].toString(),
+                            location: _homeController.productsListHomeView[index]['location'].toString(),
+                            material: _homeController.productsListHomeView[index]['material'].toString(),
+                            quantity: _homeController.productsListHomeView[index]['quantity'],
+                            sellPrice: _homeController.productsListHomeView[index]['sell_price'].toString(),
+                            note: _homeController.productsListHomeView[index]['note'].toString(),
+                            package: _homeController.productsListHomeView[index]['package'].toString(),
+                            documentID: _homeController.productsListHomeView[index].id,
+                          );
+                          return ProductCard(product: product, orderView: false);
+                        },
+                      )),
           ],
         ));
   }
