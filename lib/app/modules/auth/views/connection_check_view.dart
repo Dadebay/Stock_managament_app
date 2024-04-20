@@ -4,6 +4,7 @@ import 'dart:async';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:lottie/lottie.dart';
@@ -122,6 +123,6 @@ class _ConnectionCheckViewState extends State {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(backgroundColor: kPrimaryColor2, body: Center(child: Lottie.asset(loading2Lottie)));
+    return Scaffold(backgroundColor: backgroundColor, body: Center(child: Lottie.asset(loadingLottie, width: 70.w, height: 70.h)));
   }
 }

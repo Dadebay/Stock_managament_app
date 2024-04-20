@@ -5,6 +5,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:lottie/lottie.dart';
+import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:stock_managament_app/constants/constants.dart';
 import 'package:stock_managament_app/constants/custom_text_field.dart';
 
@@ -35,10 +37,8 @@ SnackbarController showSnackBar(String title, String subtitle, Color color) {
 }
 
 Center spinKit() {
-  return const Center(
-    child: CircularProgressIndicator(
-      color: kPrimaryColor,
-    ),
+  return Center(
+    child: Lottie.asset(loadingLottie, width: 70.w, height: 70.h),
   );
 }
 
@@ -50,6 +50,29 @@ Center errorData() {
 
 Center emptyData() {
   return const Center(child: Text("Empty Data"));
+}
+
+CustomFooter customFooter() {
+  return CustomFooter(
+    builder: (BuildContext context, LoadStatus? mode) {
+      Widget body;
+      if (mode == LoadStatus.idle) {
+        body = const Text("pull up load");
+      } else if (mode == LoadStatus.loading) {
+        body = spinKit();
+      } else if (mode == LoadStatus.failed) {
+        body = const Text("Load Failed!Click retry!");
+      } else if (mode == LoadStatus.canLoading) {
+        body = const Text("release to load more");
+      } else {
+        body = const Text("No more Data");
+      }
+      return SizedBox(
+        height: 55.0,
+        child: Center(child: body),
+      );
+    },
+  );
 }
 
 Expanded homePageTopWidget({required String stockInHand, required String totalProducts}) {

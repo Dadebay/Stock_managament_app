@@ -5,10 +5,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_iconly/flutter_iconly.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:stock_managament_app/app/data/models/product_model.dart';
 import 'package:stock_managament_app/app/modules/sales/controllers/sales_controller.dart';
 import 'package:stock_managament_app/constants/cards/product_card_with_counter.dart';
 import 'package:stock_managament_app/constants/constants.dart';
+import 'package:stock_managament_app/constants/widgets.dart';
 
 class SelectProductsView extends StatefulWidget {
   const SelectProductsView({super.key});
@@ -22,6 +24,95 @@ class _SelectProductsViewState extends State<SelectProductsView> {
   final SalesController salesController = Get.put(SalesController());
   TextEditingController controller = TextEditingController();
   final List _searchResult = [];
+
+  final RefreshController _refreshController = RefreshController(initialRefresh: false);
+
+  void _onRefresh() async {
+    await Future.delayed(const Duration(milliseconds: 1000));
+    salesController.productList.clear();
+    salesController.productListDocuments.clear();
+    setState(() {});
+
+    await FirebaseFirestore.instance.collection('products').orderBy("date", descending: true).limit(limit).get().then((value) {
+      salesController.productListDocuments.addAll(value.docs);
+      for (var element in value.docs) {
+        final product = ProductModel(
+          name: element['name'],
+          brandName: element['brand'].toString(),
+          category: element['category'].toString(),
+          cost: element['cost'],
+          gramm: element['gramm'],
+          image: element['image'].toString(),
+          location: element['location'].toString(),
+          material: element['material'].toString(),
+          quantity: element['quantity'],
+          sellPrice: element['sell_price'].toString(),
+          note: element['note'].toString(),
+          package: element['package'].toString(),
+          documentID: element.id,
+        );
+        salesController.addProduct(
+          product: product,
+          count: 0,
+        );
+      }
+      setState(() {});
+    });
+
+    _refreshController.refreshCompleted();
+  }
+
+  void _onLoading() async {
+    await Future.delayed(const Duration(milliseconds: 1000));
+    if (mounted) {
+      setState(() {});
+    }
+    int length = salesController.productList.length;
+
+    print("asdasdasd");
+    print(salesController.productListDocuments.last);
+    print(salesController.productListDocuments.last);
+    print(salesController.productListDocuments.last);
+    print(salesController.productListDocuments.last);
+    print(salesController.productListDocuments.last);
+    print(salesController.productListDocuments.last);
+    final secondQuery = products.orderBy("date", descending: true).startAfterDocument(salesController.productListDocuments.last).limit(limit);
+    print("asdasdasd");
+    secondQuery.get().then((value) {
+      print(value.docs);
+      salesController.productListDocuments.addAll(value.docs);
+
+      for (var element in value.docs) {
+        final product = ProductModel(
+          name: element['name'],
+          brandName: element['brand'].toString(),
+          category: element['category'].toString(),
+          cost: element['cost'],
+          gramm: element['gramm'],
+          image: element['image'].toString(),
+          location: element['location'].toString(),
+          material: element['material'].toString(),
+          quantity: element['quantity'],
+          sellPrice: element['sell_price'].toString(),
+          note: element['note'].toString(),
+          package: element['package'].toString(),
+          documentID: element.id,
+        );
+        salesController.addProduct(
+          product: product,
+          count: 0,
+        );
+      }
+      print(length);
+      print(salesController.productList.length);
+      setState(() {});
+      if (length == salesController.productList.length) {
+        showSnackBar("Done", "End of the products", Colors.green);
+      }
+    });
+
+    _refreshController.loadComplete();
+  }
 
   @override
   void initState() {
@@ -138,16 +229,25 @@ class _SelectProductsViewState extends State<SelectProductsView> {
                           );
                         },
                       )
-                    : ListView.builder(
-                        padding: EdgeInsets.symmetric(horizontal: 5.w),
-                        itemCount: salesController.productList.length,
-                        physics: const BouncingScrollPhysics(),
-                        itemBuilder: (BuildContext context, int index) {
-                          return ProductCardMine(
-                            product: salesController.productList[index]['product'],
-                            // count: int.parse(salesController.productList[index]['count'].toString()),
-                          );
-                        },
+                    : SmartRefresher(
+                        enablePullDown: true,
+                        enablePullUp: true,
+                        header: const WaterDropHeader(),
+                        footer: customFooter(),
+                        controller: _refreshController,
+                        onRefresh: _onRefresh,
+                        onLoading: _onLoading,
+                        child: ListView.builder(
+                          padding: EdgeInsets.symmetric(horizontal: 5.w),
+                          itemCount: salesController.productList.length,
+                          physics: const BouncingScrollPhysics(),
+                          itemBuilder: (BuildContext context, int index) {
+                            return ProductCardMine(
+                              product: salesController.productList[index]['product'],
+                              // count: int.parse(salesController.productList[index]['count'].toString()),
+                            );
+                          },
+                        ),
                       ),
               );
             }),

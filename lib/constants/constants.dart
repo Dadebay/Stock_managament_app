@@ -5,6 +5,7 @@ const Color kPrimaryColor1 = Color(0xff1f2123);
 const Color kPrimaryColor2 = Color(0xff6366f1);
 const Color backgroundColor = Color(0xfff2f2f2);
 const Color kBlackColor = Color(0xff2b2b2b);
+const int limit = 5;
 
 ///BorderRadius
 const BorderRadius borderRadius5 = BorderRadius.all(Radius.circular(5));
@@ -33,6 +34,5 @@ const String appName = 'Kümüş';
 const String loremImpsum =
     'Lorem ipsum, yaygın olarak kullanılan bir yer tutucu metne verilen isimdir. Dolgu veya sahte metin olarak da bilinen bu tip yer tutucu metinler, aslında anlamlı bir şey söylemeden bir alanı doldurmaya yarayan metinlerdir,Lorem ipsum, yaygın olarak kullanılan bir yer tutucu metne verilen isimdir. Dolgu veya sahte metin olarak da bilinen bu tip yer tutucu metinler, aslında anlamlı bir şey söylemeden bir alanı doldurmaya yarayan metinlerdir,Lorem ipsum, yaygın olarak kullanılan bir yer tutucu metne verilen isimdir. Dolgu veya sahte metin olarak da bilinen bu tip yer tutucu metinler, aslında anlamlı bir şey söylemeden bir alanı doldurmaya yarayan metinlerdir,Lorem ipsum, yaygın olarak kullanılan bir yer tutucu metne verilen isimdir. Dolgu veya sahte metin olarak da bilinen bu tip yer tutucu metinler, aslında anlamlı bir şey söylemeden bir alanı doldurmaya yarayan metinlerdir';
 /////////////////////////////////////////////////
-const String loading1Lottie = 'assets/lottie/loading1.json';
-const String loading2Lottie = 'assets/lottie/loading2.json';
-const String loading3Lottie = 'assets/lottie/loading3.json';
+const String loadingLottie = 'assets/lottie/loading.json';
+const String noDataLottie = 'assets/lottie/noData.json';

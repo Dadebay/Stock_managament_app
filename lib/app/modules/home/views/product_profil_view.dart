@@ -145,7 +145,7 @@ class _ProductProfilViewState extends State<ProductProfilView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CustomAppBar(backArrow: true, actionIcon: false, name: widget.product.name!),
+      appBar: CustomAppBar(backArrow: true, centerTitle: true, actionIcon: false, name: widget.product.name!),
       body: SingleChildScrollView(
         child: Padding(
           padding: EdgeInsets.symmetric(horizontal: 15.w),
