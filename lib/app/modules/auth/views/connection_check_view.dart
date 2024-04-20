@@ -3,11 +3,13 @@
 import 'dart:async';
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:lottie/lottie.dart';
 import 'package:stock_managament_app/app/modules/home/controllers/home_controller.dart';
 import 'package:stock_managament_app/app/modules/home/views/bottom_nav_bar.dart';
-import 'package:stock_managament_app/app/modules/home/views/login_view.dart';
+import 'package:stock_managament_app/app/modules/auth/views/login_view.dart';
 import 'package:stock_managament_app/constants/constants.dart';
 
 class ConnectionCheckView extends StatefulWidget {
@@ -25,14 +27,9 @@ class _ConnectionCheckViewState extends State {
   }
 
   GetStorage storage = GetStorage();
-
   final HomeController homeController = Get.put(HomeController());
   void checkConnection() async {
     bool loginValue = storage.read('login') ?? false;
-    print('[][][][][][][][][][][]][]');
-    print('[][][][][][][][][][][]][]');
-    print(loginValue);
-    print('[][][][][][][][][][][]][]');
     try {
       final result = await InternetAddress.lookup('google.com');
       if (result.isNotEmpty && result.first.rawAddress.isNotEmpty) {
@@ -40,7 +37,6 @@ class _ConnectionCheckViewState extends State {
           Navigator.of(context).pushReplacement(
             MaterialPageRoute(
               builder: (BuildContext context) {
-                // return const BottomNavBar();
                 return loginValue ? const BottomNavBar() : const SignUpView();
               },
             ),
@@ -73,36 +69,24 @@ class _ConnectionCheckViewState extends State {
                   children: <Widget>[
                     Text(
                       'noConnection1'.tr,
-                      style: const TextStyle(
-                        fontSize: 24.0,
-                        color: kPrimaryColor2,
-                        fontFamily: gilroyMedium,
-                      ),
+                      style: const TextStyle(fontSize: 24.0, color: kPrimaryColor2, fontFamily: gilroyMedium),
                     ),
                     Padding(
                       padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 5),
                       child: Text(
                         'noConnection2'.tr,
                         textAlign: TextAlign.center,
-                        style: const TextStyle(
-                          color: Colors.black,
-                          fontFamily: gilroyMedium,
-                          fontSize: 16.0,
-                        ),
+                        style: const TextStyle(color: Colors.black, fontFamily: gilroyMedium, fontSize: 16.0),
                       ),
                     ),
                     ElevatedButton(
                       onPressed: () {
                         Navigator.of(context).pop();
-                        Future.delayed(const Duration(milliseconds: 1000), () {
-                          checkConnection();
-                        });
+                        Future.delayed(const Duration(milliseconds: 1000), () => checkConnection());
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: kPrimaryColor2,
-                        shape: const RoundedRectangleBorder(
-                          borderRadius: borderRadius10,
-                        ),
+                        shape: const RoundedRectangleBorder(borderRadius: borderRadius10),
                         padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 14),
                       ),
                       child: Text(
@@ -123,15 +107,9 @@ class _ConnectionCheckViewState extends State {
                 maxRadius: 70,
                 minRadius: 60,
                 child: Container(
-                  decoration: const BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: Colors.white,
-                  ),
+                  decoration: const BoxDecoration(shape: BoxShape.circle, color: Colors.white),
                   child: ClipRRect(
-                    child: Image.asset(
-                      'assets/icons/noconnection.gif',
-                      fit: BoxFit.fill,
-                    ),
+                    child: Image.asset('assets/icons/noconnection.gif', fit: BoxFit.fill),
                   ),
                 ),
               ),
@@ -144,13 +122,6 @@ class _ConnectionCheckViewState extends State {
 
   @override
   Widget build(BuildContext context) {
-    final Size size = MediaQuery.of(context).size;
-
-    return const Scaffold(
-      backgroundColor: kPrimaryColor2,
-      body: Center(
-        child: CircularProgressIndicator(),
-      ),
-    );
+    return Scaffold(backgroundColor: kPrimaryColor2, body: Center(child: Lottie.asset(loading2Lottie)));
   }
 }

@@ -18,14 +18,10 @@ class SignUpView extends StatefulWidget {
 
 class _SignUpViewState extends State<SignUpView> {
   FocusNode focusNode = FocusNode();
-
   FocusNode focusNode1 = FocusNode();
-
   TextEditingController textEditingController = TextEditingController();
-
   TextEditingController textEditingController1 = TextEditingController();
   final _formKey = GlobalKey<FormState>();
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(

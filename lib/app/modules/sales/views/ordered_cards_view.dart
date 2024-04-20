@@ -1,15 +1,10 @@
-import 'dart:convert';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_ui_firestore/firebase_ui_firestore.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_iconly/flutter_iconly.dart';
 
 import 'package:get/get.dart';
-import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:stock_managament_app/app/data/models/order_model.dart';
-import 'package:stock_managament_app/app/modules/sales/controllers/sales_controller.dart';
 import 'package:stock_managament_app/app/modules/sales/views/create_order.dart';
 import 'package:stock_managament_app/app/modules/search/views/search_view.dart';
 import 'package:stock_managament_app/constants/cards/sales_card.dart';
@@ -27,7 +22,7 @@ class SalesView extends StatefulWidget {
 }
 
 class _SalesViewState extends State<SalesView> {
-  SortOption _selectedSortOption = SortOption.date; // Default sort option
+  SortOption _selectedSortOption = SortOption.date;
 
   void _showSortDialog() {
     showDialog(
@@ -83,63 +78,68 @@ class _SalesViewState extends State<SalesView> {
     });
   }
 
-  final SalesController salesController = Get.put(SalesController());
-  @override
-  void initState() {
-    super.initState();
-    salesController.collectionReference.orderBy("date", descending: true).get().then((value) {
-      salesController.cardsList = value.docs;
-      for (var element in value.docs) {
-        salesController.cardsListSaveDates.add(element['date']);
-      }
+  bool onRefresh = false;
+  Future<Null> _refreshLocalGallery() async {
+    print('refreshing stocks...');
+    onRefresh = true;
+    setState(() {});
+    Future.delayed(const Duration(seconds: 1), () {
+      onRefresh = false;
       setState(() {});
     });
+    print(onRefresh);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Get.to(() => const CreateOrderView());
-        },
-        backgroundColor: kPrimaryColor2,
-        child: const Icon(Icons.add, color: Colors.white),
-      ),
+          onPressed: () {
+            Get.to(() => const CreateOrderView());
+          },
+          backgroundColor: kPrimaryColor2,
+          child: const Icon(Icons.add, color: Colors.white)),
       appBar: appBar(),
-      body: FirestoreListView<Map<String, dynamic>>(
-        query: FirebaseFirestore.instance.collection('sales').orderBy("date", descending: true),
-        pageSize: 3,
-        shrinkWrap: true,
-        showFetchingIndicator: true,
-        fetchingIndicatorBuilder: (context) => const Center(child: CircularProgressIndicator()),
-        emptyBuilder: (context) => const Text('No data'),
-        errorBuilder: (context, error, stackTrace) => Text(error.toString()),
-        loadingBuilder: (context) => const Center(
-            child: CircularProgressIndicator(
-          color: Colors.amber,
-        )),
-        itemBuilder: (context, doc) {
-          Map<String, dynamic> user = doc.data();
-          final order = OrderModel(
-              orderID: doc.id,
-              clientAddress: user['client_address'],
-              clientName: user['client_name'],
-              clientNumber: user['client_number'],
-              coupon: user['coupon'],
-              date: user['date'],
-              discount: user['discount'],
-              note: user['note'],
-              package: user['package'],
-              status: user['status'],
-              sumCost: user['sum_cost'],
-              sumPrice: user['sum_price'],
-              products: user['product_count']);
-          return SalesCard(
-            index: 10,
-            order: order,
-          );
-        },
+      body: RefreshIndicator(
+        onRefresh: _refreshLocalGallery,
+        child: onRefresh
+            ? const Center(
+                child: CircularProgressIndicator(),
+              )
+            : FirestoreListView<Map<String, dynamic>>(
+                query: FirebaseFirestore.instance.collection('sales').orderBy("date", descending: true),
+                pageSize: 3,
+                shrinkWrap: true,
+                showFetchingIndicator: true,
+                fetchingIndicatorBuilder: (context) => const Center(child: CircularProgressIndicator()),
+                emptyBuilder: (context) => const Text('No data'),
+                errorBuilder: (context, error, stackTrace) => Text(error.toString()),
+                loadingBuilder: (context) => const Center(
+                    child: CircularProgressIndicator(
+                  color: Colors.amber,
+                )),
+                itemBuilder: (context, doc) {
+                  Map<String, dynamic> user = doc.data();
+                  final order = OrderModel(
+                      orderID: doc.id,
+                      clientAddress: user['client_address'],
+                      clientName: user['client_name'],
+                      clientNumber: user['client_number'],
+                      coupon: user['coupon'],
+                      date: user['date'],
+                      discount: user['discount'],
+                      note: user['note'],
+                      package: user['package'],
+                      status: user['status'],
+                      sumCost: user['sum_cost'],
+                      sumPrice: user['sum_price'],
+                      products: user['product_count']);
+                  return SalesCard(
+                    docID: doc.id,
+                    order: order,
+                  );
+                },
+              ),
       ),
     );
   }
@@ -154,7 +154,11 @@ class _SalesViewState extends State<SalesView> {
           children: [
             IconButton(
                 onPressed: () {
-                  Get.to(() => SearchView(productList: salesController.cardsList, orderedProductsSearch: true));
+                  Get.to(() => SearchView(
+                        productList: const [],
+                        whereToSearch: 'orders',
+                        collectionReference: FirebaseFirestore.instance.collection('sales'),
+                      ));
                 },
                 icon: const Icon(IconlyLight.search, color: Colors.black)),
             IconButton(

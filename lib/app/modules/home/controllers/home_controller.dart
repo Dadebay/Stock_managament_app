@@ -18,9 +18,19 @@ class HomeController extends GetxController {
     storage.write('login', loginView.value);
   }
 
+  @override
+  void onInit() {
+    super.onInit();
+    collectionReference.get().then((value) {
+      productsListHomeView = value.docs;
+      stockInHand.value = 0;
+      totalProductCount.value = value.docs.length;
+      for (var element in value.docs) {
+        stockInHand.value += int.parse(element['quantity'].toString());
+      }
+    });
+  }
+
   CollectionReference collectionReference = FirebaseFirestore.instance.collection('products');
   List<QueryDocumentSnapshot<Object?>> productsListHomeView = [];
-  void updateStock(int quantity) {
-    stockInHand.value += quantity;
-  }
 }

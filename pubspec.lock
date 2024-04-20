@@ -9,6 +9,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.3.30"
+  archive:
+    dependency: transitive
+    description:
+      name: archive
+      sha256: "22600aa1e926be775fa5fe7e6894e7fb3df9efda8891c73f70fb3262399a432d"
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.4.10"
   async:
     dependency: transitive
     description:
@@ -97,6 +105,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.18.0"
+  convert:
+    dependency: transitive
+    description:
+      name: convert
+      sha256: "0f08b14755d163f6e2134cb58222dd25ea2a2ee8a195e53983d57c075324d592"
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.1.1"
   cross_file:
     dependency: transitive
     description:
@@ -201,38 +217,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.15.0"
-  firebase_database:
-    dependency: transitive
-    description:
-      name: firebase_database
-      sha256: f70072c5ad104c586f6ff08e7824c98f7fff6277debcef208871f6bdde5572e3
-      url: "https://pub.dev"
-    source: hosted
-    version: "10.5.2"
-  firebase_database_platform_interface:
-    dependency: transitive
-    description:
-      name: firebase_database_platform_interface
-      sha256: a8818dac4ac62be4d1c292f177794ebcf8a8d441bf7826e2d8c5dd0cbca6b336
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.2.5+30"
-  firebase_database_web:
-    dependency: transitive
-    description:
-      name: firebase_database_web
-      sha256: "4829d6afdfda19ab4a1ccc9e298dc2b00748c7d1f154b6332736a2b14540ee7b"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.2.5+2"
-  firebase_pagination:
-    dependency: "direct main"
-    description:
-      name: firebase_pagination
-      sha256: "46fad486feb9656d2b5198a30384d787efd602cef20d2fb33d9fb405f3e641de"
-      url: "https://pub.dev"
-    source: hosted
-    version: "3.1.0"
   firebase_storage:
     dependency: "direct main"
     description:
@@ -453,6 +437,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.18.1"
+  js:
+    dependency: transitive
+    description:
+      name: js
+      sha256: c1b2e9b5ea78c45e1a0788d29606ba27dc5f71f019f32ca5140f61ef071838cf
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.7.1"
   leak_tracker:
     dependency: transitive
     description:
@@ -485,6 +477,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.0.0"
+  lottie:
+    dependency: "direct main"
+    description:
+      name: lottie
+      sha256: ce2bb2605753915080e4ee47f036a64228c88dc7f56f7bc1dbe912d75b55b1e2
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.1.0"
   matcher:
     dependency: transitive
     description:
@@ -597,14 +597,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.1.8"
-  pull_to_refresh:
-    dependency: "direct main"
+  pointycastle:
+    dependency: transitive
     description:
-      name: pull_to_refresh
-      sha256: bbadd5a931837b57739cf08736bea63167e284e71fb23b218c8c9a6e042aad12
+      name: pointycastle
+      sha256: "79fbafed02cfdbe85ef3fd06c7f4bc2cbcba0177e61b765264853d4253b21744"
       url: "https://pub.dev"
     source: hosted
-    version: "2.0.0"
+    version: "3.9.0"
   rxdart:
     dependency: transitive
     description:

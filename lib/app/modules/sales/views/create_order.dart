@@ -146,7 +146,7 @@ class _CreateOrderViewState extends State<CreateOrderView> {
                   salesController.sumbitSale(textControllers: textControllers, status: selectedStatus);
                 }
               },
-              text: 'Submit'),
+              text: 'agree'),
           SizedBox(
             height: 30.h,
           )

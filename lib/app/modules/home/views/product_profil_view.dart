@@ -96,7 +96,7 @@ class _ProductProfilViewState extends State<ProductProfilView> {
         FirebaseFirestore.instance.collection('products').doc(widget.product.documentID).update({'image': url});
         imageURL = url;
         setState(() {});
-        _homeController.collectionReference.get();
+        // _homeController.collectionReference.get();
         Get.back();
       });
     } catch (e) {

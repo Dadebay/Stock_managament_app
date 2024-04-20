@@ -8,16 +8,16 @@ import 'package:stock_managament_app/constants/widgets.dart';
 
 class SalesCard extends StatelessWidget {
   final OrderModel order;
-  final int index;
+  final String docID;
 
-  const SalesCard({super.key, required this.order, required this.index});
+  const SalesCard({super.key, required this.order, required this.docID});
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
         Get.to(() => SalesProductView(
               order: order,
-              index: index,
+              docID: docID,
             ));
       },
       child: Container(
@@ -28,7 +28,7 @@ class SalesCard extends StatelessWidget {
         ]),
         child: Column(
           children: [
-            topPart("#$index", order.status!),
+            topPart("#${docID.substring(0, 5)}", order.status!),
             Expanded(
                 child: Padding(
               padding: EdgeInsets.symmetric(vertical: 6.h, horizontal: 10.w),

@@ -14,9 +14,9 @@ import 'package:stock_managament_app/constants/widgets.dart';
 
 class SalesProductView extends StatefulWidget {
   final OrderModel order;
-  final int index;
+  final String docID;
 
-  const SalesProductView({super.key, required this.order, required this.index});
+  const SalesProductView({super.key, required this.order, required this.docID});
 
   @override
   State<SalesProductView> createState() => _SalesProductViewState();
@@ -38,6 +38,7 @@ class _SalesProductViewState extends State<SalesProductView> {
   int statusRemover = 0;
   @override
   void initState() {
+    print(widget.order.orderID);
     super.initState();
     if (widget.order.status!.toLowerCase() == 'preparing') {
       _selectedSortOption = SortOptions.preparing;
@@ -100,7 +101,7 @@ class _SalesProductViewState extends State<SalesProductView> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: Text('${"order".tr}   #${widget.index.toString()}'),
+        title: Text('${"order".tr}   #${widget.docID.toString()}'),
         centerTitle: true,
         leading: IconButton(
             onPressed: () {

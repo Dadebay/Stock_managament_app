@@ -76,41 +76,45 @@ class SalesController extends GetxController {
       FirebaseFirestore.instance.collection('products').doc(product.documentID).update({'quantity': int.parse(product.quantity.toString()) - int.parse(element['count'].toString())});
     }
     sumPrice -= double.parse(textControllers[7].text.toString());
-    FirebaseFirestore.instance.collection('sales').add({
-      'client_address': textControllers[4].text,
-      'client_name': textControllers[3].text,
-      'client_number': textControllers[2].text,
-      'coupon': textControllers[5].text,
-      'date': textControllers[0].text,
-      'discount': textControllers[7].text,
-      'note': textControllers[6].text,
-      'package': textControllers[1].text,
-      'status': status,
-      'product_count': selectedProductsList.length.toString(),
-      'sum_price': sumPrice.toString(),
-      'sum_cost': sumCost.toString(),
-    }).then((value) {
-      for (var element in selectedProductsList) {
-        final ProductModel product = element['product'];
-        FirebaseFirestore.instance.collection('sales').doc(value.id).collection('products').add({
-          'brand': product.brandName,
-          'category': product.category,
-          'cost': product.cost,
-          'gramm': product.gramm,
-          'image': product.image,
-          'location': product.location,
-          'material': product.material,
-          'name': product.name,
-          'note': product.note,
-          'package': product.package,
-          'quantity': element['count'],
-          'sell_price': product.sellPrice,
-        });
-      }
-    });
-    Get.back();
-    selectedProductsList.clear();
-    productList.clear();
-    showSnackBar("Done", "Your purchase submitted ", Colors.green);
+    if (double.parse(textControllers[7].text.toString()) > sumPrice) {
+      showSnackBar("Error", "A discount price cannot be greater than the sum price.", Colors.red);
+    } else {
+      FirebaseFirestore.instance.collection('sales').add({
+        'client_address': textControllers[4].text,
+        'client_name': textControllers[3].text,
+        'client_number': textControllers[2].text,
+        'coupon': textControllers[5].text,
+        'date': textControllers[0].text,
+        'discount': textControllers[7].text,
+        'note': textControllers[6].text,
+        'package': textControllers[1].text,
+        'status': status,
+        'product_count': selectedProductsList.length.toString(),
+        'sum_price': sumPrice.toString(),
+        'sum_cost': sumCost.toString(),
+      }).then((value) {
+        for (var element in selectedProductsList) {
+          final ProductModel product = element['product'];
+          FirebaseFirestore.instance.collection('sales').doc(value.id).collection('products').add({
+            'brand': product.brandName,
+            'category': product.category,
+            'cost': product.cost,
+            'gramm': product.gramm,
+            'image': product.image,
+            'location': product.location,
+            'material': product.material,
+            'name': product.name,
+            'note': product.note,
+            'package': product.package,
+            'quantity': element['count'],
+            'sell_price': product.sellPrice,
+          });
+        }
+      });
+      Get.back();
+      selectedProductsList.clear();
+      productList.clear();
+      showSnackBar("Done", "Your purchase submitted ", Colors.green);
+    }
   }
 }

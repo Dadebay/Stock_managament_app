@@ -4,31 +4,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
-import 'package:stock_managament_app/app/modules/home/views/connection_check_view.dart';
+import 'package:stock_managament_app/app/modules/auth/views/connection_check_view.dart';
 import 'package:stock_managament_app/app/utils.dart';
 import 'package:stock_managament_app/constants/constants.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-class MyHttpOverrides extends HttpOverrides {
-  @override
-  HttpClient createHttpClient(SecurityContext? context) {
-    return super.createHttpClient(context)..badCertificateCallback = (X509Certificate cert, String host, int port) => true;
-  }
-}
-
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  HttpOverrides.global = MyHttpOverrides();
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   await GetStorage.init();
-  await SystemChrome.setPreferredOrientations([
-    DeviceOrientation.portraitUp,
-    DeviceOrientation.portraitDown,
-  ]);
+  await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
   runApp(const MyApp());
 }
 
@@ -51,7 +38,7 @@ class _MyAppState extends State<MyApp> {
         builder: (_, child) {
           return GetMaterialApp(
             debugShowCheckedModeBanner: false,
-            title: 'Stock Managament',
+            title: appName,
             theme: ThemeData(
               brightness: Brightness.light,
               fontFamily: gilroyRegular,
@@ -67,11 +54,7 @@ class _MyAppState extends State<MyApp> {
               visualDensity: VisualDensity.adaptivePlatformDensity,
             ),
             fallbackLocale: const Locale('tm'),
-            locale: storage.read('langCode') != null
-                ? Locale(storage.read('langCode'))
-                : const Locale(
-                    'tm',
-                  ),
+            locale: storage.read('langCode') != null ? Locale(storage.read('langCode')) : const Locale('tm'),
             translations: MyTranslations(),
             defaultTransition: Transition.fade,
             home: const ConnectionCheckView(),
