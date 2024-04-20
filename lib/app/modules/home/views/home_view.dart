@@ -43,6 +43,8 @@ class _HomeViewState extends State<HomeView> {
           actionIcon: true,
           icon: IconButton(
               onPressed: () {
+                // _homeController.setDataFalse();
+
                 Get.to(() => SearchView(orderedProductsSearch: false, productList: _homeController.productsListHomeView));
               },
               icon: const Icon(IconlyLight.search)),

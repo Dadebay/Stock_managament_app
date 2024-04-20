@@ -5,6 +5,7 @@ import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:stock_managament_app/app/data/models/order_model.dart';
 import 'package:stock_managament_app/app/data/models/product_model.dart';
+import 'package:stock_managament_app/app/modules/sales/controllers/sales_controller.dart';
 import 'package:stock_managament_app/constants/cards/product_card.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_iconly/flutter_iconly.dart';
@@ -53,16 +54,26 @@ class _SalesProductViewState extends State<SalesProductView> {
     } else if (widget.order.status!.toLowerCase() == 'canceled') {
       statusMapping.remove("readyToShip");
       statusSortOption.remove("readyToShip");
-      statusSortOption.remove("canceled");
-      statusMapping.remove("canceled");
+      statusMapping.remove("shipped");
+      statusSortOption.remove("shipped");
       statusMapping.remove("preparing");
       statusSortOption.remove("preparing");
       _selectedSortOption = SortOptions.canceled;
     } else if (widget.order.status!.toLowerCase() == 'refund') {
+      statusMapping.remove("readyToShip");
+      statusSortOption.remove("readyToShip");
+      statusMapping.remove("shipped");
+      statusSortOption.remove("shipped");
+      statusMapping.remove("preparing");
+      statusSortOption.remove("preparing");
+      statusMapping.remove("canceled");
+      statusSortOption.remove("canceled");
       _selectedSortOption = SortOptions.refund;
     }
     setState(() {});
   }
+
+  final SalesController salesController = Get.put(SalesController());
 
   Widget radioButton(SortOptions option, String text) {
     return RadioListTile(
@@ -78,6 +89,7 @@ class _SalesProductViewState extends State<SalesProductView> {
           showSnackBar("Done", "Status changed succefully", Colors.green);
         });
         setState(() {});
+        salesController.collectionReference.orderBy("date", descending: true).get();
         Get.back();
       },
     );
@@ -94,10 +106,7 @@ class _SalesProductViewState extends State<SalesProductView> {
             onPressed: () {
               Get.back();
             },
-            icon: const Icon(
-              IconlyLight.arrowLeftCircle,
-              color: Colors.black,
-            )),
+            icon: const Icon(IconlyLight.arrowLeftCircle, color: Colors.black)),
       ),
       body: ListView(
         shrinkWrap: true,
@@ -225,7 +234,8 @@ class _SalesProductViewState extends State<SalesProductView> {
       },
       child: Column(
         children: [
-          Padding(
+          Container(
+            color: Colors.white,
             padding: EdgeInsets.only(top: 10.h, bottom: 8.h),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,

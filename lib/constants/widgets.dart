@@ -29,7 +29,7 @@ SnackbarController showSnackBar(String title, String subtitle, Color color) {
     snackPosition: SnackPosition.TOP,
     backgroundColor: color,
     borderRadius: 20.0,
-    animationDuration: const Duration(seconds: 2),
+    duration: const Duration(milliseconds: 800),
     margin: const EdgeInsets.all(8),
   );
 }

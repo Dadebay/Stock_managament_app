@@ -2,15 +2,13 @@
 
 import 'dart:async';
 import 'dart:io';
-import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
+import 'package:stock_managament_app/app/modules/home/controllers/home_controller.dart';
 import 'package:stock_managament_app/app/modules/home/views/bottom_nav_bar.dart';
-import 'package:stock_managament_app/app/modules/home/views/home_view.dart';
 import 'package:stock_managament_app/app/modules/home/views/login_view.dart';
 import 'package:stock_managament_app/constants/constants.dart';
-
-import '../../../../constants/widgets.dart';
 
 class ConnectionCheckView extends StatefulWidget {
   const ConnectionCheckView({super.key});
@@ -26,7 +24,15 @@ class _ConnectionCheckViewState extends State {
     checkConnection();
   }
 
+  GetStorage storage = GetStorage();
+
+  final HomeController homeController = Get.put(HomeController());
   void checkConnection() async {
+    bool loginValue = storage.read('login') ?? false;
+    print('[][][][][][][][][][][]][]');
+    print('[][][][][][][][][][][]][]');
+    print(loginValue);
+    print('[][][][][][][][][][][]][]');
     try {
       final result = await InternetAddress.lookup('google.com');
       if (result.isNotEmpty && result.first.rawAddress.isNotEmpty) {
@@ -34,7 +40,8 @@ class _ConnectionCheckViewState extends State {
           Navigator.of(context).pushReplacement(
             MaterialPageRoute(
               builder: (BuildContext context) {
-                return const BottomNavBar();
+                // return const BottomNavBar();
+                return loginValue ? const BottomNavBar() : const SignUpView();
               },
             ),
           );

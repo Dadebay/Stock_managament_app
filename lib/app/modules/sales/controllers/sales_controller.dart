@@ -6,6 +6,7 @@ import 'package:stock_managament_app/constants/widgets.dart';
 
 class SalesController extends GetxController {
   RxList selectedProductsList = [].obs;
+  RxList cardsListSaveDates = [].obs;
   RxList productList = [].obs;
   CollectionReference collectionReference = FirebaseFirestore.instance.collection('sales');
   List<QueryDocumentSnapshot<Object?>> cardsList = [];
