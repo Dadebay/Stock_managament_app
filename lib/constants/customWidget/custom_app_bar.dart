@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_iconly/flutter_iconly.dart';
 import 'package:get/get.dart';
-import 'package:stock_managament_app/constants/constants.dart';
+import 'package:stock_managament_app/constants/customWidget/constants.dart';
 
 class CustomAppBar extends StatelessWidget implements PreferredSize {
   final bool backArrow;

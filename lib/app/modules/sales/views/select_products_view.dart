@@ -1,4 +1,3 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -8,9 +7,9 @@ import 'package:get/get.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:stock_managament_app/app/data/models/product_model.dart';
 import 'package:stock_managament_app/app/modules/sales/controllers/sales_controller.dart';
-import 'package:stock_managament_app/constants/cards/product_card_with_counter.dart';
-import 'package:stock_managament_app/constants/constants.dart';
-import 'package:stock_managament_app/constants/widgets.dart';
+import 'package:stock_managament_app/constants/cards/product_card.dart';
+import 'package:stock_managament_app/constants/customWidget/constants.dart';
+import 'package:stock_managament_app/constants/customWidget/widgets.dart';
 
 class SelectProductsView extends StatefulWidget {
   const SelectProductsView({super.key});
@@ -69,17 +68,8 @@ class _SelectProductsViewState extends State<SelectProductsView> {
     }
     int length = salesController.productList.length;
 
-    print("asdasdasd");
-    print(salesController.productListDocuments.last);
-    print(salesController.productListDocuments.last);
-    print(salesController.productListDocuments.last);
-    print(salesController.productListDocuments.last);
-    print(salesController.productListDocuments.last);
-    print(salesController.productListDocuments.last);
     final secondQuery = products.orderBy("date", descending: true).startAfterDocument(salesController.productListDocuments.last).limit(limit);
-    print("asdasdasd");
     secondQuery.get().then((value) {
-      print(value.docs);
       salesController.productListDocuments.addAll(value.docs);
 
       for (var element in value.docs) {
@@ -103,8 +93,6 @@ class _SelectProductsViewState extends State<SelectProductsView> {
           count: 0,
         );
       }
-      print(length);
-      print(salesController.productList.length);
       setState(() {});
       if (length == salesController.productList.length) {
         showSnackBar("Done", "End of the products", Colors.green);
@@ -223,9 +211,10 @@ class _SelectProductsViewState extends State<SelectProductsView> {
                         itemCount: _searchResult.length,
                         physics: const BouncingScrollPhysics(),
                         itemBuilder: (context, i) {
-                          return ProductCardMine(
+                          return ProductCard(
                             product: _searchResult[i]['product'],
-                            // count: int.parse(_searchResult[i]['count'].toString()),
+                            orderView: false,
+                            addCounterWidget: true,
                           );
                         },
                       )
@@ -242,9 +231,10 @@ class _SelectProductsViewState extends State<SelectProductsView> {
                           itemCount: salesController.productList.length,
                           physics: const BouncingScrollPhysics(),
                           itemBuilder: (BuildContext context, int index) {
-                            return ProductCardMine(
+                            return ProductCard(
                               product: salesController.productList[index]['product'],
-                              // count: int.parse(salesController.productList[index]['count'].toString()),
+                              orderView: false,
+                              addCounterWidget: true,
                             );
                           },
                         ),

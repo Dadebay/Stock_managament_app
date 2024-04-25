@@ -1,16 +1,14 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:stock_managament_app/app/data/models/order_model.dart';
 import 'package:stock_managament_app/app/data/models/product_model.dart';
 import 'package:stock_managament_app/app/modules/sales/controllers/sales_controller.dart';
-import 'package:stock_managament_app/constants/cards/product_card.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_iconly/flutter_iconly.dart';
-import 'package:stock_managament_app/constants/constants.dart';
-import 'package:stock_managament_app/constants/widgets.dart';
+import 'package:stock_managament_app/constants/cards/product_card.dart';
+import 'package:stock_managament_app/constants/customWidget/constants.dart';
+import 'package:stock_managament_app/constants/customWidget/widgets.dart';
 
 class SalesProductView extends StatefulWidget {
   final OrderModel order;
@@ -36,23 +34,24 @@ class _SalesProductViewState extends State<SalesProductView> {
     "refund": SortOptions.refund
   };
   int statusRemover = 0;
-  @override
-  void initState() {
-    print(widget.order.orderID);
-    super.initState();
-    if (widget.order.status!.toLowerCase() == 'preparing') {
+
+  final SalesController salesController = Get.put(SalesController());
+
+  doStatusFunction(String status) {
+    print(status);
+    if (status == 'preparing') {
       _selectedSortOption = SortOptions.preparing;
-    } else if (widget.order.status!.toLowerCase() == 'readyToShip' || widget.order.status!.toLowerCase() == "ready to ship") {
+    } else if (status == 'readyToShip' || status == "ready to ship" || status == "Ready to ship") {
       statusMapping.remove("preparing");
       statusSortOption.remove("preparing");
       _selectedSortOption = SortOptions.readyToShip;
-    } else if (widget.order.status!.toLowerCase() == 'shipped') {
+    } else if (status == 'shipped') {
       statusMapping.remove("readyToShip");
       statusSortOption.remove("readyToShip");
       statusMapping.remove("preparing");
       statusSortOption.remove("preparing");
       _selectedSortOption = SortOptions.shipped;
-    } else if (widget.order.status!.toLowerCase() == 'canceled') {
+    } else if (status == 'canceled') {
       statusMapping.remove("readyToShip");
       statusSortOption.remove("readyToShip");
       statusMapping.remove("shipped");
@@ -60,7 +59,7 @@ class _SalesProductViewState extends State<SalesProductView> {
       statusMapping.remove("preparing");
       statusSortOption.remove("preparing");
       _selectedSortOption = SortOptions.canceled;
-    } else if (widget.order.status!.toLowerCase() == 'refund') {
+    } else if (status == 'refund') {
       statusMapping.remove("readyToShip");
       statusSortOption.remove("readyToShip");
       statusMapping.remove("shipped");
@@ -74,7 +73,11 @@ class _SalesProductViewState extends State<SalesProductView> {
     setState(() {});
   }
 
-  final SalesController salesController = Get.put(SalesController());
+  @override
+  void initState() {
+    super.initState();
+    doStatusFunction(widget.order.status!.toLowerCase());
+  }
 
   Widget radioButton(SortOptions option, String text) {
     return RadioListTile(
@@ -101,7 +104,7 @@ class _SalesProductViewState extends State<SalesProductView> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: Text('${"order".tr}   #${widget.docID.toString()}'),
+        title: Text('${"order".tr}   #${widget.docID.substring(0, 5).toString()}'),
         centerTitle: true,
         leading: IconButton(
             onPressed: () {
@@ -109,122 +112,144 @@ class _SalesProductViewState extends State<SalesProductView> {
             },
             icon: const Icon(IconlyLight.arrowLeftCircle, color: Colors.black)),
       ),
-      body: ListView(
-        shrinkWrap: true,
-        padding: EdgeInsets.symmetric(horizontal: 15.w),
-        children: [
-          statusChangeButton(context, 'Name'),
-          textWidgetOrderedPage(
-              documentID: widget.order.orderID!,
-              text1: 'dateOrder',
-              text2: widget.order.date!,
-              context: context,
-              labelName: 'date',
-              ontap: false,
-              status: statusMapping[_selectedSortOption.name.toString()].toString()),
-          textWidgetOrderedPage(
-              documentID: widget.order.orderID!,
-              text1: 'package',
-              text2: widget.order.package!,
-              context: context,
-              labelName: 'package',
-              ontap: true,
-              status: statusMapping[_selectedSortOption.name.toString()].toString()),
-          textWidgetOrderedPage(
-              documentID: widget.order.orderID!,
-              text1: 'clientNumber',
-              text2: widget.order.clientNumber!,
-              context: context,
-              labelName: 'client_number',
-              ontap: true,
-              status: statusMapping[_selectedSortOption.name.toString()].toString()),
-          textWidgetOrderedPage(
-              documentID: widget.order.orderID!,
-              text1: 'userName',
-              text2: widget.order.clientName!,
-              context: context,
-              labelName: 'client_name',
-              ontap: true,
-              status: statusMapping[_selectedSortOption.name.toString()].toString()),
-          textWidgetOrderedPage(
-              documentID: widget.order.orderID!,
-              text1: 'clientAddress',
-              text2: widget.order.clientAddress!,
-              context: context,
-              labelName: 'client_address',
-              ontap: true,
-              status: statusMapping[_selectedSortOption.name.toString()].toString()),
-          textWidgetOrderedPage(
-              documentID: widget.order.orderID!,
-              text1: 'discount',
-              text2: widget.order.discount!,
-              context: context,
-              labelName: 'discount',
-              ontap: true,
-              status: statusMapping[_selectedSortOption.name.toString()].toString()),
-          textWidgetOrderedPage(
-              documentID: widget.order.orderID!,
-              text1: 'priceProduct',
-              text2: widget.order.sumPrice!,
-              context: context,
-              labelName: 'Sum Price',
-              ontap: false,
-              status: statusMapping[_selectedSortOption.name.toString()].toString()),
-          textWidgetOrderedPage(
-              documentID: widget.order.orderID!,
-              text1: 'note',
-              text2: widget.order.note!,
-              context: context,
-              labelName: 'note',
-              ontap: true,
-              status: statusMapping[_selectedSortOption.name.toString()].toString()),
-          textWidgetOrderedPage(
-              documentID: widget.order.orderID!,
-              text1: 'productCount',
-              text2: widget.order.products!.toString(),
-              context: context,
-              labelName: 'Product count',
-              ontap: false,
-              status: statusMapping[_selectedSortOption.name.toString()].toString()),
-          StreamBuilder(
-              stream: FirebaseFirestore.instance.collection('sales').doc(widget.order.orderID).collection('products').snapshots(),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return spinKit();
-                } else if (snapshot.hasError) {
-                  return errorData();
-                } else if (snapshot.data!.docs.isEmpty) {
-                  return emptyData();
-                } else if (snapshot.hasData) {
-                  return ListView.builder(
-                    shrinkWrap: true,
-                    itemCount: snapshot.data!.docs.length,
-                    physics: const BouncingScrollPhysics(),
-                    itemBuilder: (BuildContext context, int index) {
-                      final product = ProductModel(
-                        name: snapshot.data!.docs[index]['name'],
-                        brandName: snapshot.data!.docs[index]['brand'].toString(),
-                        category: snapshot.data!.docs[index]['category'].toString(),
-                        cost: snapshot.data!.docs[index]['cost'],
-                        gramm: snapshot.data!.docs[index]['gramm'],
-                        image: snapshot.data!.docs[index]['image'].toString(),
-                        location: snapshot.data!.docs[index]['location'].toString(),
-                        material: snapshot.data!.docs[index]['material'].toString(),
-                        quantity: snapshot.data!.docs[index]['quantity'],
-                        sellPrice: snapshot.data!.docs[index]['sell_price'].toString(),
-                        note: snapshot.data!.docs[index]['note'].toString(),
-                        package: snapshot.data!.docs[index]['package'].toString(),
-                        documentID: snapshot.data!.docs[index].id,
-                      );
-                      return ProductCard(product: product, orderView: true);
-                    },
-                  );
-                }
+      body: StreamBuilder(
+          stream: FirebaseFirestore.instance.collection('sales').doc(widget.order.orderID!).snapshots(),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return spinKit();
+            } else if (snapshot.hasData) {
+              return ListView(
+                shrinkWrap: true,
+                padding: EdgeInsets.symmetric(horizontal: 15.w),
+                children: [
+                  statusChangeButton(context, 'Name'),
+                  textWidgetOrderedPage(
+                      order: widget.order,
+                      text1: 'dateOrder',
+                      text2: widget.order.date!,
+                      context: context,
+                      labelName: 'date',
+                      ontap: false,
+                      status: statusMapping[_selectedSortOption.name.toString()].toString()),
+                  textWidgetOrderedPage(
+                      order: widget.order,
+                      text1: 'package',
+                      text2: snapshot.data!['package'],
+                      context: context,
+                      labelName: 'package',
+                      ontap: true,
+                      status: statusMapping[_selectedSortOption.name.toString()].toString()),
+                  textWidgetOrderedPage(
+                      order: widget.order,
+                      text1: 'clientNumber',
+                      text2: snapshot.data!['client_number'],
+                      context: context,
+                      labelName: 'client_number',
+                      ontap: true,
+                      status: statusMapping[_selectedSortOption.name.toString()].toString()),
+                  textWidgetOrderedPage(
+                      order: widget.order,
+                      text1: 'userName',
+                      text2: snapshot.data!['client_name'],
+                      context: context,
+                      labelName: 'client_name',
+                      ontap: true,
+                      status: statusMapping[_selectedSortOption.name.toString()].toString()),
+                  textWidgetOrderedPage(
+                      order: widget.order,
+                      text1: 'clientAddress',
+                      text2: snapshot.data!['client_address'],
+                      context: context,
+                      labelName: 'client_address',
+                      ontap: true,
+                      status: statusMapping[_selectedSortOption.name.toString()].toString()),
+                  textWidgetOrderedPage(
+                      order: widget.order,
+                      text1: 'discount',
+                      text2: snapshot.data!['discount'],
+                      context: context,
+                      labelName: 'discount',
+                      ontap: true,
+                      status: statusMapping[_selectedSortOption.name.toString()].toString()),
+                  textWidgetOrderedPage(
+                      order: widget.order,
+                      text1: 'priceProduct',
+                      text2: snapshot.data!['sum_price'].toString(),
+                      context: context,
+                      labelName: 'priceProduct',
+                      ontap: false,
+                      status: statusMapping[_selectedSortOption.name.toString()].toString()),
+                  textWidgetOrderedPage(
+                      order: widget.order,
+                      text1: 'Coupon',
+                      text2: snapshot.data!['coupon'].toString() == "" ? '0.0' : snapshot.data!['coupon'].toString(),
+                      context: context,
+                      labelName: 'coupon',
+                      ontap: statusMapping[_selectedSortOption.name.toString()].toString().toLowerCase() == 'shipped' ? false : true,
+                      status: statusMapping[_selectedSortOption.name.toString()].toString()),
+                  textWidgetOrderedPage(
+                      order: widget.order,
+                      text1: 'note',
+                      text2: snapshot.data!['note'],
+                      context: context,
+                      labelName: 'note',
+                      ontap: true,
+                      status: statusMapping[_selectedSortOption.name.toString()].toString()),
+                  textWidgetOrderedPage(
+                      order: widget.order,
+                      text1: 'productCount',
+                      text2: widget.order.products!.toString(),
+                      context: context,
+                      labelName: 'Product count',
+                      ontap: false,
+                      status: statusMapping[_selectedSortOption.name.toString()].toString()),
+                  StreamBuilder(
+                      stream: FirebaseFirestore.instance.collection('sales').doc(widget.order.orderID).collection('products').snapshots(),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState == ConnectionState.waiting) {
+                          return spinKit();
+                        } else if (snapshot.hasError) {
+                          return errorData();
+                        } else if (snapshot.data!.docs.isEmpty) {
+                          return emptyData();
+                        } else if (snapshot.hasData) {
+                          print(snapshot.data);
+                          return ListView.builder(
+                            shrinkWrap: true,
+                            itemCount: snapshot.data!.docs.length,
+                            physics: const BouncingScrollPhysics(),
+                            itemBuilder: (BuildContext context, int index) {
+                              final product = ProductModel(
+                                name: snapshot.data!.docs[index]['name'],
+                                brandName: snapshot.data!.docs[index]['brand'].toString(),
+                                category: snapshot.data!.docs[index]['category'].toString(),
+                                cost: snapshot.data!.docs[index]['cost'],
+                                gramm: snapshot.data!.docs[index]['gramm'],
+                                image: snapshot.data!.docs[index]['image'].toString(),
+                                location: snapshot.data!.docs[index]['location'].toString(),
+                                material: snapshot.data!.docs[index]['material'].toString(),
+                                quantity: snapshot.data!.docs[index]['quantity'],
+                                sellPrice: snapshot.data!.docs[index]['sell_price'].toString(),
+                                note: snapshot.data!.docs[index]['note'].toString(),
+                                package: snapshot.data!.docs[index]['package'].toString(),
+                                documentID: snapshot.data!.docs[index].id,
+                              );
+                              return ProductCard(
+                                product: product,
+                                orderView: true,
+                                addCounterWidget: false,
+                              );
+                            },
+                          );
+                        }
 
-                return const Text("No data");
-              })
-        ],
-      ),
+                        return const Text("No data");
+                      })
+                ],
+              );
+            }
+            return emptyData();
+          }),
     );
   }
 

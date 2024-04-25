@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:stock_managament_app/app/data/models/order_model.dart';
 import 'package:stock_managament_app/app/modules/sales/views/ordered_products_view.dart';
-import 'package:stock_managament_app/constants/constants.dart';
+import 'package:stock_managament_app/constants/customWidget/constants.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:stock_managament_app/constants/widgets.dart';
+import 'package:stock_managament_app/constants/customWidget/widgets.dart';
 
 class SalesCard extends StatelessWidget {
   final OrderModel order;

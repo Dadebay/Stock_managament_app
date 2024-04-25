@@ -7,11 +7,11 @@ import 'package:get/get.dart';
 import 'package:stock_managament_app/app/modules/sales/controllers/sales_controller.dart';
 import 'package:stock_managament_app/app/modules/sales/views/select_products_view.dart';
 import 'package:stock_managament_app/constants/buttons/agree_button_view.dart';
-import 'package:stock_managament_app/constants/cards/product_card_with_counter.dart';
-import 'package:stock_managament_app/constants/constants.dart';
-import 'package:stock_managament_app/constants/custom_text_field.dart';
-import 'package:stock_managament_app/constants/phone_number.dart';
-import 'package:stock_managament_app/constants/widgets.dart';
+import 'package:stock_managament_app/constants/cards/product_card.dart';
+import 'package:stock_managament_app/constants/customWidget/constants.dart';
+import 'package:stock_managament_app/constants/customWidget/custom_text_field.dart';
+import 'package:stock_managament_app/constants/customWidget/phone_number.dart';
+import 'package:stock_managament_app/constants/customWidget/widgets.dart';
 
 import '../../../data/models/product_model.dart';
 
@@ -31,6 +31,8 @@ class _CreateOrderViewState extends State<CreateOrderView> {
   @override
   void initState() {
     textControllers[0].text = DateTime.now().toString().substring(0, 19);
+    salesController.selectedProductsList.clear();
+    salesController.productList.clear();
     super.initState();
   }
 
@@ -125,9 +127,10 @@ class _CreateOrderViewState extends State<CreateOrderView> {
                         shrinkWrap: true,
                         itemBuilder: (BuildContext context, int index) {
                           final ProductModel product = salesController.selectedProductsList[index]['product'];
-                          return ProductCardMine(
-                            product: product,
-                          );
+                          return ProductCard(product: product, orderView: false, addCounterWidget: true);
+                          // ProductCardMine(
+                          //   product: product,
+                          // );
                         },
                       ),
                     ],

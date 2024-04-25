@@ -1,8 +1,9 @@
 // ignore_for_file: file_names
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-import 'package:stock_managament_app/constants/constants.dart';
+import 'package:stock_managament_app/constants/customWidget/constants.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class CustomTextField extends StatelessWidget {
@@ -16,6 +17,7 @@ class CustomTextField extends StatelessWidget {
   final bool? readOnly;
   final bool? tmtValueShow;
   final bool? isNumber;
+  final Function()? onTap;
 
   const CustomTextField({
     required this.labelName,
@@ -29,6 +31,7 @@ class CustomTextField extends StatelessWidget {
     this.tmtValueShow,
     super.key,
     required this.readOnly,
+    this.onTap,
   });
   @override
   Widget build(BuildContext context) {
@@ -37,6 +40,7 @@ class CustomTextField extends StatelessWidget {
       child: TextFormField(
         style: const TextStyle(color: Colors.black, fontFamily: gilroyMedium),
         cursorColor: Colors.black,
+        onTap: onTap,
         controller: controller,
         validator: (value) {
           if (value!.isEmpty) {
@@ -51,6 +55,9 @@ class CustomTextField extends StatelessWidget {
         focusNode: focusNode,
         keyboardType: isNumber == true ? TextInputType.number : TextInputType.text,
         enabled: readOnly,
+        inputFormatters: [
+          LengthLimitingTextInputFormatter(labelName == 'clientNumber' ? 8 : 300),
+        ],
         decoration: InputDecoration(
           errorMaxLines: 2,
           suffix: tmtValueShow == true

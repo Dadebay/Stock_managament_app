@@ -7,8 +7,9 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:lottie/lottie.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
-import 'package:stock_managament_app/constants/constants.dart';
-import 'package:stock_managament_app/constants/custom_text_field.dart';
+import 'package:stock_managament_app/app/data/models/order_model.dart';
+import 'package:stock_managament_app/constants/customWidget/constants.dart';
+import 'package:stock_managament_app/constants/customWidget/custom_text_field.dart';
 
 SnackbarController showSnackBar(String title, String subtitle, Color color) {
   if (SnackbarController.isSnackbarBeingShown) {
@@ -49,7 +50,7 @@ Center errorData() {
 }
 
 Center emptyData() {
-  return const Center(child: Text("Empty Data"));
+  return const Center(child: Text("No product found"));
 }
 
 CustomFooter customFooter() {
@@ -75,43 +76,42 @@ CustomFooter customFooter() {
   );
 }
 
-Expanded homePageTopWidget({required String stockInHand, required String totalProducts}) {
-  return Expanded(
-    flex: 1,
-    child: Row(
-      children: [
-        Expanded(
-            child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'totalProducts'.tr,
-              style: TextStyle(color: Colors.grey, fontFamily: gilroySemiBold, fontSize: 16.sp),
-            ),
-            Text(
-              totalProducts,
-              style: TextStyle(color: Colors.black, fontFamily: gilroyBold, fontSize: 30.sp),
-            ),
-          ],
-        )),
-        Expanded(
-            child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'stockInHand'.tr,
-              style: TextStyle(color: Colors.grey, fontFamily: gilroySemiBold, fontSize: 16.sp),
-            ),
-            Text(
-              stockInHand,
-              style: TextStyle(color: Colors.black, fontFamily: gilroyBold, fontSize: 30.sp),
-            ),
-          ],
-        )),
-      ],
-    ),
+Widget homePageTopWidget({required String stockInHand, required String totalProducts}) {
+  return Row(
+    children: [
+      Expanded(
+          child: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'totalProducts'.tr,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(color: Colors.grey, fontFamily: gilroySemiBold, fontSize: 16.sp),
+          ),
+          Text(
+            totalProducts,
+            style: TextStyle(color: Colors.black, fontFamily: gilroyBold, fontSize: 30.sp),
+          ),
+        ],
+      )),
+      Expanded(
+          child: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'stockInHand'.tr,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(color: Colors.grey, fontFamily: gilroySemiBold, fontSize: 16.sp),
+          ),
+          Text(
+            stockInHand,
+            style: TextStyle(color: Colors.black, fontFamily: gilroyBold, fontSize: 30.sp),
+          ),
+        ],
+      )),
+    ],
   );
 }
 
@@ -181,7 +181,7 @@ Column textWidget({required String text1, required String text2}) {
 }
 
 Widget textWidgetOrderedPage(
-    {required bool ontap, required String status, required BuildContext context, required String text1, required String text2, required String labelName, required String documentID}) {
+    {required bool ontap, required String status, required BuildContext context, required String text1, required String text2, required String labelName, required OrderModel order}) {
   FocusNode focusNode = FocusNode();
   final TextEditingController textEditingController = TextEditingController();
   textEditingController.text = text2;
@@ -197,11 +197,7 @@ Widget textWidgetOrderedPage(
             builder: (BuildContext context) {
               return AlertDialog(
                 alignment: Alignment.center,
-                title: Text(
-                  text1.tr,
-                  textAlign: TextAlign.center,
-                  style: TextStyle(color: Colors.black, fontFamily: gilroyBold, fontSize: 20.sp),
-                ),
+                title: Text(text1.tr, textAlign: TextAlign.center, style: TextStyle(color: Colors.black, fontFamily: gilroyBold, fontSize: 20.sp)),
                 backgroundColor: Colors.white,
                 shadowColor: Colors.red,
                 content: Column(
@@ -211,27 +207,35 @@ Widget textWidgetOrderedPage(
                 actionsAlignment: MainAxisAlignment.center,
                 actions: <Widget>[
                   TextButton(
-                    child: Text(
-                      'no'.tr,
-                      style: TextStyle(fontFamily: gilroyMedium, fontSize: 18.sp),
-                    ),
+                    child: Text('no'.tr, style: TextStyle(fontFamily: gilroyMedium, fontSize: 18.sp)),
                     onPressed: () {
                       Navigator.of(context).pop();
                     },
                   ),
                   TextButton(
-                    child: Text(
-                      'yes'.tr,
-                      style: TextStyle(fontFamily: gilroyBold, fontSize: 18.sp),
-                    ),
+                    child: Text('yes'.tr, style: TextStyle(fontFamily: gilroyBold, fontSize: 18.sp)),
                     onPressed: () {
-                      FirebaseFirestore.instance.collection('sales').doc(documentID).update({
-                        labelName: textEditingController.text,
-                      }).then((value) {
-                        showSnackBar("copySucces", "changesUpdated", Colors.green);
-                      });
-                      Navigator.of(context).pop();
-                      Navigator.of(context).pop();
+                      if (text1 == 'discount') {
+                        if (double.parse(textEditingController.text.toString()) > double.parse(order.sumPrice.toString())) {
+                          showSnackBar('Error', 'Discount price cannot higher than Sum price', Colors.red);
+                        } else {
+                          double discount = textEditingController.text.isEmpty ? 0.0 : double.parse(textEditingController.text.toString());
+                          FirebaseFirestore.instance
+                              .collection('sales')
+                              .doc(order.orderID)
+                              .update({labelName: textEditingController.text, 'sum_price': double.parse(order.sumPrice!.toString()) - discount}).then((value) {
+                            showSnackBar("copySucces", "changesUpdated", Colors.green);
+                          });
+                          Navigator.of(context).pop();
+                        }
+                      } else {
+                        FirebaseFirestore.instance.collection('sales').doc(order.orderID).update({
+                          labelName: textEditingController.text,
+                        }).then((value) {
+                          showSnackBar("copySucces", "changesUpdated", Colors.green);
+                        });
+                        Navigator.of(context).pop();
+                      }
                     },
                   ),
                 ],
@@ -259,11 +263,11 @@ Widget textWidgetOrderedPage(
                   style: TextStyle(color: Colors.grey, fontFamily: gilroyMedium, fontSize: 14.sp),
                 ),
                 Text(
-                  text1 == "Client number"
+                  text1 == "clientNumber"
                       ? "+993 $text2"
-                      : text1 == "Sum Price"
+                      : text1 == "priceProduct"
                           ? "$text2 TMT"
-                          : text1 == "Discount"
+                          : text1 == "discount" || text1 == "Coupon"
                               ? "$text2 TMT"
                               : text2,
                   overflow: TextOverflow.ellipsis,

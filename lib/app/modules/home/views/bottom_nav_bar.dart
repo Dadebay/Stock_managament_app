@@ -1,10 +1,17 @@
 // // ignore_for_file: file_names, must_be_immutable, always_use_package_imports, avoid_void_async, non_constant_identifier_names
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_iconly/flutter_iconly.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:stock_managament_app/app/modules/home/controllers/home_controller.dart';
+import 'package:stock_managament_app/app/modules/sales/controllers/sales_controller.dart';
+import 'package:stock_managament_app/app/modules/sales/views/create_order.dart';
 import 'package:stock_managament_app/app/modules/sales/views/ordered_cards_view.dart';
-import 'package:stock_managament_app/constants/constants.dart';
+import 'package:stock_managament_app/app/modules/search/views/search_view.dart';
+import 'package:stock_managament_app/constants/customWidget/constants.dart';
+import 'package:stock_managament_app/constants/customWidget/custom_app_bar.dart';
 
 import 'home_view.dart';
 
@@ -16,10 +23,78 @@ class BottomNavBar extends StatefulWidget {
 
 class _BottomNavBarState extends State<BottomNavBar> {
   int selectedIndex = 0;
+  final SalesController _salesController = Get.put(SalesController());
+  final HomeController _homeController = Get.put(HomeController());
   List page = [const HomeView(), const SalesView()];
+  Future<dynamic> filter() {
+    return Get.bottomSheet(Container(
+      padding: EdgeInsets.symmetric(vertical: 10.h, horizontal: 10.w),
+      decoration: const BoxDecoration(color: Colors.white, borderRadius: BorderRadius.only(topLeft: Radius.circular(20), topRight: Radius.circular(20))),
+      child: Wrap(
+        children: [
+          Text(
+            'filter'.tr,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: Colors.black,
+              fontFamily: gilroySemiBold,
+              fontSize: 22.sp,
+            ),
+          ),
+          ListView.builder(
+            itemCount: _salesController.statuses.length,
+            shrinkWrap: true,
+            physics: const BouncingScrollPhysics(),
+            itemBuilder: (BuildContext context, int index) {
+              return ListTile(
+                onTap: () => _salesController.sortSalesCards(index),
+                title: Text(_salesController.statuses[index]),
+                trailing: IconButton(onPressed: () {}, icon: const Icon(IconlyLight.arrowRightCircle)),
+              );
+            },
+          ),
+        ],
+      ),
+    ));
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: CustomAppBar(
+        backArrow: false,
+        actionIcon: true,
+        icon: selectedIndex == 0
+            ? IconButton(
+                onPressed: () {
+                  Get.to(() => SearchView(productList: _homeController.productsListHomeView, whereToSearch: 'products'));
+                },
+                icon: const Icon(IconlyLight.search))
+            : Row(mainAxisSize: MainAxisSize.min, children: [
+                IconButton(
+                    onPressed: () {
+                      Get.to(() => SearchView(productList: _salesController.cardsList, whereToSearch: 'orders'));
+                    },
+                    icon: const Icon(IconlyLight.search, color: Colors.black)),
+                IconButton(
+                    onPressed: () {
+                      filter();
+                    },
+                    icon: const Icon(IconlyLight.filter, color: Colors.black)),
+              ]),
+        name: selectedIndex == 1 ? 'sales' : "products",
+      ),
+      floatingActionButton: selectedIndex == 1
+          ? FloatingActionButton(
+              onPressed: () {
+                Get.to(() => const CreateOrderView());
+              },
+              backgroundColor: kPrimaryColor2,
+              child: const Icon(Icons.add, color: Colors.white),
+            )
+          : const SizedBox.shrink(),
       bottomNavigationBar: BottomNavigationBar(
         backgroundColor: Colors.white,
         iconSize: 22,

@@ -5,6 +5,7 @@ import 'package:get_storage/get_storage.dart';
 class HomeController extends GetxController {
   RxInt stockInHand = 0.obs;
   RxBool loginView = false.obs;
+  RxBool agreeButton = false.obs;
   RxInt totalProductCount = 0.obs;
   GetStorage storage = GetStorage();
   updateLoginData() {

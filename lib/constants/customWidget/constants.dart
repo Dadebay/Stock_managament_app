@@ -24,12 +24,10 @@ const String gilroyRegular = 'GilroyRegular';
 //Language icons
 const String tmIcon = 'assets/image/tm.png';
 const String ruIcon = 'assets/image/ru.png';
-const String trIcon = 'assets/image/tr.png';
 const String engIcon = 'assets/image/uk.png';
 ///////////////////
 const String logo = 'assets/icons/logo.png';
 const String noData = 'assets/lottie/noData.json';
-const String shareIcon = 'assets/icons/share1.png';
 const String appName = 'Kümüş';
 const String loremImpsum =
     'Lorem ipsum, yaygın olarak kullanılan bir yer tutucu metne verilen isimdir. Dolgu veya sahte metin olarak da bilinen bu tip yer tutucu metinler, aslında anlamlı bir şey söylemeden bir alanı doldurmaya yarayan metinlerdir,Lorem ipsum, yaygın olarak kullanılan bir yer tutucu metne verilen isimdir. Dolgu veya sahte metin olarak da bilinen bu tip yer tutucu metinler, aslında anlamlı bir şey söylemeden bir alanı doldurmaya yarayan metinlerdir,Lorem ipsum, yaygın olarak kullanılan bir yer tutucu metne verilen isimdir. Dolgu veya sahte metin olarak da bilinen bu tip yer tutucu metinler, aslında anlamlı bir şey söylemeden bir alanı doldurmaya yarayan metinlerdir,Lorem ipsum, yaygın olarak kullanılan bir yer tutucu metne verilen isimdir. Dolgu veya sahte metin olarak da bilinen bu tip yer tutucu metinler, aslında anlamlı bir şey söylemeden bir alanı doldurmaya yarayan metinlerdir';

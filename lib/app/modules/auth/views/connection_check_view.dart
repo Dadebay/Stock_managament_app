@@ -3,7 +3,6 @@
 import 'dart:async';
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
@@ -11,7 +10,7 @@ import 'package:lottie/lottie.dart';
 import 'package:stock_managament_app/app/modules/home/controllers/home_controller.dart';
 import 'package:stock_managament_app/app/modules/home/views/bottom_nav_bar.dart';
 import 'package:stock_managament_app/app/modules/auth/views/login_view.dart';
-import 'package:stock_managament_app/constants/constants.dart';
+import 'package:stock_managament_app/constants/customWidget/constants.dart';
 
 class ConnectionCheckView extends StatefulWidget {
   const ConnectionCheckView({super.key});

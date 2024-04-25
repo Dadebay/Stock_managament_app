@@ -2,12 +2,30 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:stock_managament_app/app/data/models/product_model.dart';
-import 'package:stock_managament_app/constants/widgets.dart';
+import 'package:stock_managament_app/constants/customWidget/widgets.dart';
 
 class SalesController extends GetxController {
   RxList selectedProductsList = [].obs;
   RxList productList = [].obs;
+  RxBool isFiltered = false.obs;
+  RxString isFilteredStatusName = "".obs;
+  List statuses = ['Preparing', 'Ready to ship', 'Shipped', 'Refund', 'Canceled'];
+
   RxList productListDocuments = [].obs;
+
+  sortSalesCards(int index) {
+    cardsList.clear();
+    isFiltered.value = true;
+    isFilteredStatusName.value = statuses[index];
+    FirebaseFirestore.instance.collection('sales').where('status', isEqualTo: statuses[index]).get().then((value) {
+      if (value.docs.isEmpty) {
+        cardsList.clear();
+      } else {
+        cardsList = value.docs;
+      }
+    });
+    Get.back();
+  }
 
   CollectionReference collectionReference = FirebaseFirestore.instance.collection('sales');
   List<QueryDocumentSnapshot<Object?>> cardsList = [];
@@ -40,6 +58,11 @@ class SalesController extends GetxController {
       final ProductModel product = element['product'];
       if (product.documentID.toString() == id.toString()) {
         element['count'] = count;
+        if (int.parse(element['count'].toString()) == 0) {
+          print(element);
+          selectedProductsList.removeWhere((element2) => element2['count'] == 0);
+          print(selectedProductsList);
+        }
       }
     }
 
@@ -76,8 +99,8 @@ class SalesController extends GetxController {
       int.parse(product.quantity.toString()) - int.parse(element['count'].toString());
       FirebaseFirestore.instance.collection('products').doc(product.documentID).update({'quantity': int.parse(product.quantity.toString()) - int.parse(element['count'].toString())});
     }
-    sumPrice -= double.parse(textControllers[7].text.toString());
-    if (double.parse(textControllers[7].text.toString()) > sumPrice) {
+    double discountPrice = textControllers[7].text == "" ? 0.0 : double.parse(textControllers[7].text.toString());
+    if (discountPrice >= sumPrice) {
       showSnackBar("Error", "A discount price cannot be greater than the sum price.", Colors.red);
     } else {
       FirebaseFirestore.instance.collection('sales').add({
@@ -93,10 +116,11 @@ class SalesController extends GetxController {
         'product_count': selectedProductsList.length.toString(),
         'sum_price': sumPrice.toString(),
         'sum_cost': sumCost.toString(),
-      }).then((value) {
+      }).then((value) async {
         for (var element in selectedProductsList) {
           final ProductModel product = element['product'];
-          FirebaseFirestore.instance.collection('sales').doc(value.id).collection('products').add({
+          print(value.id);
+          await FirebaseFirestore.instance.collection('sales').doc(value.id).collection('products').add({
             'brand': product.brandName,
             'category': product.category,
             'cost': product.cost,
@@ -113,8 +137,7 @@ class SalesController extends GetxController {
         }
       });
       Get.back();
-      selectedProductsList.clear();
-      productList.clear();
+
       showSnackBar("Done", "Your purchase submitted ", Colors.green);
     }
   }
