@@ -30,21 +30,4 @@ class ProductModel {
     this.quantity,
     this.sellPrice,
   });
-
-  // factory ProductModel.fromJson(Map<dynamic, dynamic> json) {
-  //   return ProductModel(
-  //     brandName: json['brand'] ?? '',
-  //     category: json['category'] ?? '',
-  //     cost: json['cost'] ?? -1,
-  //     gramm: json['gramm'] ?? -1,
-  //     image: json['image'] ?? '',
-  //     material: json['material'] ?? '',
-  //     location: json['location'] ?? '',
-  //     name: json['name'] ?? '',
-  //     note: json['note'] ?? '',
-  //     package: json['package'] ?? '',
-  //     quantity: json['quantity'] ?? -1,
-  //     sellPrice: json['sell_price'] ?? '',
-  //   );
-  // }
 }

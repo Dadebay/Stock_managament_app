@@ -34,3 +34,5 @@ const String loremImpsum =
 /////////////////////////////////////////////////
 const String loadingLottie = 'assets/lottie/loading.json';
 const String noDataLottie = 'assets/lottie/noData.json';
+/////////////////////////////////////////////////
+

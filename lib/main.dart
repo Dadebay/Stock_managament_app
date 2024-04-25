@@ -5,7 +5,7 @@ import 'package:get_storage/get_storage.dart';
 import 'package:stock_managament_app/app/modules/auth/views/connection_check_view.dart';
 import 'package:stock_managament_app/app/utils.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:stock_managament_app/constants/customWidget/constants.dart';
+import 'constants/customWidget/constants.dart';
 import 'firebase_options.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 

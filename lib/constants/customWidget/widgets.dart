@@ -50,7 +50,11 @@ Center errorData() {
 }
 
 Center emptyData() {
-  return const Center(child: Text("No product found"));
+  return Center(
+      child: Text(
+    "noProduct".tr,
+    style: TextStyle(color: Colors.black, fontFamily: gilroySemiBold, fontSize: 20.sp),
+  ));
 }
 
 CustomFooter customFooter() {
@@ -58,15 +62,15 @@ CustomFooter customFooter() {
     builder: (BuildContext context, LoadStatus? mode) {
       Widget body;
       if (mode == LoadStatus.idle) {
-        body = const Text("pull up load");
+        body = const Text('Garaşyň...');
       } else if (mode == LoadStatus.loading) {
-        body = spinKit();
+        body = const CircularProgressIndicator(color: kPrimaryColor2);
       } else if (mode == LoadStatus.failed) {
-        body = const Text("Load Failed!Click retry!");
+        body = const Text('Load Failed!Click retry!');
       } else if (mode == LoadStatus.canLoading) {
-        body = const Text("release to load more");
+        body = const Text('');
       } else {
-        body = const Text("No more Data");
+        body = const Text('No more Data');
       }
       return SizedBox(
         height: 55.0,
@@ -76,43 +80,23 @@ CustomFooter customFooter() {
   );
 }
 
-Widget homePageTopWidget({required String stockInHand, required String totalProducts}) {
-  return Row(
+Expanded textWidgetHomeVIew(String totalProducts, String text) {
+  return Expanded(
+      child: Column(
+    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+    crossAxisAlignment: CrossAxisAlignment.start,
     children: [
-      Expanded(
-          child: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'totalProducts'.tr,
-            overflow: TextOverflow.ellipsis,
-            style: TextStyle(color: Colors.grey, fontFamily: gilroySemiBold, fontSize: 16.sp),
-          ),
-          Text(
-            totalProducts,
-            style: TextStyle(color: Colors.black, fontFamily: gilroyBold, fontSize: 30.sp),
-          ),
-        ],
-      )),
-      Expanded(
-          child: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'stockInHand'.tr,
-            overflow: TextOverflow.ellipsis,
-            style: TextStyle(color: Colors.grey, fontFamily: gilroySemiBold, fontSize: 16.sp),
-          ),
-          Text(
-            stockInHand,
-            style: TextStyle(color: Colors.black, fontFamily: gilroyBold, fontSize: 30.sp),
-          ),
-        ],
-      )),
+      Text(
+        text,
+        overflow: TextOverflow.ellipsis,
+        style: TextStyle(color: Colors.grey, fontFamily: gilroySemiBold, fontSize: 16.sp),
+      ),
+      Text(
+        totalProducts,
+        style: TextStyle(color: Colors.black, fontFamily: gilroyBold, fontSize: 30.sp),
+      ),
     ],
-  );
+  ));
 }
 
 Container bottomPart(String orderSum) {
@@ -303,6 +287,20 @@ CachedNetworkImage imageView({required String imageURl}) {
     placeholder: (context, url) => spinKit(),
     errorWidget: (context, url, error) => Center(
       child: Text('noImage'.tr),
+    ),
+  );
+}
+
+Text filterTextWidget(String name) {
+  return Text(
+    name,
+    maxLines: 1,
+    overflow: TextOverflow.ellipsis,
+    textAlign: TextAlign.center,
+    style: TextStyle(
+      color: Colors.black,
+      fontFamily: gilroySemiBold,
+      fontSize: 22.sp,
     ),
   );
 }
