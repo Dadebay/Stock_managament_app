@@ -200,10 +200,13 @@ Widget textWidgetOrderedPage(
                     child: Text('yes'.tr, style: TextStyle(fontFamily: gilroyBold, fontSize: 18.sp)),
                     onPressed: () {
                       if (text1 == 'discount') {
-                        if (double.parse(textEditingController.text.toString()) > double.parse(order.sumPrice.toString())) {
-                          showSnackBar('Error', 'Discount price cannot higher than Sum price', Colors.red);
+                        double sumPrice = double.parse(order.sumPrice.toString());
+                        double discount = textEditingController.text.isEmpty ? 0.0 : double.parse(textEditingController.text.toString());
+                        if (sumPrice == discount) {
+                          showSnackBar('errorTitle', 'notHigherThanSumPrice', Colors.red);
+                        } else if (discount > sumPrice) {
+                          showSnackBar('errorTitle', 'notHigherThanSumPrice', Colors.red);
                         } else {
-                          double discount = textEditingController.text.isEmpty ? 0.0 : double.parse(textEditingController.text.toString());
                           FirebaseFirestore.instance
                               .collection('sales')
                               .doc(order.orderID)
@@ -227,7 +230,7 @@ Widget textWidgetOrderedPage(
             },
           );
         } else {
-          showSnackBar("Error", "You cannot change order status", Colors.red);
+          showSnackBar("errorTitle", "cannotChangeOrderStatus", Colors.red);
         }
       }
     },

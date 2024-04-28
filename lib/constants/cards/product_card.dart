@@ -48,8 +48,9 @@ class _ProductCardState extends State<ProductCard> {
       child: ListTile(
         title: Text(
           widget.product.name!,
-          maxLines: 2,
-          style: TextStyle(color: Colors.black, fontSize: 15.sp),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: TextStyle(color: Colors.black, fontFamily: gilroyMedium, fontSize: 15.sp),
         ),
         dense: true,
         visualDensity: const VisualDensity(vertical: 3),
@@ -128,6 +129,7 @@ class _ProductCardState extends State<ProductCard> {
                 children: [
                   Text(
                     widget.product.name!,
+                    maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(color: Colors.black, fontFamily: gilroySemiBold, fontSize: 16.sp),
                   ),

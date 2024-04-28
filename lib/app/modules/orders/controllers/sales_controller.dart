@@ -6,9 +6,13 @@ import 'package:stock_managament_app/constants/customWidget/constants.dart';
 import 'package:stock_managament_app/constants/customWidget/widgets.dart';
 
 class SalesController extends GetxController {
-  List<QueryDocumentSnapshot<Object?>> orderCardList = [];
+  RxList orderCardList = [].obs;
   RxString isFilteredStatusName = "".obs;
   RxBool isFiltered = false.obs;
+  RxList productList = [].obs;
+  RxList selectedProductsList = [].obs;
+
+  RxBool loadingDataSelectProductView = false.obs;
   RxBool loadingDataOrders = false.obs;
   List statuses = ['Preparing', 'Ready to ship', 'Shipped', 'Refund', 'Canceled'];
   CollectionReference collectionReference = FirebaseFirestore.instance.collection('sales');
@@ -27,7 +31,7 @@ class SalesController extends GetxController {
       if (value.docs.isEmpty) {
         orderCardList.clear();
       } else {
-        orderCardList = value.docs;
+        orderCardList.value = value.docs;
       }
     });
     loadingDataOrders.value = false;
@@ -37,17 +41,50 @@ class SalesController extends GetxController {
 
   getData() {
     loadingDataOrders.value = true;
+    print(orderCardList);
     collectionReference.orderBy("date", descending: true).limit(limit).get().then((value) {
-      orderCardList = value.docs;
+      orderCardList.value = value.docs;
     });
+    print(orderCardList);
+
     loadingDataOrders.value = false;
+  }
+
+  getDataSelectProductsView() async {
+    loadingDataSelectProductView.value = true;
+    await FirebaseFirestore.instance.collection('products').get().then((value) {
+      productList.clear();
+      for (var element in value.docs) {
+        final product = ProductModel(
+          name: element['name'],
+          brandName: element['brand'].toString(),
+          category: element['category'].toString(),
+          cost: element['cost'],
+          gramm: element['gramm'],
+          image: element['image'].toString(),
+          location: element['location'].toString(),
+          material: element['material'].toString(),
+          quantity: element['quantity'],
+          sellPrice: element['sell_price'].toString(),
+          note: element['note'].toString(),
+          package: element['package'].toString(),
+          documentID: element.id,
+        );
+        addProduct(product: product, count: 0);
+      }
+      for (var element in selectedProductsList) {
+        final ProductModel product = element['product'];
+        upgradeCount(int.parse(product.documentID.toString()), int.parse(element['count'].toString()));
+      }
+    });
+    loadingDataSelectProductView.value = false;
   }
 
   Future<void> onRefreshController() async {
     orderCardList.clear();
     loadingDataOrders.value = true;
     await collectionReference.orderBy("date", descending: true).limit(limit).get().then((value) {
-      orderCardList = value.docs;
+      orderCardList.value = value.docs;
     });
     isFiltered.value = false;
     loadingDataOrders.value = false;
@@ -56,10 +93,10 @@ class SalesController extends GetxController {
   Future<void> onLoadingController() async {
     int length = orderCardList.length;
     loadingDataOrders.value = true;
-
     if (isFiltered.value == true) {
       collectionReference.where("status", isEqualTo: isFilteredStatusName.value.toLowerCase()).startAfterDocument(orderCardList.last).limit(limit).get().then((value) {
         orderCardList.addAll(value.docs);
+
         if (length == orderCardList.length) {
           showSnackBar("done", "endOFProduct", Colors.green);
         }
@@ -74,11 +111,6 @@ class SalesController extends GetxController {
     }
     loadingDataOrders.value = false;
   }
-
-/////////////////=//////////////////
-  RxList productList = [].obs;
-  RxList productListDocuments = [].obs;
-  RxList selectedProductsList = [].obs;
 
   addProduct({required ProductModel product, required int count}) {
     productList.add({'product': product, 'count': count});
@@ -102,41 +134,17 @@ class SalesController extends GetxController {
         element['count'] = count;
       }
     }
-
     productList.refresh();
-    for (var element in selectedProductsList) {
-      final ProductModel product = element['product'];
-      if (product.documentID.toString() == id.toString()) {
-        element['count'] = count;
-        if (int.parse(element['count'].toString()) == 0) {
-          print(element);
-          selectedProductsList.removeWhere((element2) => element2['count'] == 0);
-          print(selectedProductsList);
-        }
-      }
-    }
-
-    selectedProductsList.refresh();
-  }
-
-  addProductMain({required int count, required ProductModel product}) {
-    if (selectedProductsList.isEmpty) {
-      selectedProductsList.add({'product': product, 'count': count});
-    } else {
-      bool value = false;
-
+    if (selectedProductsList.isNotEmpty) {
       for (var element in selectedProductsList) {
-        final ProductModel productMine = element['product'];
-        if (product.documentID.toString() == productMine.documentID) {
+        final ProductModel product = element['product'];
+        if (product.documentID.toString() == id.toString()) {
           element['count'] = count;
-          value = true;
         }
       }
-      if (!value) {
-        selectedProductsList.add({'product': product, 'count': count});
-      }
+      selectedProductsList.removeWhere((element) => element['count'].toString() == '0');
+      selectedProductsList.refresh();
     }
-    selectedProductsList.refresh();
   }
 
   sumbitSale({required List<TextEditingController> textControllers, required String status}) {
@@ -169,7 +177,6 @@ class SalesController extends GetxController {
       }).then((value) async {
         for (var element in selectedProductsList) {
           final ProductModel product = element['product'];
-          print(value.id);
           await FirebaseFirestore.instance.collection('sales').doc(value.id).collection('products').add({
             'brand': product.brandName,
             'category': product.category,
@@ -190,5 +197,26 @@ class SalesController extends GetxController {
 
       showSnackBar("Done", "Your purchase submitted ", Colors.green);
     }
+  }
+/////////////////=//////////////////
+
+  addProductMain({required int count, required ProductModel product}) {
+    if (selectedProductsList.isEmpty) {
+      selectedProductsList.add({'product': product, 'count': count});
+    } else {
+      bool value = false;
+
+      for (var element in selectedProductsList) {
+        final ProductModel productMine = element['product'];
+        if (product.documentID.toString() == productMine.documentID) {
+          element['count'] = count;
+          value = true;
+        }
+      }
+      if (!value) {
+        selectedProductsList.add({'product': product, 'count': count});
+      }
+    }
+    selectedProductsList.refresh();
   }
 }

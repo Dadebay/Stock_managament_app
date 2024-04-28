@@ -21,6 +21,7 @@ class HomeController extends GetxController {
   @override
   void onInit() async {
     super.onInit();
+    print("I am getting data Homeview ----------------------------------------");
     getData();
   }
 

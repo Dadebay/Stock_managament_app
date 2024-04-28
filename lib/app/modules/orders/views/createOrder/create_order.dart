@@ -1,19 +1,18 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
-import 'package:flutter_iconly/flutter_iconly.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:stock_managament_app/app/modules/orders/controllers/sales_controller.dart';
-import 'package:stock_managament_app/app/modules/orders/views/select_products_view.dart';
+import 'package:stock_managament_app/app/modules/orders/views/createOrder/select_order_products.dart';
 import 'package:stock_managament_app/constants/buttons/agree_button_view.dart';
 import 'package:stock_managament_app/constants/cards/product_card.dart';
 import 'package:stock_managament_app/constants/customWidget/constants.dart';
+import 'package:stock_managament_app/constants/customWidget/custom_app_bar.dart';
 import 'package:stock_managament_app/constants/customWidget/custom_text_field.dart';
 import 'package:stock_managament_app/constants/customWidget/phone_number.dart';
 import 'package:stock_managament_app/constants/customWidget/widgets.dart';
 
-import '../../../data/models/product_model.dart';
+import '../../../../data/models/product_model.dart';
 
 class CreateOrderView extends StatefulWidget {
   const CreateOrderView({super.key});
@@ -28,6 +27,7 @@ class _CreateOrderViewState extends State<CreateOrderView> {
   final SalesController salesController = Get.put(SalesController());
   String selectedStatus = "Preparing"; // Set an initial value
   List<TextEditingController> textControllers = List.generate(9, (_) => TextEditingController());
+  final _formKey = GlobalKey<FormState>();
 
   @override
   void initState() {
@@ -40,25 +40,7 @@ class _CreateOrderViewState extends State<CreateOrderView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-        leading: IconButton(
-            onPressed: () {
-              Get.back();
-            },
-            icon: const Icon(
-              IconlyLight.arrowLeftCircle,
-              color: Colors.black,
-            )),
-        title: Text(
-          'creatOrder'.tr,
-          style: TextStyle(color: Colors.black, fontFamily: gilroyMedium, fontSize: 18.sp),
-        ),
-        centerTitle: true,
-        foregroundColor: Colors.white,
-        scrolledUnderElevation: 0,
-        backgroundColor: Colors.white,
-      ),
+      appBar: CustomAppBar(backArrow: true, centerTitle: true, actionIcon: false, name: 'createOrder'.tr),
       body: ListView(
         padding: EdgeInsets.symmetric(horizontal: 10.w),
         children: [
@@ -87,9 +69,15 @@ class _CreateOrderViewState extends State<CreateOrderView> {
             ),
           ),
           CustomTextField(labelName: "package", borderRadius: true, controller: textControllers[1], focusNode: focusNodes[1], requestfocusNode: focusNodes[2], unFocus: false, readOnly: true),
-          PhoneNumber(mineFocus: focusNodes[2], controller: textControllers[2], requestFocus: focusNodes[3], style: false, unFocus: true),
-          CustomTextField(labelName: "Client Name", borderRadius: true, controller: textControllers[3], focusNode: focusNodes[3], requestfocusNode: focusNodes[4], unFocus: false, readOnly: true),
-          CustomTextField(labelName: "Client Address", borderRadius: true, controller: textControllers[4], focusNode: focusNodes[4], requestfocusNode: focusNodes[5], unFocus: false, readOnly: true),
+          Form(
+              key: _formKey,
+              child: Column(
+                children: [
+                  PhoneNumber(mineFocus: focusNodes[2], controller: textControllers[2], requestFocus: focusNodes[3], style: false, unFocus: true),
+                  CustomTextField(labelName: "userName", borderRadius: true, controller: textControllers[3], focusNode: focusNodes[3], requestfocusNode: focusNodes[4], unFocus: false, readOnly: true),
+                ],
+              )),
+          CustomTextField(labelName: "clientAddress", borderRadius: true, controller: textControllers[4], focusNode: focusNodes[4], requestfocusNode: focusNodes[5], unFocus: false, readOnly: true),
           CustomTextField(
               labelName: "Coupon",
               isNumber: true,
@@ -110,44 +98,23 @@ class _CreateOrderViewState extends State<CreateOrderView> {
               requestfocusNode: focusNodes[7],
               unFocus: false,
               readOnly: true),
-          CustomTextField(labelName: "Note", borderRadius: true, maxline: 3, controller: textControllers[6], focusNode: focusNodes[7], requestfocusNode: focusNodes[0], unFocus: false, readOnly: true),
-          Obx(() {
-            return salesController.selectedProductsList.isEmpty
-                ? const SizedBox.shrink()
-                : Wrap(
-                    children: [
-                      Padding(
-                        padding: EdgeInsets.only(top: 10.h, left: 10.w, bottom: 10.h),
-                        child: Text(
-                          "Selected products",
-                          style: TextStyle(color: Colors.black, fontFamily: gilroySemiBold, fontSize: 22.sp),
-                        ),
-                      ),
-                      ListView.builder(
-                        itemCount: salesController.selectedProductsList.length,
-                        shrinkWrap: true,
-                        itemBuilder: (BuildContext context, int index) {
-                          final ProductModel product = salesController.selectedProductsList[index]['product'];
-                          return ProductCard(product: product, orderView: false, addCounterWidget: true);
-                          // ProductCardMine(
-                          //   product: product,
-                          // );
-                        },
-                      ),
-                    ],
-                  );
-          }),
+          CustomTextField(labelName: "note", borderRadius: true, maxline: 3, controller: textControllers[6], focusNode: focusNodes[7], requestfocusNode: focusNodes[0], unFocus: false, readOnly: true),
+          selectedProductsView(),
           AgreeButton(
               onTap: () {
-                Get.to(() => const SelectProductsView());
+                Get.to(() => const SelectOrderProducts());
               },
-              text: 'Select products'),
+              text: 'selectProducts'),
           AgreeButton(
               onTap: () {
-                if (salesController.selectedProductsList.isEmpty) {
-                  showSnackBar('Error', 'Please select one or more products', Colors.red);
+                if (_formKey.currentState!.validate()) {
+                  if (salesController.selectedProductsList.isEmpty) {
+                    showSnackBar('errorTitle', 'selectMoreProducts', Colors.red);
+                  } else {
+                    salesController.sumbitSale(textControllers: textControllers, status: selectedStatus);
+                  }
                 } else {
-                  salesController.sumbitSale(textControllers: textControllers, status: selectedStatus);
+                  showSnackBar('errorTitle', 'loginErrorFillBlanks', Colors.red);
                 }
               },
               text: 'agree'),
@@ -157,5 +124,31 @@ class _CreateOrderViewState extends State<CreateOrderView> {
         ],
       ),
     );
+  }
+
+  Obx selectedProductsView() {
+    return Obx(() {
+      return salesController.selectedProductsList.isEmpty
+          ? const SizedBox.shrink()
+          : Wrap(
+              children: [
+                Padding(
+                  padding: EdgeInsets.only(top: 10.h, left: 10.w, bottom: 10.h),
+                  child: Text(
+                    "selectedProducts".tr,
+                    style: TextStyle(color: Colors.black, fontFamily: gilroySemiBold, fontSize: 22.sp),
+                  ),
+                ),
+                ListView.builder(
+                  itemCount: salesController.selectedProductsList.length,
+                  shrinkWrap: true,
+                  itemBuilder: (BuildContext context, int index) {
+                    final ProductModel product = salesController.selectedProductsList[index]['product'];
+                    return ProductCard(product: product, orderView: false, addCounterWidget: true);
+                  },
+                ),
+              ],
+            );
+    });
   }
 }

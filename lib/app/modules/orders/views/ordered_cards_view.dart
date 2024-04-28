@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import 'package:get/get.dart';
@@ -18,7 +19,7 @@ class _OrdersViewState extends State<OrdersView> {
   final SalesController salesController = Get.put(SalesController());
   final RefreshController _refreshControllerOrders = RefreshController(initialRefresh: false);
 
-  void _onRefresh() async {
+  void _onRefresh2() async {
     await Future.delayed(const Duration(milliseconds: 1000));
     salesController.onRefreshController();
     _refreshControllerOrders.refreshCompleted();
@@ -38,7 +39,7 @@ class _OrdersViewState extends State<OrdersView> {
       header: const WaterDropHeader(),
       footer: customFooter(),
       controller: _refreshControllerOrders,
-      onRefresh: _onRefresh,
+      onRefresh: _onRefresh2,
       onLoading: _onLoading,
       child: Obx(() {
         return salesController.loadingDataOrders.value == true
@@ -47,6 +48,7 @@ class _OrdersViewState extends State<OrdersView> {
                 ? emptyData()
                 : ListView.builder(
                     itemCount: salesController.orderCardList.length,
+                    shrinkWrap: true,
                     physics: const BouncingScrollPhysics(),
                     itemBuilder: (BuildContext context, int index) {
                       final order = OrderModel(

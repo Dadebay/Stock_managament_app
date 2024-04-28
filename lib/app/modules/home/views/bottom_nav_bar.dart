@@ -4,9 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_iconly/flutter_iconly.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:stock_managament_app/app/modules/home/controllers/home_controller.dart';
 import 'package:stock_managament_app/app/modules/orders/controllers/sales_controller.dart';
-import 'package:stock_managament_app/app/modules/orders/views/create_order.dart';
+import 'package:stock_managament_app/app/modules/orders/views/createOrder/create_order.dart';
 import 'package:stock_managament_app/app/modules/orders/views/ordered_cards_view.dart';
 import 'package:stock_managament_app/app/modules/search/views/search_view.dart';
 import 'package:stock_managament_app/constants/customWidget/constants.dart';
@@ -23,10 +22,8 @@ class BottomNavBar extends StatefulWidget {
 }
 
 class _BottomNavBarState extends State<BottomNavBar> {
-  List page = [const HomeView(), const OrdersView()];
+  List page = [];
   int selectedIndex = 0;
-
-  final HomeController _homeController = Get.put(HomeController());
   final SalesController _salesController = Get.put(SalesController());
 
   Future<dynamic> filter() {
@@ -63,9 +60,9 @@ class _BottomNavBarState extends State<BottomNavBar> {
         backArrow: false,
         actionIcon: true,
         icon: selectedIndex == 0
-            ? IconButton(onPressed: () => Get.to(() => SearchView(productList: _homeController.productsListHomeView, whereToSearch: 'products')), icon: const Icon(IconlyLight.search))
+            ? IconButton(onPressed: () => Get.to(() => const SearchView(whereToSearch: 'products')), icon: const Icon(IconlyLight.search))
             : Row(mainAxisSize: MainAxisSize.min, children: [
-                IconButton(onPressed: () => Get.to(() => SearchView(productList: _salesController.orderCardList, whereToSearch: 'orders')), icon: const Icon(IconlyLight.search, color: Colors.black)),
+                IconButton(onPressed: () => Get.to(() => const SearchView(whereToSearch: 'orders')), icon: const Icon(IconlyLight.search, color: Colors.black)),
                 IconButton(onPressed: () => filter(), icon: const Icon(IconlyLight.filter, color: Colors.black)),
               ]),
         name: selectedIndex == 1 ? 'sales' : "products",
@@ -105,7 +102,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
         ],
       ),
       body: Center(
-        child: page[selectedIndex],
+        child: selectedIndex == 0 ? const HomeView() : const OrdersView(),
       ),
     );
   }

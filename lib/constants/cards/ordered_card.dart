@@ -15,7 +15,7 @@ class OrderedCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        Get.to(() => OrderedProductsView(
+        Get.to(() => OrderCardsProfil(
               order: order,
               docID: docID,
             ));
