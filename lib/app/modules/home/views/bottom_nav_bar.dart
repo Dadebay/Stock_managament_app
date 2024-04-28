@@ -8,6 +8,7 @@ import 'package:stock_managament_app/app/modules/orders/controllers/sales_contro
 import 'package:stock_managament_app/app/modules/orders/views/createOrder/create_order.dart';
 import 'package:stock_managament_app/app/modules/orders/views/ordered_cards_view.dart';
 import 'package:stock_managament_app/app/modules/search/views/search_view.dart';
+import 'package:stock_managament_app/app/modules/settings/views/settings_view.dart';
 import 'package:stock_managament_app/constants/customWidget/constants.dart';
 import 'package:stock_managament_app/constants/customWidget/custom_app_bar.dart';
 import 'package:stock_managament_app/constants/customWidget/widgets.dart';
@@ -60,7 +61,12 @@ class _BottomNavBarState extends State<BottomNavBar> {
         backArrow: false,
         actionIcon: true,
         icon: selectedIndex == 0
-            ? IconButton(onPressed: () => Get.to(() => const SearchView(whereToSearch: 'products')), icon: const Icon(IconlyLight.search))
+            ? Row(
+                children: [
+                  IconButton(onPressed: () => Get.to(() => const SearchView(whereToSearch: 'products')), icon: const Icon(IconlyLight.search)),
+                  IconButton(onPressed: () => Get.to(() => const SettingsView()), icon: const Icon(IconlyLight.setting))
+                ],
+              )
             : Row(mainAxisSize: MainAxisSize.min, children: [
                 IconButton(onPressed: () => Get.to(() => const SearchView(whereToSearch: 'orders')), icon: const Icon(IconlyLight.search, color: Colors.black)),
                 IconButton(onPressed: () => filter(), icon: const Icon(IconlyLight.filter, color: Colors.black)),
