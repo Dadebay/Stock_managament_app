@@ -25,12 +25,15 @@ class _HomeViewState extends State<HomeView> {
     {'name': 'Materials', 'searchName': 'material'}
   ];
   void _onRefresh() async {
+    print("qwe");
+
     await Future.delayed(const Duration(milliseconds: 1000));
     _homeController.onRefreshController();
     _refreshControllerMine.refreshCompleted();
   }
 
   void _onLoading() async {
+    print("qwe");
     await Future.delayed(const Duration(milliseconds: 1000));
     _homeController.onLoadingController();
     _refreshControllerMine.loadComplete();
@@ -40,26 +43,28 @@ class _HomeViewState extends State<HomeView> {
   final RefreshController _refreshControllerMine = RefreshController(initialRefresh: false);
 
   Future<dynamic> filter() {
-    return Get.bottomSheet(Container(
-      padding: EdgeInsets.symmetric(vertical: 10.h, horizontal: 10.w),
-      decoration: const BoxDecoration(color: Colors.white, borderRadius: BorderRadius.only(topLeft: Radius.circular(20), topRight: Radius.circular(20))),
-      child: Wrap(
-        children: [
-          filterTextWidget('filter'.tr),
-          ListView.builder(
+    return Get.defaultDialog(
+        title: 'filter'.tr,
+        titleStyle: TextStyle(color: Colors.black, fontFamily: gilroySemiBold, fontSize: 20.sp),
+        content: Container(
+          width: Get.size.width / 1.5,
+          height: Get.size.height / 2,
+          padding: EdgeInsets.symmetric(vertical: 10.h, horizontal: 10.w),
+          child: ListView.builder(
             itemCount: filters.length,
             shrinkWrap: true,
             physics: const BouncingScrollPhysics(),
             itemBuilder: (BuildContext context, int index) {
               return ListTile(
                 onTap: () {
-                  Get.bottomSheet(Container(
-                    padding: EdgeInsets.symmetric(vertical: 10.h, horizontal: 10.w),
-                    decoration: const BoxDecoration(color: Colors.white, borderRadius: BorderRadius.only(topLeft: Radius.circular(20), topRight: Radius.circular(20))),
-                    child: Wrap(
-                      children: [
-                        filterTextWidget(filters[index]['name']),
-                        StreamBuilder(
+                  Get.defaultDialog(
+                      title: filters[index]['name'],
+                      titleStyle: TextStyle(color: Colors.black, fontFamily: gilroySemiBold, fontSize: 18.sp),
+                      content: Container(
+                        width: Get.size.width / 1.5,
+                        height: Get.size.height / 2,
+                        padding: EdgeInsets.symmetric(vertical: 10.h, horizontal: 10.w),
+                        child: StreamBuilder(
                             stream: FirebaseFirestore.instance.collection(filters[index]['name'].toLowerCase()).snapshots(),
                             builder: (context, snapshot) {
                               if (snapshot.hasData) {
@@ -81,18 +86,17 @@ class _HomeViewState extends State<HomeView> {
                                 child: spinKit(),
                               );
                             }),
-                      ],
-                    ),
-                  ));
+                      ));
                 },
-                title: Text(filters[index]['name'].toString()),
+                title: Text(
+                  filters[index]['name'].toString(),
+                  style: TextStyle(color: Colors.black, fontFamily: gilroyMedium, fontSize: 18.sp),
+                ),
                 trailing: const Icon(IconlyLight.arrowRightCircle),
               );
             },
           ),
-        ],
-      ),
-    ));
+        ));
   }
 
   @override
@@ -136,6 +140,7 @@ class _HomeViewState extends State<HomeView> {
                   : _homeController.productsListHomeView.isEmpty
                       ? emptyData()
                       : ListView.separated(
+                          shrinkWrap: true,
                           padding: EdgeInsets.zero,
                           itemCount: _homeController.productsListHomeView.length,
                           physics: const BouncingScrollPhysics(),
@@ -144,8 +149,8 @@ class _HomeViewState extends State<HomeView> {
                                 name: _homeController.productsListHomeView[index]['name'],
                                 brandName: _homeController.productsListHomeView[index]['brand'].toString(),
                                 category: _homeController.productsListHomeView[index]['category'].toString(),
-                                cost: _homeController.productsListHomeView[index]['cost'],
-                                gramm: _homeController.productsListHomeView[index]['gramm'],
+                                cost: _homeController.productsListHomeView[index]['cost'].toString(),
+                                gramm: _homeController.productsListHomeView[index]['gramm'].toString(),
                                 image: _homeController.productsListHomeView[index]['image'].toString(),
                                 location: _homeController.productsListHomeView[index]['location'].toString(),
                                 material: _homeController.productsListHomeView[index]['material'].toString(),

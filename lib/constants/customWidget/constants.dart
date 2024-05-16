@@ -5,7 +5,7 @@ const Color kPrimaryColor1 = Color(0xff1f2123);
 const Color kPrimaryColor2 = Color(0xff6366f1);
 const Color backgroundColor = Color(0xfff2f2f2);
 const Color kBlackColor = Color(0xff2b2b2b);
-const int limit = 5;
+const int limit = 10;
 
 ///BorderRadius
 const BorderRadius borderRadius5 = BorderRadius.all(Radius.circular(5));

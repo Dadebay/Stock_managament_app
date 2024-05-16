@@ -35,28 +35,29 @@ class _MyAppState extends State<MyApp> {
         splitScreenMode: true,
         builder: (_, child) {
           return GetMaterialApp(
-            debugShowCheckedModeBanner: false,
-            title: appName,
-            theme: ThemeData(
-              brightness: Brightness.light,
-              fontFamily: gilroyRegular,
-              colorSchemeSeed: kPrimaryColor,
-              useMaterial3: true,
-              appBarTheme: const AppBarTheme(
-                backgroundColor: Colors.white,
-                systemOverlayStyle: SystemUiOverlayStyle(statusBarColor: Colors.white, statusBarBrightness: Brightness.light, statusBarIconBrightness: Brightness.dark),
-                titleTextStyle: TextStyle(color: Colors.black, fontFamily: gilroySemiBold, fontSize: 20),
-                elevation: 0,
+              debugShowCheckedModeBanner: false,
+              title: appName,
+              theme: ThemeData(
+                brightness: Brightness.light,
+                fontFamily: gilroyRegular,
+                colorSchemeSeed: kPrimaryColor,
+                useMaterial3: true,
+                appBarTheme: const AppBarTheme(
+                  backgroundColor: Colors.white,
+                  systemOverlayStyle: SystemUiOverlayStyle(statusBarColor: Colors.white, statusBarBrightness: Brightness.light, statusBarIconBrightness: Brightness.dark),
+                  titleTextStyle: TextStyle(color: Colors.black, fontFamily: gilroySemiBold, fontSize: 20),
+                  elevation: 0,
+                ),
+                bottomSheetTheme: BottomSheetThemeData(backgroundColor: Colors.transparent.withOpacity(0)),
+                visualDensity: VisualDensity.adaptivePlatformDensity,
               ),
-              bottomSheetTheme: BottomSheetThemeData(backgroundColor: Colors.transparent.withOpacity(0)),
-              visualDensity: VisualDensity.adaptivePlatformDensity,
-            ),
-            fallbackLocale: const Locale('tm'),
-            locale: storage.read('langCode') != null ? Locale(storage.read('langCode')) : const Locale('tm'),
-            translations: MyTranslations(),
-            defaultTransition: Transition.fade,
-            home: const ConnectionCheckView(),
-          );
+              fallbackLocale: const Locale('tm'),
+              locale: storage.read('langCode') != null ? Locale(storage.read('langCode')) : const Locale('tm'),
+              translations: MyTranslations(),
+              defaultTransition: Transition.fade,
+              home: const ConnectionCheckView()
+              // home: const ConnectionCheckView(),
+              );
         });
   }
 }

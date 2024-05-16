@@ -84,7 +84,19 @@ class _OrderCardsProfilState extends State<OrderCardsProfil> {
       title: Text(text),
       value: option,
       groupValue: _selectedSortOption,
-      onChanged: (SortOptions? value) {
+      onChanged: (SortOptions? value) async {
+        if (option == SortOptions.canceled || option == SortOptions.refund) {
+          await FirebaseFirestore.instance.collection('sales').doc(widget.order.orderID).collection('products').get().then((value) async {
+            for (var element in value.docs) {
+              await FirebaseFirestore.instance.collection('products').where('name', isEqualTo: element['name']).get().then((value2) {
+                FirebaseFirestore.instance
+                    .collection('products')
+                    .doc(value2.docs[0].id)
+                    .update({'quantity': int.parse(value2.docs[0]['quantity'].toString()) + int.parse(element['quantity'].toString())});
+              });
+            }
+          });
+        }
         _selectedSortOption = value!;
         doStatusFunction(statusMapping[_selectedSortOption.name.toString()].toString());
         FirebaseFirestore.instance.collection('sales').doc(widget.order.orderID).update({
@@ -319,8 +331,8 @@ class _OrderCardsProfilState extends State<OrderCardsProfil> {
                   name: snapshot.data!.docs[index]['name'],
                   brandName: snapshot.data!.docs[index]['brand'].toString(),
                   category: snapshot.data!.docs[index]['category'].toString(),
-                  cost: snapshot.data!.docs[index]['cost'],
-                  gramm: snapshot.data!.docs[index]['gramm'],
+                  cost: snapshot.data!.docs[index]['cost'].toString(),
+                  gramm: snapshot.data!.docs[index]['gramm'].toString(),
                   image: snapshot.data!.docs[index]['image'].toString(),
                   location: snapshot.data!.docs[index]['location'].toString(),
                   material: snapshot.data!.docs[index]['material'].toString(),

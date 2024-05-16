@@ -27,13 +27,15 @@ class ProductProfilView extends StatefulWidget {
 }
 
 class _ProductProfilViewState extends State<ProductProfilView> {
-  List<FocusNode> focusNodes = List.generate(9, (_) => FocusNode());
-  List<bool> readOnlyStates = List.generate(9, (_) => false);
-  List<TextEditingController> textControllers = List.generate(9, (_) => TextEditingController());
+  List<FocusNode> focusNodes = List.generate(10, (_) => FocusNode());
   String imageURL = "";
+  List<bool> readOnlyStates = List.generate(10, (_) => false);
+  List<TextEditingController> textControllers = List.generate(10, (_) => TextEditingController());
+
+  final HomeController _homeController = Get.put(HomeController());
   File? _photo;
   final ImagePicker _picker = ImagePicker();
-  final HomeController _homeController = Get.put(HomeController());
+
   void changeData(final ProductModel productModel) {
     imageURL = productModel.image!;
     updateFieldIfNotEmpty(productModel.name, 0);
@@ -41,9 +43,10 @@ class _ProductProfilViewState extends State<ProductProfilView> {
     updateFieldIfNotEmpty(productModel.brandName, 2);
     updateFieldIfNotEmpty(productModel.gramm.toString(), 3);
     updateFieldIfNotEmpty(productModel.material.toString(), 4);
-    updateFieldIfNotEmpty('${productModel.sellPrice} TMT', 5);
+    updateFieldIfNotEmpty('${productModel.sellPrice}', 5);
     updateFieldIfNotEmpty(productModel.location.toString(), 6);
     updateFieldIfNotEmpty(productModel.quantity.toString(), 7);
+    updateFieldIfNotEmpty(productModel.note.toString(), 8);
   }
 
   void updateFieldIfNotEmpty(String? value, int index) {
@@ -72,6 +75,43 @@ class _ProductProfilViewState extends State<ProductProfilView> {
         showImageUploadDialog();
       }
     });
+  }
+
+//5151 mr Komekow taze mekdebin prog  hat ugradyp
+
+  Future<dynamic> changeTextFieldWithData(String name, int indexTile, String changeName) {
+    return Get.defaultDialog(
+        contentPadding: EdgeInsets.zero,
+        title: changeName.tr,
+        content: SizedBox(
+          height: Get.height / 1.5,
+          width: Get.width,
+          child: StreamBuilder(
+              stream: FirebaseFirestore.instance.collection(name).snapshots(),
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  return ListView.separated(
+                    itemCount: snapshot.data!.docs.length,
+                    shrinkWrap: true,
+                    physics: const BouncingScrollPhysics(),
+                    itemBuilder: (BuildContext context, int indexx) {
+                      return ListTile(
+                          onTap: () {
+                            textControllers[indexTile].text = snapshot.data!.docs[indexx]['name'];
+                            Get.back();
+                          },
+                          title: Text(snapshot.data!.docs[indexx]['name']));
+                    },
+                    separatorBuilder: (BuildContext context, int index) {
+                      return const Divider(thickness: 1, color: Colors.grey);
+                    },
+                  );
+                }
+                return Center(
+                  child: spinKit(),
+                );
+              }),
+        ));
   }
 
   Future uploadFile() async {
@@ -138,41 +178,6 @@ class _ProductProfilViewState extends State<ProductProfilView> {
     );
   }
 
-  Future<dynamic> changeTextFieldWithData(String name, int indexTile, String changeName) {
-    return Get.bottomSheet(Container(
-      padding: EdgeInsets.symmetric(vertical: 10.h, horizontal: 10.w),
-      decoration: const BoxDecoration(color: Colors.white, borderRadius: BorderRadius.only(topLeft: Radius.circular(20), topRight: Radius.circular(20))),
-      child: Wrap(
-        children: [
-          filterTextWidget(changeName.tr),
-          StreamBuilder(
-              stream: FirebaseFirestore.instance.collection(name).snapshots(),
-              builder: (context, snapshot) {
-                if (snapshot.hasData) {
-                  return ListView.builder(
-                    itemCount: snapshot.data!.docs.length,
-                    shrinkWrap: true,
-                    physics: const BouncingScrollPhysics(),
-                    itemBuilder: (BuildContext context, int indexx) {
-                      return ListTile(
-                        onTap: () {
-                          textControllers[indexTile].text = snapshot.data!.docs[indexx]['name'];
-                          Get.back();
-                        },
-                        title: Text(snapshot.data!.docs[indexx]['name']),
-                      );
-                    },
-                  );
-                }
-                return Center(
-                  child: spinKit(),
-                );
-              }),
-        ],
-      ),
-    ));
-  }
-
   Column textFields(BuildContext context) {
     return Column(
       children: [
@@ -191,6 +196,7 @@ class _ProductProfilViewState extends State<ProductProfilView> {
               changeTextFieldWithData('categories', 1, 'category');
             },
             readOnly: readOnlyStates[1],
+            // readOnly: true,
             labelName: 'category',
             borderRadius: true,
             controller: textControllers[1],
@@ -203,6 +209,7 @@ class _ProductProfilViewState extends State<ProductProfilView> {
               changeTextFieldWithData('brands', 2, 'brand');
             },
             readOnly: readOnlyStates[2],
+            // readOnly: true,
             labelName: 'brand',
             borderRadius: true,
             controller: textControllers[2],
@@ -236,7 +243,9 @@ class _ProductProfilViewState extends State<ProductProfilView> {
             requestfocusNode: focusNodes[7],
             unFocus: true),
         CustomTextField(
-            readOnly: readOnlyStates[7], labelName: 'quantity', borderRadius: true, controller: textControllers[7], focusNode: focusNodes[7], requestfocusNode: focusNodes[1], unFocus: true),
+            readOnly: readOnlyStates[7], labelName: 'quantity', borderRadius: true, controller: textControllers[7], focusNode: focusNodes[7], requestfocusNode: focusNodes[8], unFocus: true),
+        CustomTextField(
+            readOnly: readOnlyStates[8], maxline: 3, labelName: 'note', borderRadius: true, controller: textControllers[8], focusNode: focusNodes[8], requestfocusNode: focusNodes[1], unFocus: true),
         imageURL.isEmpty || imageURL == ''
             ? AgreeButton(
                 onTap: () {
@@ -249,7 +258,7 @@ class _ProductProfilViewState extends State<ProductProfilView> {
           onTap: () async {
             int i = 0;
             bool changeValue = false;
-            List names = ['name', 'category', 'brand', 'gramm', 'material', 'sell_price', 'location', 'quantity'];
+            List names = ['name', 'category', 'brand', 'gramm', 'material', 'sell_price', 'location', 'quantity', 'note'];
             _homeController.agreeButton.value = !_homeController.agreeButton.value;
 
             for (var element in readOnlyStates) {
@@ -326,8 +335,8 @@ class _ProductProfilViewState extends State<ProductProfilView> {
                 name: snapshot.data!['name'],
                 brandName: snapshot.data!['brand'].toString(),
                 category: snapshot.data!['category'].toString(),
-                cost: snapshot.data!['cost'],
-                gramm: snapshot.data!['gramm'],
+                cost: snapshot.data!['cost'].toString(),
+                gramm: snapshot.data!['gramm'].toString(),
                 image: snapshot.data!['image'].toString(),
                 location: snapshot.data!['location'].toString(),
                 material: snapshot.data!['material'].toString(),

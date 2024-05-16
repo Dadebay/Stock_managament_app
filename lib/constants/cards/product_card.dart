@@ -60,7 +60,7 @@ class _ProductCardState extends State<ProductCard> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              '${widget.product.sellPrice!} TMT',
+              widget.product.sellPrice!,
               style: TextStyle(color: Colors.grey, fontFamily: gilroyRegular, fontSize: 14.sp),
             ),
             Text(
@@ -79,7 +79,7 @@ class _ProductCardState extends State<ProductCard> {
                   if (selectedCount > 0) {
                     selectedCount--;
                   }
-                  salesController.decreaseCount(int.parse(widget.product.documentID.toString()), selectedCount);
+                  salesController.decreaseCount(widget.product.documentID.toString(), selectedCount);
                 });
               },
             ),
@@ -91,11 +91,12 @@ class _ProductCardState extends State<ProductCard> {
             IconButton(
               icon: const Icon(CupertinoIcons.add_circled, color: Colors.black),
               onPressed: () {
+                print(widget.product.quantity);
                 if (selectedCount >= widget.product.quantity!) {
-                  showSnackBar("Error", "We dont have to much item ", Colors.red);
+                  showSnackBar("Error", "Not in stock", Colors.red);
                 } else {
                   selectedCount++;
-                  salesController.upgradeCount(int.parse(widget.product.documentID.toString()), selectedCount);
+                  salesController.upgradeCount(widget.product.documentID.toString(), selectedCount);
                   salesController.addProductMain(product: widget.product, count: selectedCount);
                 }
               },
@@ -139,7 +140,7 @@ class _ProductCardState extends State<ProductCard> {
                     style: TextStyle(color: Colors.grey, fontFamily: gilroyRegular, fontSize: 14.sp),
                   ),
                   Text(
-                    "${"price".tr} ${widget.product.sellPrice} TMT",
+                    "${"price".tr} ${widget.product.sellPrice}",
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(color: Colors.grey, fontFamily: gilroyRegular, fontSize: 14.sp),
                   ),

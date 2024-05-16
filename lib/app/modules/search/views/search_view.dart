@@ -12,10 +12,9 @@ import 'package:stock_managament_app/constants/customWidget/custom_app_bar.dart'
 import 'package:stock_managament_app/constants/customWidget/widgets.dart';
 
 class SearchView extends StatefulWidget {
-  const SearchView({super.key, required this.whereToSearch});
-
   final String whereToSearch;
 
+  const SearchView({super.key, required this.whereToSearch});
   @override
   State<SearchView> createState() => _SearchViewState();
 }

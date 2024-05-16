@@ -111,7 +111,7 @@ Container bottomPart(String orderSum) {
           style: TextStyle(color: Colors.grey, fontSize: 14.sp, fontFamily: gilroySemiBold),
         ),
         Text(
-          "$orderSum TMT",
+          orderSum,
           style: TextStyle(color: Colors.black, fontSize: 14.sp, fontFamily: gilroyBold),
         ),
       ],
@@ -253,9 +253,9 @@ Widget textWidgetOrderedPage(
                   text1 == "clientNumber"
                       ? "+993 $text2"
                       : text1 == "priceProduct"
-                          ? "$text2 TMT"
+                          ? text2
                           : text1 == "discount" || text1 == "Coupon"
-                              ? "$text2 TMT"
+                              ? text2
                               : text2,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(color: Colors.black, fontFamily: gilroySemiBold, fontSize: 14.sp),

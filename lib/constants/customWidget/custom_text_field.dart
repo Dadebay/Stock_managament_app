@@ -15,7 +15,6 @@ class CustomTextField extends StatelessWidget {
   final bool unFocus;
   final bool? borderRadius;
   final bool? readOnly;
-  final bool? tmtValueShow;
   final bool? isNumber;
   final Function()? onTap;
 
@@ -28,7 +27,6 @@ class CustomTextField extends StatelessWidget {
     this.maxline,
     this.isNumber,
     this.borderRadius,
-    this.tmtValueShow,
     super.key,
     required this.readOnly,
     this.onTap,
@@ -60,12 +58,7 @@ class CustomTextField extends StatelessWidget {
         ],
         decoration: InputDecoration(
           errorMaxLines: 2,
-          suffix: tmtValueShow == true
-              ? Text(
-                  "TMT",
-                  style: TextStyle(color: Colors.grey.shade400, fontSize: 16.sp),
-                )
-              : const SizedBox.shrink(),
+          suffix: const SizedBox.shrink(),
           errorStyle: const TextStyle(fontFamily: gilroyMedium),
           hintMaxLines: 5,
           helperMaxLines: 5,

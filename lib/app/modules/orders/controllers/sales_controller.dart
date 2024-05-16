@@ -59,8 +59,8 @@ class SalesController extends GetxController {
           name: element['name'],
           brandName: element['brand'].toString(),
           category: element['category'].toString(),
-          cost: element['cost'],
-          gramm: element['gramm'],
+          cost: element['cost'].toString(),
+          gramm: element['gramm'].toString(),
           image: element['image'].toString(),
           location: element['location'].toString(),
           material: element['material'].toString(),
@@ -74,7 +74,7 @@ class SalesController extends GetxController {
       }
       for (var element in selectedProductsList) {
         final ProductModel product = element['product'];
-        upgradeCount(int.parse(product.documentID.toString()), int.parse(element['count'].toString()));
+        upgradeCount(product.documentID.toString(), int.parse(element['count'].toString()));
       }
     });
     loadingDataSelectProductView.value = false;
@@ -116,7 +116,7 @@ class SalesController extends GetxController {
     productList.add({'product': product, 'count': count});
   }
 
-  upgradeCount(int id, int count) {
+  upgradeCount(String id, int count) {
     for (var element in productList) {
       final ProductModel product = element['product'];
       if (product.documentID.toString() == id.toString()) {
@@ -127,7 +127,7 @@ class SalesController extends GetxController {
     productList.refresh();
   }
 
-  decreaseCount(int id, int count) {
+  decreaseCount(String id, int count) {
     for (var element in productList) {
       final ProductModel product = element['product'];
       if (product.documentID.toString() == id.toString()) {
@@ -158,9 +158,11 @@ class SalesController extends GetxController {
       FirebaseFirestore.instance.collection('products').doc(product.documentID).update({'quantity': int.parse(product.quantity.toString()) - int.parse(element['count'].toString())});
     }
     double discountPrice = textControllers[7].text == "" ? 0.0 : double.parse(textControllers[7].text.toString());
-    if (discountPrice >= sumPrice) {
+    if (discountPrice >= sumPrice || sumPrice - discountPrice < 0) {
       showSnackBar("Error", "A discount price cannot be greater than the sum price.", Colors.red);
     } else {
+      sumPrice -= discountPrice;
+      print(sumPrice);
       FirebaseFirestore.instance.collection('sales').add({
         'client_address': textControllers[4].text,
         'client_name': textControllers[3].text,

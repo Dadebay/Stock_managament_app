@@ -79,25 +79,9 @@ class _CreateOrderViewState extends State<CreateOrderView> {
               )),
           CustomTextField(labelName: "clientAddress", borderRadius: true, controller: textControllers[4], focusNode: focusNodes[4], requestfocusNode: focusNodes[5], unFocus: false, readOnly: true),
           CustomTextField(
-              labelName: "Coupon",
-              isNumber: true,
-              tmtValueShow: true,
-              borderRadius: true,
-              controller: textControllers[5],
-              focusNode: focusNodes[5],
-              requestfocusNode: focusNodes[6],
-              unFocus: false,
-              readOnly: true),
+              labelName: "Coupon", isNumber: true, borderRadius: true, controller: textControllers[5], focusNode: focusNodes[5], requestfocusNode: focusNodes[6], unFocus: false, readOnly: true),
           CustomTextField(
-              labelName: "Discount",
-              isNumber: true,
-              tmtValueShow: true,
-              borderRadius: true,
-              controller: textControllers[7],
-              focusNode: focusNodes[6],
-              requestfocusNode: focusNodes[7],
-              unFocus: false,
-              readOnly: true),
+              labelName: "Discount", isNumber: true, borderRadius: true, controller: textControllers[7], focusNode: focusNodes[6], requestfocusNode: focusNodes[7], unFocus: false, readOnly: true),
           CustomTextField(labelName: "note", borderRadius: true, maxline: 3, controller: textControllers[6], focusNode: focusNodes[7], requestfocusNode: focusNodes[0], unFocus: false, readOnly: true),
           selectedProductsView(),
           AgreeButton(
@@ -112,6 +96,7 @@ class _CreateOrderViewState extends State<CreateOrderView> {
                     showSnackBar('errorTitle', 'selectMoreProducts', Colors.red);
                   } else {
                     salesController.sumbitSale(textControllers: textControllers, status: selectedStatus);
+                    // FirebaseFirestore.instance.collection('clients').where('number',isEqualTo: );
                   }
                 } else {
                   showSnackBar('errorTitle', 'loginErrorFillBlanks', Colors.red);

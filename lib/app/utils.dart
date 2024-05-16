@@ -475,7 +475,7 @@ class MyTranslations extends Translations {
           'productAddToFav': 'Added to my favorites',
           'productCount': 'Product Count',
           'productName': 'Product Name',
-          'products': 'Maps',
+          'products': 'Products',
           'profile': 'User',
           'quantity': 'Number',
           'questions': 'Frequently Asked Questions?',

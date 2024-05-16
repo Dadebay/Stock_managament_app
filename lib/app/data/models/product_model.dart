@@ -1,8 +1,8 @@
 class ProductModel {
   final String? brandName;
   final String? category;
-  final int? cost;
-  final int? gramm;
+  final String? cost;
+  final String? gramm;
   final String? image;
   final String? location;
   final String? material;
