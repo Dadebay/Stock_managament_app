@@ -223,6 +223,30 @@ Widget textWidgetOrderedPage(
                         });
                         Navigator.of(context).pop();
                       }
+                      if (text1 == 'clientNumber') {
+                        FirebaseFirestore.instance.collection('clients').get().then((value) {
+                          bool clientAddValue = false;
+                          for (var element in value.docs) {
+                            if (element['number'] == textEditingController.text) {
+                              clientAddValue = true;
+                              double sumClientPrice = double.parse(element['sum_price'].toString()) + double.parse(order.sumPrice.toString());
+                              element.reference.update({'sum_price': sumClientPrice, 'order_count': element['order_count'] + 1});
+                              FirebaseFirestore.instance.collection('clients').where('number', isEqualTo: text2).get().then((valueaa) {
+                                for (var element22 in valueaa.docs) {
+                                  element22.reference.delete();
+                                }
+                              });
+                            }
+                          }
+                          if (clientAddValue == false) {
+                            for (var element in value.docs) {
+                              if (element['number'] == text2) {
+                                element.reference.update({'number': textEditingController.text});
+                              }
+                            }
+                          }
+                        });
+                      }
                     },
                   ),
                 ],

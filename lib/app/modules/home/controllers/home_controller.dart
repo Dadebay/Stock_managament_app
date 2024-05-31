@@ -90,9 +90,10 @@ class HomeController extends GetxController {
     });
   }
 
-  updateLoginData() {
+  updateLoginData(bool loginValue, bool adminValue) {
     loginView.value = true;
-    storage.write('login', loginView.value);
+    storage.write('login', loginValue);
+    storage.write('isAdmin', adminValue);
   }
 
   setDataFalse() {

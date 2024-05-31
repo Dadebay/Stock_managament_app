@@ -185,6 +185,7 @@ class SalesController extends GetxController {
             'cost': product.cost,
             'gramm': product.gramm,
             'image': product.image,
+            'date': product.date,
             'location': product.location,
             'material': product.material,
             'name': product.name,
@@ -194,6 +195,29 @@ class SalesController extends GetxController {
             'sell_price': product.sellPrice,
           });
         }
+      });
+      FirebaseFirestore.instance.collection('clients').get().then((value) {
+        bool valueAddClient = false;
+        for (var element in value.docs) {
+          if (element['number'] == textControllers[2].text) {
+            valueAddClient = true;
+            double sumClientPrice = double.parse(element['sum_price'].toString()) + double.parse(sumPrice.toString());
+            element.reference.update({'sum_price': sumClientPrice, 'order_count': element['order_count'] + 1, 'name': textControllers[3].text});
+          }
+        }
+        if (valueAddClient == false) {
+          FirebaseFirestore.instance.collection('clients').add({
+            'address': textControllers[4].text,
+            'name': textControllers[3].text,
+            'number': textControllers[2].text,
+            'sum_price': sumPrice.toString(),
+            'order_count': 1,
+            'date': textControllers[0].text,
+          });
+        }
+      });
+      selectedProductsList.sort((a, b) {
+        return a['date'].compareTo(b['date']);
       });
       Get.back();
 

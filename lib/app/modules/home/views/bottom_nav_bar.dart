@@ -4,10 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_iconly/flutter_iconly.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:stock_managament_app/app/modules/orders/controllers/sales_controller.dart';
 import 'package:stock_managament_app/app/modules/orders/views/createOrder/create_order.dart';
 import 'package:stock_managament_app/app/modules/orders/views/ordered_cards_view.dart';
 import 'package:stock_managament_app/app/modules/search/views/search_view.dart';
+import 'package:stock_managament_app/app/modules/sendSMS/views/send_sms_view.dart';
 import 'package:stock_managament_app/app/modules/settings/views/settings_view.dart';
 import 'package:stock_managament_app/constants/customWidget/constants.dart';
 import 'package:stock_managament_app/constants/customWidget/custom_app_bar.dart';
@@ -26,6 +28,13 @@ class _BottomNavBarState extends State<BottomNavBar> {
   List page = [];
   int selectedIndex = 0;
   final SalesController _salesController = Get.put(SalesController());
+  final storage = GetStorage();
+  bool isAdmin = false;
+  @override
+  void initState() {
+    super.initState();
+    isAdmin = storage.read('isAdmin') ?? false;
+  }
 
   Future<dynamic> filter() {
     return Get.bottomSheet(Container(
@@ -53,6 +62,9 @@ class _BottomNavBarState extends State<BottomNavBar> {
     ));
   }
 
+  List pages = [const HomeView(), const OrdersView(), SendSMSView()];
+  List names = ['sales', 'products', 'Send SMS'];
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -67,11 +79,13 @@ class _BottomNavBarState extends State<BottomNavBar> {
                   IconButton(onPressed: () => Get.to(() => const SettingsView()), icon: const Icon(IconlyLight.setting))
                 ],
               )
-            : Row(mainAxisSize: MainAxisSize.min, children: [
-                IconButton(onPressed: () => Get.to(() => const SearchView(whereToSearch: 'orders')), icon: const Icon(IconlyLight.search, color: Colors.black)),
-                IconButton(onPressed: () => filter(), icon: const Icon(IconlyLight.filter, color: Colors.black)),
-              ]),
-        name: selectedIndex == 1 ? 'sales' : "products",
+            : isAdmin
+                ? const SizedBox.shrink()
+                : Row(mainAxisSize: MainAxisSize.min, children: [
+                    IconButton(onPressed: () => Get.to(() => const SearchView(whereToSearch: 'orders')), icon: const Icon(IconlyLight.search, color: Colors.black)),
+                    IconButton(onPressed: () => filter(), icon: const Icon(IconlyLight.filter, color: Colors.black)),
+                  ]),
+        name: names[selectedIndex],
       ),
       floatingActionButton: selectedIndex == 1
           ? FloatingActionButton(
@@ -92,23 +106,44 @@ class _BottomNavBarState extends State<BottomNavBar> {
         unselectedLabelStyle: const TextStyle(fontFamily: gilroyMedium, fontSize: 12),
         currentIndex: selectedIndex,
         onTap: (index) async => setState(() => selectedIndex = index),
-        items: [
-          BottomNavigationBarItem(
-            icon: const Icon(IconlyLight.home),
-            activeIcon: const Icon(IconlyBold.home),
-            label: 'home'.tr,
-            tooltip: 'home'.tr,
-          ),
-          BottomNavigationBarItem(
-            icon: const Icon(IconlyLight.chart),
-            activeIcon: const Icon(IconlyBold.chart),
-            label: 'sales'.tr,
-            tooltip: 'sales'.tr,
-          ),
-        ],
+        items: isAdmin
+            ? [
+                BottomNavigationBarItem(
+                  icon: const Icon(IconlyLight.home),
+                  activeIcon: const Icon(IconlyBold.home),
+                  label: 'home'.tr,
+                  tooltip: 'home'.tr,
+                ),
+                BottomNavigationBarItem(
+                  icon: const Icon(IconlyLight.chart),
+                  activeIcon: const Icon(IconlyBold.chart),
+                  label: 'sales'.tr,
+                  tooltip: 'sales'.tr,
+                ),
+                BottomNavigationBarItem(
+                  icon: const Icon(IconlyLight.chat),
+                  activeIcon: const Icon(IconlyBold.chat),
+                  label: 'SMS'.tr,
+                  tooltip: 'SMS'.tr,
+                ),
+              ]
+            : [
+                BottomNavigationBarItem(
+                  icon: const Icon(IconlyLight.home),
+                  activeIcon: const Icon(IconlyBold.home),
+                  label: 'home'.tr,
+                  tooltip: 'home'.tr,
+                ),
+                BottomNavigationBarItem(
+                  icon: const Icon(IconlyLight.chart),
+                  activeIcon: const Icon(IconlyBold.chart),
+                  label: 'sales'.tr,
+                  tooltip: 'sales'.tr,
+                ),
+              ],
       ),
       body: Center(
-        child: selectedIndex == 0 ? const HomeView() : const OrdersView(),
+        child: pages[selectedIndex],
       ),
     );
   }

@@ -6,6 +6,7 @@ class ProductModel {
   final String? image;
   final String? location;
   final String? material;
+  final String? date;
   final String? name;
 
   final int? quantity;
@@ -17,6 +18,7 @@ class ProductModel {
 
   ProductModel({
     this.documentID,
+    this.date,
     this.brandName,
     this.category,
     this.cost,

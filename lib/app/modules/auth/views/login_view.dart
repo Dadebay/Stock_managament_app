@@ -81,7 +81,13 @@ class _SignUpViewState extends State<SignUpView> {
                               textEditingController1.text.toLowerCase() == element['password'].toString().toLowerCase()) {
                             if (element['active'] == false) {
                               FirebaseFirestore.instance.collection('users').doc(element.id).update({'active': true});
-                              Get.find<HomeController>().updateLoginData();
+                              FirebaseFirestore.instance.collection('users').doc(element.id).get().then((value) {
+                                print(value['isAdmin']);
+                                print(value['isAdmin']);
+                                print(value['isAdmin']);
+                                print(value['isAdmin']);
+                                Get.find<HomeController>().updateLoginData(true, value['isAdmin']);
+                              });
                               Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (BuildContext context) => const BottomNavBar()));
                               valueLogin = true;
                               Get.find<HomeController>().agreeButton.value = !Get.find<HomeController>().agreeButton.value;
