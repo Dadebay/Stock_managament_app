@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:stock_managament_app/app/modules/home/controllers/home_controller.dart';
 import 'package:stock_managament_app/app/modules/orders/controllers/sales_controller.dart';
 import 'package:stock_managament_app/app/modules/orders/views/createOrder/select_order_products.dart';
 import 'package:stock_managament_app/constants/buttons/agree_button_view.dart';
@@ -28,7 +29,7 @@ class _CreateOrderViewState extends State<CreateOrderView> {
   String selectedStatus = "Preparing"; // Set an initial value
   List<TextEditingController> textControllers = List.generate(9, (_) => TextEditingController());
   final _formKey = GlobalKey<FormState>();
-
+  final HomeController homeController = Get.put(HomeController());
   @override
   void initState() {
     textControllers[0].text = DateTime.now().toString().substring(0, 19);
@@ -84,28 +85,53 @@ class _CreateOrderViewState extends State<CreateOrderView> {
               labelName: "Discount", isNumber: true, borderRadius: true, controller: textControllers[7], focusNode: focusNodes[6], requestfocusNode: focusNodes[7], unFocus: false, readOnly: true),
           CustomTextField(labelName: "note", borderRadius: true, maxline: 3, controller: textControllers[6], focusNode: focusNodes[7], requestfocusNode: focusNodes[0], unFocus: false, readOnly: true),
           selectedProductsView(),
-          AgreeButton(
+          GestureDetector(
               onTap: () {
                 Get.to(() => const SelectOrderProducts());
               },
-              text: 'selectProducts'),
-          AgreeButton(
-              onTap: () {
-                if (_formKey.currentState!.validate()) {
-                  if (salesController.selectedProductsList.isEmpty) {
-                    showSnackBar('errorTitle', 'selectMoreProducts', Colors.red);
+              child: AnimatedContainer(
+                decoration: const BoxDecoration(borderRadius: borderRadius20, color: kPrimaryColor2),
+                margin: EdgeInsets.symmetric(horizontal: 0, vertical: 8.h),
+                padding: EdgeInsets.symmetric(vertical: 10.h, horizontal: 10.h),
+                width: Get.size.width,
+                duration: const Duration(milliseconds: 800),
+                child: Text(
+                  'selectProducts'.tr,
+                  textAlign: TextAlign.center,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(color: Colors.white, fontFamily: gilroyBold, fontSize: 22),
+                ),
+              )),
+          Center(
+            child: AgreeButton(
+                onTap: () {
+                  if (_formKey.currentState!.validate()) {
+                    if (salesController.selectedProductsList.isEmpty) {
+                      showSnackBar('errorTitle', 'selectMoreProducts', Colors.red);
+                    } else {
+                      print("i press");
+
+                      //if agreeButton is true wait for submit sale function finished if agreebutton false change agree button value
+
+                      if (homeController.agreeButton.value == false) {
+                        homeController.agreeButton.value = true;
+
+                        showSnackBar("error", "submit sale gidip dur garas sykla", Colors.green);
+                        salesController.sumbitSale(textControllers: textControllers, context: context, status: selectedStatus);
+                      } else {
+                        showSnackBar("wait", "waitMyManSubtitle", Colors.red);
+                      }
+                    }
                   } else {
-                    salesController.sumbitSale(textControllers: textControllers, status: selectedStatus);
-                    // FirebaseFirestore.instance.collection('clients').where('number',isEqualTo: );
+                    showSnackBar('errorTitle', 'loginErrorFillBlanks', Colors.red);
                   }
-                } else {
-                  showSnackBar('errorTitle', 'loginErrorFillBlanks', Colors.red);
-                }
-              },
-              text: 'agree'),
+                },
+                text: 'agree'),
+          ),
           SizedBox(
             height: 30.h,
-          )
+          ),
         ],
       ),
     );

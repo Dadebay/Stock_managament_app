@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:stock_managament_app/app/data/models/product_model.dart';
+import 'package:stock_managament_app/app/modules/home/controllers/home_controller.dart';
 import 'package:stock_managament_app/constants/customWidget/constants.dart';
 import 'package:stock_managament_app/constants/customWidget/widgets.dart';
 
@@ -147,9 +148,11 @@ class SalesController extends GetxController {
     }
   }
 
-  sumbitSale({required List<TextEditingController> textControllers, required String status}) {
+  sumbitSale({required List<TextEditingController> textControllers, required String status, required BuildContext context}) async {
+    final HomeController homeController = Get.find<HomeController>();
     double sumCost = 0.0;
     double sumPrice = 0.0;
+    //TODO: ADD await function if ap not working very vell
     for (var element in selectedProductsList) {
       final ProductModel product = element['product'];
       sumCost += double.parse(product.cost.toString()).toDouble() * int.parse(element['count'].toString());
@@ -158,11 +161,12 @@ class SalesController extends GetxController {
       FirebaseFirestore.instance.collection('products').doc(product.documentID).update({'quantity': int.parse(product.quantity.toString()) - int.parse(element['count'].toString())});
     }
     double discountPrice = textControllers[7].text == "" ? 0.0 : double.parse(textControllers[7].text.toString());
+    
     if (discountPrice >= sumPrice || sumPrice - discountPrice < 0) {
       showSnackBar("Error", "A discount price cannot be greater than the sum price.", Colors.red);
     } else {
       sumPrice -= discountPrice;
-      print(sumPrice);
+      //write sale to sales column-----------------------------------------------------------------
       FirebaseFirestore.instance.collection('sales').add({
         'client_address': textControllers[4].text,
         'client_name': textControllers[3].text,
@@ -177,54 +181,63 @@ class SalesController extends GetxController {
         'sum_price': sumPrice.toString(),
         'sum_cost': sumCost.toString(),
       }).then((value) async {
-        for (var element in selectedProductsList) {
-          final ProductModel product = element['product'];
-          await FirebaseFirestore.instance.collection('sales').doc(value.id).collection('products').add({
-            'brand': product.brandName,
-            'category': product.category,
-            'cost': product.cost,
-            'gramm': product.gramm,
-            'image': product.image,
-            'date': product.date,
-            'location': product.location,
-            'material': product.material,
-            'name': product.name,
-            'note': product.note,
-            'package': product.package,
-            'quantity': element['count'],
-            'sell_price': product.sellPrice,
-          });
-        }
+        //write products to sales id -----------------------------------------------------------------
+        writeProductToSaleID(value.id);
       });
-      FirebaseFirestore.instance.collection('clients').get().then((value) {
-        bool valueAddClient = false;
-        for (var element in value.docs) {
-          if (element['number'] == textControllers[2].text) {
-            valueAddClient = true;
-            double sumClientPrice = double.parse(element['sum_price'].toString()) + double.parse(sumPrice.toString());
-            element.reference.update({'sum_price': sumClientPrice, 'order_count': element['order_count'] + 1, 'name': textControllers[3].text});
-          }
-        }
-        if (valueAddClient == false) {
-          FirebaseFirestore.instance.collection('clients').add({
-            'address': textControllers[4].text,
-            'name': textControllers[3].text,
-            'number': textControllers[2].text,
-            'sum_price': sumPrice.toString(),
-            'order_count': 1,
-            'date': textControllers[0].text,
-          });
-        }
-      });
+      // write client to clients column ------------------------------------------------------------
+      findClientOrAddNewOne(textControllers: textControllers, sumPrice: sumPrice.toString());
       selectedProductsList.sort((a, b) {
         return a['date'].compareTo(b['date']);
       });
-      Get.back();
-
+      Navigator.of(context).pop();
+      homeController.agreeButton.value = false;
       showSnackBar("Done", "Your purchase submitted ", Colors.green);
     }
   }
-/////////////////=//////////////////
+
+  writeProductToSaleID(String id) {
+    for (var element in selectedProductsList) {
+      final ProductModel product = element['product'];
+      FirebaseFirestore.instance.collection('sales').doc(id).collection('products').add({
+        'brand': product.brandName,
+        'category': product.category,
+        'cost': product.cost,
+        'gramm': product.gramm,
+        'image': product.image,
+        'date': product.date,
+        'location': product.location,
+        'material': product.material,
+        'name': product.name,
+        'note': product.note,
+        'package': product.package,
+        'quantity': element['count'],
+        'sell_price': product.sellPrice,
+      });
+    }
+  }
+
+  findClientOrAddNewOne({required List<TextEditingController> textControllers, required String sumPrice}) {
+    FirebaseFirestore.instance.collection('clients').get().then((value) async {
+      bool valueAddClient = false;
+      for (var element in value.docs) {
+        if (element['number'] == textControllers[2].text) {
+          valueAddClient = true;
+          double sumClientPrice = double.parse(element['sum_price'].toString()) + double.parse(sumPrice.toString());
+          element.reference.update({'sum_price': sumClientPrice, 'order_count': element['order_count'] + 1, 'name': textControllers[3].text});
+        }
+      }
+      if (valueAddClient == false) {
+        FirebaseFirestore.instance.collection('clients').add({
+          'address': textControllers[4].text,
+          'name': textControllers[3].text,
+          'number': textControllers[2].text,
+          'sum_price': sumPrice.toString(),
+          'order_count': 1,
+          'date': textControllers[0].text,
+        });
+      }
+    });
+  }
 
   addProductMain({required int count, required ProductModel product}) {
     if (selectedProductsList.isEmpty) {
