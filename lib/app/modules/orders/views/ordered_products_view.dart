@@ -203,6 +203,7 @@ class _OrderCardsProfilState extends State<OrderCardsProfil> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
+        scrolledUnderElevation: 0.0,
         title: Text('${"order".tr}   #${widget.docID.substring(0, 5).toString()}'),
         centerTitle: true,
         leading: IconButton(

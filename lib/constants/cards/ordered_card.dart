@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:stock_managament_app/app/data/models/order_model.dart';
 import 'package:stock_managament_app/app/modules/orders/views/ordered_products_view.dart';
 import 'package:stock_managament_app/constants/customWidget/constants.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:stock_managament_app/constants/customWidget/widgets.dart';
 
 class OrderedCard extends StatelessWidget {
@@ -28,7 +28,7 @@ class OrderedCard extends StatelessWidget {
         ]),
         child: Column(
           children: [
-            topPart("#${docID.substring(0, 5)}", order.status!),
+            topPart(docID, order.status!),
             Expanded(
                 child: Padding(
               padding: EdgeInsets.symmetric(vertical: 6.h, horizontal: 10.w),

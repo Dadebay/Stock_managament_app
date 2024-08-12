@@ -131,13 +131,23 @@ Container topPart(String text, String status) {
     child: Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(
-          "${"order".tr} ID",
-          style: TextStyle(color: Colors.white, fontSize: 14.sp, fontFamily: gilroySemiBold),
+        Expanded(
+          flex: 1,
+          child: Text(
+            "order".tr,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(color: Colors.white, fontSize: 14.sp, fontFamily: gilroySemiBold),
+          ),
         ),
-        Text(
-          text,
-          style: TextStyle(color: Colors.white, fontSize: 14.sp, fontFamily: gilroySemiBold),
+        Expanded(
+          flex: 2,
+          child: Text(
+            text,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(color: Colors.white, fontSize: 14.sp, fontFamily: gilroySemiBold),
+          ),
         ),
       ],
     ),

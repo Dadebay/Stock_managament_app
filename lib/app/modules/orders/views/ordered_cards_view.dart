@@ -1,6 +1,5 @@
-import 'package:flutter/cupertino.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-
 import 'package:get/get.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:stock_managament_app/app/data/models/order_model.dart';
@@ -52,23 +51,42 @@ class _OrdersViewState extends State<OrdersView> {
                     physics: const BouncingScrollPhysics(),
                     itemBuilder: (BuildContext context, int index) {
                       final order = OrderModel(
-                          orderID: salesController.orderCardList[index].id,
-                          clientAddress: salesController.orderCardList[index]['client_address'],
-                          clientName: salesController.orderCardList[index]['client_name'],
-                          clientNumber: salesController.orderCardList[index]['client_number'],
-                          coupon: salesController.orderCardList[index]['coupon'].toString(),
-                          date: salesController.orderCardList[index]['date'],
-                          discount: salesController.orderCardList[index]['discount'].toString(),
-                          note: salesController.orderCardList[index]['note'],
-                          package: salesController.orderCardList[index]['package'],
-                          status: salesController.orderCardList[index]['status'],
-                          sumCost: salesController.orderCardList[index]['sum_cost'].toString(),
-                          sumPrice: salesController.orderCardList[index]['sum_price'].toString(),
-                          products: salesController.orderCardList[index]['product_count']);
-                      return OrderedCard(
-                        order: order,
-                        docID: order.orderID.toString(),
+                        orderID: salesController.orderCardList[index].id,
+                        clientAddress: salesController.orderCardList[index]['client_address'],
+                        clientName: salesController.orderCardList[index]['client_name'],
+                        clientNumber: salesController.orderCardList[index]['client_number'],
+                        coupon: salesController.orderCardList[index]['coupon'].toString(),
+                        date: salesController.orderCardList[index]['date'],
+                        discount: salesController.orderCardList[index]['discount'].toString(),
+                        note: salesController.orderCardList[index]['note'],
+                        package: salesController.orderCardList[index]['package'],
+                        status: salesController.orderCardList[index]['status'],
+                        sumCost: salesController.orderCardList[index]['sum_cost'].toString(),
+                        sumPrice: salesController.orderCardList[index]['sum_price'].toString(),
+                        products: salesController.orderCardList[index]['product_count'],
                       );
+
+                      return FutureBuilder(
+                          future: FirebaseFirestore.instance.collection('sales').doc(order.orderID).collection('products').get(),
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState == ConnectionState.waiting) {
+                              return const Center(
+                                  child: Padding(
+                                padding: EdgeInsets.all(15.0),
+                                child: CircularProgressIndicator(),
+                              ));
+                            } else if (snapshot.hasError) {
+                              return Text('Error: ${snapshot.error}');
+                            } else if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                              return const Text('No products found');
+                            } else {
+                              String productName = snapshot.data!.docs[0]['name'];
+                              return OrderedCard(
+                                order: order,
+                                docID: productName,
+                              );
+                            }
+                          });
                     },
                   );
       }),
