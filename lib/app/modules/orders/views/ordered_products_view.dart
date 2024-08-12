@@ -1,11 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_iconly/flutter_iconly.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:stock_managament_app/app/data/models/order_model.dart';
 import 'package:stock_managament_app/app/data/models/product_model.dart';
 import 'package:stock_managament_app/app/modules/orders/controllers/sales_controller.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_iconly/flutter_iconly.dart';
 import 'package:stock_managament_app/constants/cards/product_card.dart';
 import 'package:stock_managament_app/constants/customWidget/constants.dart';
 import 'package:stock_managament_app/constants/customWidget/widgets.dart';
@@ -44,7 +44,6 @@ class _OrderCardsProfilState extends State<OrderCardsProfil> {
   }
 
   doStatusFunction(String status) {
-    print(status);
     if (status == 'preparing') {
       _selectedSortOption = SortOptions.preparing;
     } else if (status == 'readyToShip' || status == "ready to ship" || status == "Ready to ship") {
@@ -321,7 +320,6 @@ class _OrderCardsProfilState extends State<OrderCardsProfil> {
           } else if (snapshot.data!.docs.isEmpty) {
             return emptyData();
           } else if (snapshot.hasData) {
-            print(snapshot.data);
             return ListView.builder(
               shrinkWrap: true,
               itemCount: snapshot.data!.docs.length,

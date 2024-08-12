@@ -42,12 +42,9 @@ class SalesController extends GetxController {
 
   getData() {
     loadingDataOrders.value = true;
-    print(orderCardList);
     collectionReference.orderBy("date", descending: true).limit(limit).get().then((value) {
       orderCardList.value = value.docs;
     });
-    print(orderCardList);
-
     loadingDataOrders.value = false;
   }
 
@@ -161,13 +158,14 @@ class SalesController extends GetxController {
       FirebaseFirestore.instance.collection('products').doc(product.documentID).update({'quantity': int.parse(product.quantity.toString()) - int.parse(element['count'].toString())});
     }
     double discountPrice = textControllers[7].text == "" ? 0.0 : double.parse(textControllers[7].text.toString());
-    
+
     if (discountPrice >= sumPrice || sumPrice - discountPrice < 0) {
       showSnackBar("Error", "A discount price cannot be greater than the sum price.", Colors.red);
+      homeController.agreeButton.value = false;
     } else {
       sumPrice -= discountPrice;
       //write sale to sales column-----------------------------------------------------------------
-      FirebaseFirestore.instance.collection('sales').add({
+      await FirebaseFirestore.instance.collection('sales').add({
         'client_address': textControllers[4].text,
         'client_name': textControllers[3].text,
         'client_number': textControllers[2].text,
@@ -195,10 +193,10 @@ class SalesController extends GetxController {
     }
   }
 
-  writeProductToSaleID(String id) {
+  writeProductToSaleID(String id) async {
     for (var element in selectedProductsList) {
       final ProductModel product = element['product'];
-      FirebaseFirestore.instance.collection('sales').doc(id).collection('products').add({
+      await FirebaseFirestore.instance.collection('sales').doc(id).collection('products').add({
         'brand': product.brandName,
         'category': product.category,
         'cost': product.cost,

@@ -88,7 +88,6 @@ class _SearchViewState extends State<SearchView> {
                                   order: order,
                                 );
                               } else {
-                                print("mendeeeeee");
                                 final product = controller.text.isEmpty
                                     ? ProductModel(
                                         name: searchController.productsList[index]['name'],

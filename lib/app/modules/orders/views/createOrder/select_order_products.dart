@@ -6,6 +6,7 @@ import 'package:get/get.dart';
 import 'package:stock_managament_app/app/data/models/product_model.dart';
 import 'package:stock_managament_app/app/modules/orders/controllers/sales_controller.dart';
 import 'package:stock_managament_app/constants/cards/product_card.dart';
+import 'package:stock_managament_app/constants/customWidget/constants.dart';
 import 'package:stock_managament_app/constants/customWidget/custom_app_bar.dart';
 import 'package:stock_managament_app/constants/customWidget/widgets.dart';
 
@@ -50,33 +51,11 @@ class _SelectOrderProductsState extends State<SelectOrderProducts> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+        backgroundColor: Colors.white,
         appBar: const CustomAppBar(backArrow: true, centerTitle: true, actionIcon: false, name: 'selectProducts'),
         body: Column(
           children: [
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Card(
-                child: ListTile(
-                  leading: const Icon(
-                    IconlyLight.search,
-                    color: Colors.black,
-                  ),
-                  title: TextField(
-                    controller: controller,
-                    decoration: InputDecoration(hintText: 'search'.tr, border: InputBorder.none),
-                    onChanged: onSearchTextChanged,
-                  ),
-                  contentPadding: EdgeInsets.only(left: 15.w),
-                  trailing: IconButton(
-                    icon: const Icon(CupertinoIcons.xmark_circle),
-                    onPressed: () {
-                      controller.clear();
-                      onSearchTextChanged('');
-                    },
-                  ),
-                ),
-              ),
-            ),
+            searchWidget(),
             Expanded(
               child: Obx(() {
                 return _searchResult.isNotEmpty || controller.text.isNotEmpty
@@ -110,5 +89,35 @@ class _SelectOrderProductsState extends State<SelectOrderProducts> {
             ),
           ],
         ));
+  }
+
+  Container searchWidget() {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.grey.shade100,
+        borderRadius: borderRadius20,
+        border: Border.all(color: kPrimaryColor1.withOpacity(0.4)),
+      ),
+      margin: const EdgeInsets.all(8.0),
+      child: ListTile(
+        leading: const Icon(
+          IconlyLight.search,
+          color: Colors.black,
+        ),
+        title: TextField(
+          controller: controller,
+          decoration: InputDecoration(hintText: 'search'.tr, border: InputBorder.none),
+          onChanged: onSearchTextChanged,
+        ),
+        contentPadding: EdgeInsets.only(left: 15.w),
+        trailing: IconButton(
+          icon: const Icon(CupertinoIcons.xmark_circle),
+          onPressed: () {
+            controller.clear();
+            onSearchTextChanged('');
+          },
+        ),
+      ),
+    );
   }
 }

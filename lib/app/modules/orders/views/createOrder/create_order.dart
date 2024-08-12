@@ -24,51 +24,59 @@ class CreateOrderView extends StatefulWidget {
 
 class _CreateOrderViewState extends State<CreateOrderView> {
   List<FocusNode> focusNodes = List.generate(9, (_) => FocusNode());
+  final HomeController homeController = Get.put(HomeController());
   CollectionReference products = FirebaseFirestore.instance.collection('products');
   final SalesController salesController = Get.put(SalesController());
   String selectedStatus = "Preparing"; // Set an initial value
   List<TextEditingController> textControllers = List.generate(9, (_) => TextEditingController());
+
   final _formKey = GlobalKey<FormState>();
-  final HomeController homeController = Get.put(HomeController());
+
   @override
   void initState() {
     textControllers[0].text = DateTime.now().toString().substring(0, 19);
     salesController.selectedProductsList.clear();
     salesController.productList.clear();
+    homeController.agreeButton.value = false;
     super.initState();
+  }
+
+  Obx selectedProductsView() {
+    return Obx(() {
+      return salesController.selectedProductsList.isEmpty
+          ? const SizedBox.shrink()
+          : Wrap(
+              children: [
+                Padding(
+                  padding: EdgeInsets.only(top: 10.h, left: 10.w, bottom: 10.h),
+                  child: Text(
+                    "selectedProducts".tr,
+                    style: TextStyle(color: Colors.black, fontFamily: gilroySemiBold, fontSize: 22.sp),
+                  ),
+                ),
+                ListView.builder(
+                  itemCount: salesController.selectedProductsList.length,
+                  shrinkWrap: true,
+                  itemBuilder: (BuildContext context, int index) {
+                    final ProductModel product = salesController.selectedProductsList[index]['product'];
+                    return ProductCard(product: product, orderView: false, addCounterWidget: true);
+                  },
+                ),
+              ],
+            );
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: CustomAppBar(backArrow: true, centerTitle: true, actionIcon: false, name: 'createOrder'.tr),
       body: ListView(
         padding: EdgeInsets.symmetric(horizontal: 10.w),
         children: [
           CustomTextField(labelName: "date", borderRadius: true, controller: textControllers[0], focusNode: focusNodes[0], requestfocusNode: focusNodes[1], unFocus: false, readOnly: false),
-          Container(
-            margin: EdgeInsets.only(top: 15.h),
-            padding: EdgeInsets.symmetric(vertical: 10.h, horizontal: 20.w),
-            decoration: BoxDecoration(
-                borderRadius: borderRadius20, // Add border radius
-                border: Border.all(color: Colors.grey.shade300)),
-            child: DropdownButtonHideUnderline(
-              child: DropdownButton<String>(
-                value: selectedStatus,
-                onChanged: (newValue) {
-                  setState(() {
-                    selectedStatus = newValue!;
-                  });
-                },
-                items: <String>["Preparing", "Ready to ship", "Shipped", "Canceled", "Refund"].map<DropdownMenuItem<String>>((String value) {
-                  return DropdownMenuItem<String>(
-                    value: value,
-                    child: Text(value),
-                  );
-                }).toList(),
-              ),
-            ),
-          ),
+          selectOrderStatus(),
           CustomTextField(labelName: "package", borderRadius: true, controller: textControllers[1], focusNode: focusNodes[1], requestfocusNode: focusNodes[2], unFocus: false, readOnly: true),
           Form(
               key: _formKey,
@@ -110,10 +118,6 @@ class _CreateOrderViewState extends State<CreateOrderView> {
                     if (salesController.selectedProductsList.isEmpty) {
                       showSnackBar('errorTitle', 'selectMoreProducts', Colors.red);
                     } else {
-                      print("i press");
-
-                      //if agreeButton is true wait for submit sale function finished if agreebutton false change agree button value
-
                       if (homeController.agreeButton.value == false) {
                         homeController.agreeButton.value = true;
 
@@ -137,29 +141,29 @@ class _CreateOrderViewState extends State<CreateOrderView> {
     );
   }
 
-  Obx selectedProductsView() {
-    return Obx(() {
-      return salesController.selectedProductsList.isEmpty
-          ? const SizedBox.shrink()
-          : Wrap(
-              children: [
-                Padding(
-                  padding: EdgeInsets.only(top: 10.h, left: 10.w, bottom: 10.h),
-                  child: Text(
-                    "selectedProducts".tr,
-                    style: TextStyle(color: Colors.black, fontFamily: gilroySemiBold, fontSize: 22.sp),
-                  ),
-                ),
-                ListView.builder(
-                  itemCount: salesController.selectedProductsList.length,
-                  shrinkWrap: true,
-                  itemBuilder: (BuildContext context, int index) {
-                    final ProductModel product = salesController.selectedProductsList[index]['product'];
-                    return ProductCard(product: product, orderView: false, addCounterWidget: true);
-                  },
-                ),
-              ],
+  Container selectOrderStatus() {
+    return Container(
+      margin: EdgeInsets.only(top: 15.h),
+      padding: EdgeInsets.symmetric(vertical: 10.h, horizontal: 20.w),
+      decoration: BoxDecoration(
+          borderRadius: borderRadius20, // Add border radius
+          border: Border.all(color: Colors.grey.shade300)),
+      child: DropdownButtonHideUnderline(
+        child: DropdownButton<String>(
+          value: selectedStatus,
+          onChanged: (newValue) {
+            setState(() {
+              selectedStatus = newValue!;
+            });
+          },
+          items: <String>["Preparing", "Ready to ship", "Shipped", "Canceled", "Refund"].map<DropdownMenuItem<String>>((String value) {
+            return DropdownMenuItem<String>(
+              value: value,
+              child: Text(value),
             );
-    });
+          }).toList(),
+        ),
+      ),
+    );
   }
 }

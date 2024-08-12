@@ -1,11 +1,7 @@
 import 'package:background_sms/background_sms.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_pagination/firebase_pagination.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_iconly/flutter_iconly.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-
 import 'package:get/get.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:stock_managament_app/constants/buttons/agree_button_view.dart';

@@ -1,13 +1,13 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_iconly/flutter_iconly.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:stock_managament_app/app/data/models/product_model.dart';
 import 'package:stock_managament_app/app/modules/home/controllers/home_controller.dart';
 import 'package:stock_managament_app/constants/cards/product_card.dart';
 import 'package:stock_managament_app/constants/customWidget/constants.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_iconly/flutter_iconly.dart';
 import 'package:stock_managament_app/constants/customWidget/widgets.dart';
 
 class HomeView extends StatefulWidget {
@@ -25,15 +25,12 @@ class _HomeViewState extends State<HomeView> {
     {'name': 'Materials', 'searchName': 'material'}
   ];
   void _onRefresh() async {
-    print("qwe");
-
     await Future.delayed(const Duration(milliseconds: 1000));
     _homeController.onRefreshController();
     _refreshControllerMine.refreshCompleted();
   }
 
   void _onLoading() async {
-    print("qwe");
     await Future.delayed(const Duration(milliseconds: 1000));
     _homeController.onLoadingController();
     _refreshControllerMine.loadComplete();

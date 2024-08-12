@@ -39,7 +39,6 @@ class SearchViewController extends GetxController {
       return result;
     }).toList();
     searchResult.value = fullData.toSet().toList();
-    print(searchResult);
     loadingData.value = false;
   }
 }

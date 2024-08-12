@@ -1,13 +1,14 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:stock_managament_app/app/modules/auth/views/connection_check_view.dart';
 import 'package:stock_managament_app/app/utils.dart';
-import 'package:firebase_core/firebase_core.dart';
+
 import 'constants/customWidget/constants.dart';
 import 'firebase_options.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();

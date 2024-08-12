@@ -62,7 +62,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
     ));
   }
 
-  List pages = [const HomeView(), const OrdersView(), SendSMSView()];
+  List pages = [const HomeView(), const OrdersView(), const SendSMSView()];
   List names = ['sales', 'products', 'Send SMS'];
 
   @override

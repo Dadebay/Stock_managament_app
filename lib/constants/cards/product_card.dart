@@ -1,13 +1,13 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_iconly/flutter_iconly.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:stock_managament_app/app/data/models/product_model.dart';
 import 'package:stock_managament_app/app/modules/home/controllers/home_controller.dart';
-import 'package:stock_managament_app/app/modules/product/views/product_profil_view.dart';
 import 'package:stock_managament_app/app/modules/orders/controllers/sales_controller.dart';
+import 'package:stock_managament_app/app/modules/product/views/product_profil_view.dart';
 import 'package:stock_managament_app/constants/customWidget/constants.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_iconly/flutter_iconly.dart';
 import 'package:stock_managament_app/constants/customWidget/widgets.dart';
 
 class ProductCard extends StatefulWidget {
@@ -41,10 +41,13 @@ class _ProductCardState extends State<ProductCard> {
     return widget.addCounterWidget ? counterWidget() : noCounterWidget();
   }
 
-  Card counterWidget() {
-    return Card(
-      shape: const RoundedRectangleBorder(borderRadius: borderRadius15),
-      elevation: 0.5,
+  Widget counterWidget() {
+    return Container(
+      margin: const EdgeInsets.only(top: 15),
+      decoration: BoxDecoration(
+        borderRadius: borderRadius20,
+        border: Border.all(color: kPrimaryColor1.withOpacity(0.4)),
+      ),
       child: ListTile(
         title: Text(
           widget.product.name!,
@@ -91,7 +94,6 @@ class _ProductCardState extends State<ProductCard> {
             IconButton(
               icon: const Icon(CupertinoIcons.add_circled, color: Colors.black),
               onPressed: () {
-                print(widget.product.quantity);
                 if (selectedCount >= widget.product.quantity!) {
                   showSnackBar("Error", "Not in stock", Colors.red);
                 } else {

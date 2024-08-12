@@ -1,15 +1,16 @@
-// ignore_for_file: file_names, always_use_package_imports
+// ignore_for_file: file_names, always_use_package_imports, library_private_types_in_public_api
 
 import 'dart:async';
 import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:lottie/lottie.dart';
+import 'package:stock_managament_app/app/modules/auth/views/login_view.dart';
 import 'package:stock_managament_app/app/modules/home/controllers/home_controller.dart';
 import 'package:stock_managament_app/app/modules/home/views/bottom_nav_bar.dart';
-import 'package:stock_managament_app/app/modules/auth/views/login_view.dart';
 import 'package:stock_managament_app/constants/customWidget/constants.dart';
 
 class ConnectionCheckView extends StatefulWidget {

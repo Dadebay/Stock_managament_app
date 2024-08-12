@@ -82,10 +82,6 @@ class _SignUpViewState extends State<SignUpView> {
                             if (element['active'] == false) {
                               FirebaseFirestore.instance.collection('users').doc(element.id).update({'active': true});
                               FirebaseFirestore.instance.collection('users').doc(element.id).get().then((value) {
-                                print(value['isAdmin']);
-                                print(value['isAdmin']);
-                                print(value['isAdmin']);
-                                print(value['isAdmin']);
                                 Get.find<HomeController>().updateLoginData(true, value['isAdmin']);
                               });
                               Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (BuildContext context) => const BottomNavBar()));
