@@ -5,8 +5,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:stock_managament_app/app/data/models/order_model.dart';
 import 'package:stock_managament_app/app/data/models/product_model.dart';
+import 'package:stock_managament_app/app/modules/orders/components/order_card.dart';
 import 'package:stock_managament_app/app/modules/search/controller/search_controller.dart';
-import 'package:stock_managament_app/constants/cards/ordered_card.dart';
 import 'package:stock_managament_app/constants/cards/product_card.dart';
 import 'package:stock_managament_app/constants/customWidget/custom_app_bar.dart';
 import 'package:stock_managament_app/constants/customWidget/widgets.dart';
@@ -38,6 +38,7 @@ class _SearchViewState extends State<SearchView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+        backgroundColor: Colors.white,
         appBar: const CustomAppBar(backArrow: true, actionIcon: false, centerTitle: true, name: "search"),
         body: Column(
           children: [
@@ -83,8 +84,7 @@ class _SearchViewState extends State<SearchView> {
                                         sumCost: searchController.searchResult[index]['sum_cost'].toString(),
                                         sumPrice: searchController.searchResult[index]['sum_price'].toString(),
                                         products: searchController.searchResult[index]['product_count']);
-                                return OrderedCard(
-                                  docID: order.orderID!,
+                                return OrderCard(
                                   order: order,
                                 );
                               } else {

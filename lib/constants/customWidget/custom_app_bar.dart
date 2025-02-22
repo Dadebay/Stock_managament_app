@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_iconly/flutter_iconly.dart';
 import 'package:get/get.dart';
+import 'package:kartal/kartal.dart';
 import 'package:stock_managament_app/constants/customWidget/constants.dart';
 
 class CustomAppBar extends StatelessWidget implements PreferredSize {
@@ -22,9 +23,16 @@ class CustomAppBar extends StatelessWidget implements PreferredSize {
 
   @override
   Widget build(BuildContext context) {
-    final double sizeWidth = MediaQuery.of(context).size.width;
     return AppBar(
       elevation: 0,
+      bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(1),
+          child: Padding(
+            padding: context.padding.horizontalNormal,
+            child: Divider(
+              color: kPrimaryColor2.withOpacity(.5),
+            ),
+          )),
       scrolledUnderElevation: 0.0,
       centerTitle: centerTitle,
       leadingWidth: centerTitle == true ? 40.0 : 0.0,
@@ -54,11 +62,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSize {
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
         textAlign: TextAlign.center,
-        style: TextStyle(
-          color: Colors.black,
-          fontFamily: gilroySemiBold,
-          fontSize: sizeWidth > 800 ? 35 : 22,
-        ),
+        style: context.general.textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.bold),
       ),
     );
   }

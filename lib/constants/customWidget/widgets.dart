@@ -6,6 +6,7 @@ import 'package:get/get.dart';
 import 'package:lottie/lottie.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:stock_managament_app/app/data/models/order_model.dart';
+import 'package:stock_managament_app/app/product/constants/icon_constants.dart';
 import 'package:stock_managament_app/constants/customWidget/constants.dart';
 import 'package:stock_managament_app/constants/customWidget/custom_text_field.dart';
 
@@ -21,7 +22,7 @@ SnackbarController showSnackBar(String title, String subtitle, Color color) {
         ? const SizedBox.shrink()
         : Text(
             title.tr,
-            style: const TextStyle(fontFamily: gilroySemiBold, fontSize: 18, color: Colors.white),
+            style: const TextStyle(fontSize: 18, color: Colors.white),
           ),
     messageText: Text(
       subtitle.tr,
@@ -30,14 +31,14 @@ SnackbarController showSnackBar(String title, String subtitle, Color color) {
     snackPosition: SnackPosition.TOP,
     backgroundColor: color,
     borderRadius: 20.0,
-    duration: const Duration(milliseconds: 800),
+    duration: const Duration(milliseconds: 1000),
     margin: const EdgeInsets.all(8),
   );
 }
 
 Center spinKit() {
   return Center(
-    child: Lottie.asset(loadingLottie, width: 70.w, height: 70.h),
+    child: Lottie.asset(IconConstants.loadingLottie, width: 70.w, height: 70.h),
   );
 }
 
@@ -51,7 +52,7 @@ Center emptyData() {
   return Center(
       child: Text(
     "noProduct".tr,
-    style: TextStyle(color: Colors.black, fontFamily: gilroySemiBold, fontSize: 20.sp),
+    style: TextStyle(color: Colors.black, fontSize: 20.sp),
   ));
 }
 
@@ -78,102 +79,7 @@ CustomFooter customFooter() {
   );
 }
 
-Expanded textWidgetHomeVIew(String totalProducts, String text) {
-  return Expanded(
-      child: Column(
-    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      Text(
-        text,
-        overflow: TextOverflow.ellipsis,
-        style: TextStyle(color: Colors.grey, fontFamily: gilroySemiBold, fontSize: 16.sp),
-      ),
-      Text(
-        totalProducts,
-        style: TextStyle(color: Colors.black, fontFamily: gilroyBold, fontSize: 30.sp),
-      ),
-    ],
-  ));
-}
-
-Container bottomPart(String orderSum) {
-  return Container(
-    width: Get.size.width,
-    padding: EdgeInsets.only(bottom: 6.h, left: 10.w, right: 10.2),
-    child: Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(
-          "priceProduct".tr,
-          style: TextStyle(color: Colors.grey, fontSize: 14.sp, fontFamily: gilroySemiBold),
-        ),
-        Text(
-          orderSum,
-          style: TextStyle(color: Colors.black, fontSize: 14.sp, fontFamily: gilroyBold),
-        ),
-      ],
-    ),
-  );
-}
-
-Container topPart(String text, String status) {
-  Map<String, Color> colorMapping = {"shipped": Colors.green, "canceled": Colors.red, "refund": Colors.red, "preparing": kPrimaryColor2, "ready to ship": Colors.purple};
-  return Container(
-    width: Get.size.width,
-    padding: EdgeInsets.symmetric(vertical: 6.h, horizontal: 10.w),
-    decoration: BoxDecoration(
-        color: colorMapping[status.toLowerCase()],
-        borderRadius: const BorderRadius.only(
-          topLeft: Radius.circular(15),
-          topRight: Radius.circular(15),
-        )),
-    child: Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Expanded(
-          flex: 1,
-          child: Text(
-            "order".tr,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: TextStyle(color: Colors.white, fontSize: 14.sp, fontFamily: gilroySemiBold),
-          ),
-        ),
-        Expanded(
-          flex: 2,
-          child: Text(
-            text,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: TextStyle(color: Colors.white, fontSize: 14.sp, fontFamily: gilroySemiBold),
-          ),
-        ),
-      ],
-    ),
-  );
-}
-
-Column textWidget({required String text1, required String text2}) {
-  return Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      Text(
-        text1.tr,
-        overflow: TextOverflow.ellipsis,
-        style: TextStyle(color: Colors.black, fontFamily: gilroySemiBold, fontSize: 14.sp),
-      ),
-      Text(
-        text2,
-        overflow: TextOverflow.ellipsis,
-        style: TextStyle(color: Colors.grey, fontFamily: gilroyMedium, fontSize: 14.sp),
-      )
-    ],
-  );
-}
-
-Widget textWidgetOrderedPage(
-    {required bool ontap, required String status, required BuildContext context, required String text1, required String text2, required String labelName, required OrderModel order}) {
+Widget textWidgetOrderedPage({required bool ontap, required String status, required BuildContext context, required String text1, required String text2, required String labelName, required OrderModel order}) {
   FocusNode focusNode = FocusNode();
   final TextEditingController textEditingController = TextEditingController();
   textEditingController.text = text2;
@@ -199,7 +105,7 @@ Widget textWidgetOrderedPage(
                 actionsAlignment: MainAxisAlignment.center,
                 actions: <Widget>[
                   TextButton(
-                    child: Text('no'.tr, style: TextStyle(fontFamily: gilroyMedium, fontSize: 18.sp)),
+                    child: Text('no'.tr, style: TextStyle(fontSize: 18.sp)),
                     onPressed: () {
                       Navigator.of(context).pop();
                     },
@@ -215,10 +121,7 @@ Widget textWidgetOrderedPage(
                         } else if (discount > sumPrice) {
                           showSnackBar('errorTitle', 'notHigherThanSumPrice', Colors.red);
                         } else {
-                          FirebaseFirestore.instance
-                              .collection('sales')
-                              .doc(order.orderID)
-                              .update({labelName: textEditingController.text, 'sum_price': double.parse(order.sumPrice!.toString()) - discount}).then((value) {
+                          FirebaseFirestore.instance.collection('sales').doc(order.orderID).update({labelName: textEditingController.text, 'sum_price': double.parse(order.sumPrice.toString()) - discount}).then((value) {
                             showSnackBar("copySucces", "changesUpdated", Colors.green);
                           });
                           Navigator.of(context).pop();
@@ -279,7 +182,7 @@ Widget textWidgetOrderedPage(
                 Text(
                   text1.tr,
                   overflow: TextOverflow.ellipsis,
-                  style: TextStyle(color: Colors.grey, fontFamily: gilroyMedium, fontSize: 14.sp),
+                  style: TextStyle(color: Colors.grey, fontSize: 14.sp),
                 ),
                 Text(
                   text1 == "clientNumber"
@@ -290,7 +193,7 @@ Widget textWidgetOrderedPage(
                               ? text2
                               : text2,
                   overflow: TextOverflow.ellipsis,
-                  style: TextStyle(color: Colors.black, fontFamily: gilroySemiBold, fontSize: 14.sp),
+                  style: TextStyle(color: Colors.black, fontSize: 14.sp),
                 )
               ],
             ),
@@ -321,7 +224,7 @@ CachedNetworkImage imageView({required String imageURl}) {
     ),
     placeholder: (context, url) => spinKit(),
     errorWidget: (context, url, error) => Center(
-      child: Text('noImage'.tr),
+      child: Text('noImage'.tr, textAlign: TextAlign.center),
     ),
   );
 }
@@ -334,7 +237,6 @@ Text filterTextWidget(String name) {
     textAlign: TextAlign.center,
     style: TextStyle(
       color: Colors.black,
-      fontFamily: gilroySemiBold,
       fontSize: 22.sp,
     ),
   );

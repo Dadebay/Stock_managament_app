@@ -26,6 +26,7 @@ class _SelectOrderProductsState extends State<SelectOrderProducts> {
   void initState() {
     super.initState();
     salesController.getDataSelectProductsView();
+    print(salesController.productList.length);
   }
 
   onSearchTextChanged(String text) async {

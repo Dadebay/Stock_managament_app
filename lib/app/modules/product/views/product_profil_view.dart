@@ -2,19 +2,19 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:stock_managament_app/app/data/models/product_model.dart';
 import 'package:stock_managament_app/app/modules/home/controllers/home_controller.dart';
 import 'package:stock_managament_app/constants/buttons/agree_button_view.dart';
 import 'package:stock_managament_app/constants/customWidget/constants.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:stock_managament_app/constants/customWidget/custom_app_bar.dart';
 import 'package:stock_managament_app/constants/customWidget/custom_text_field.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:stock_managament_app/constants/customWidget/widgets.dart';
 
 class ProductProfilView extends StatefulWidget {
@@ -256,6 +256,8 @@ class _ProductProfilViewState extends State<ProductProfilView> {
             : const SizedBox.shrink(),
         AgreeButton(
           onTap: () async {
+            print("I tapped");
+            print(readOnlyStates);
             int i = 0;
             bool changeValue = false;
             List names = ['name', 'category', 'brand', 'gramm', 'material', 'sell_price', 'location', 'quantity', 'note'];
@@ -322,6 +324,7 @@ class _ProductProfilViewState extends State<ProductProfilView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: CustomAppBar(backArrow: true, centerTitle: true, actionIcon: false, name: widget.product.name!),
       body: StreamBuilder(
           stream: FirebaseFirestore.instance.collection('products').doc(widget.product.documentID!).snapshots(),

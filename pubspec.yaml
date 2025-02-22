@@ -6,30 +6,41 @@ environment:
   sdk: ">=3.3.0 <4.0.0"
 
 dependencies:
-  cupertino_icons: ^1.0.6
-  get: 4.6.6
-  flutter_lints:
-  firebase_core:
+
+  # firebase
+  firebase_core: 
   cloud_firestore:
-  flutter_iconly:
-  flutter_screenutil:
-  pull_to_refresh: ^2.0.0
-  lottie: ^3.1.0
-  get_storage:
-  image_picker:
-  cached_network_image: ^3.3.1
   firebase_pagination: ^3.1.0
   firebase_storage:
+   
+  # Core
+  get:
+  get_storage: 
   restart_app:
   background_sms: ^0.0.4
   permission_handler: ^11.3.1
   path:
+  pull_to_refresh: ^2.0.0
+  lottie: ^3.1.0
+  image_picker:
+  cached_network_image: ^3.3.1
+   
+  # Utils
+  flutter_iconly: 
+  kartal: ^4.1.0
+  cupertino_icons: 
+  flutter_screenutil:
+
+
   flutter:
     sdk: flutter
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  #Lints
+  very_good_analysis: ^7.0.0  
+  flutter_lints: ^4.0.0
 
 flutter:
   assets:
@@ -38,18 +49,19 @@ flutter:
     - assets/lottie/
     - assets/image/
 
+
   fonts:
-    - family: GilroyBold
+    - family: PlusJakartaSans
       fonts:
-        - asset: assets/fonts/Gilroy-Bold.ttf
-    - family: GilroySemiBold
-      fonts:
-        - asset: assets/fonts/Gilroy-SemiBold.ttf
-    - family: GilroyMedium
-      fonts:
-        - asset: assets/fonts/Gilroy-Medium.ttf
-    - family: GilroyRegular
-      fonts:
-        - asset: assets/fonts/Gilroy-Regular.ttf
+        - asset: assets/fonts/PlusJakartaSans-Bold.ttf
+          weight: 700
+        - asset: assets/fonts/PlusJakartaSans-SemiBold.ttf
+          weight: 600  
+        - asset: assets/fonts/PlusJakartaSans-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/PlusJakartaSans-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/PlusJakartaSans-Light.ttf
+          weight: 300
+        
   uses-material-design: true
-  generate: true

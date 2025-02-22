@@ -27,13 +27,7 @@ class _OrderCardsProfilState extends State<OrderCardsProfil> {
   final SalesController salesController = Get.put(SalesController());
   Map<String, String> statusMapping = {"preparing": 'Preparing', "readyToShip": 'Ready to ship', "shipped": "Shipped", "canceled": "Canceled", "refund": 'Refund'};
   int statusRemover = 0;
-  Map<String, SortOptions> statusSortOption = {
-    "preparing": SortOptions.preparing,
-    "readyToShip": SortOptions.readyToShip,
-    "shipped": SortOptions.shipped,
-    "canceled": SortOptions.canceled,
-    "refund": SortOptions.refund
-  };
+  Map<String, SortOptions> statusSortOption = {"preparing": SortOptions.preparing, "readyToShip": SortOptions.readyToShip, "shipped": SortOptions.shipped, "canceled": SortOptions.canceled, "refund": SortOptions.refund};
 
   SortOptions _selectedSortOption = SortOptions.preparing; // Default sort option
 
@@ -88,10 +82,7 @@ class _OrderCardsProfilState extends State<OrderCardsProfil> {
           await FirebaseFirestore.instance.collection('sales').doc(widget.order.orderID).collection('products').get().then((value) async {
             for (var element in value.docs) {
               await FirebaseFirestore.instance.collection('products').where('name', isEqualTo: element['name']).get().then((value2) {
-                FirebaseFirestore.instance
-                    .collection('products')
-                    .doc(value2.docs[0].id)
-                    .update({'quantity': int.parse(value2.docs[0]['quantity'].toString()) + int.parse(element['quantity'].toString())});
+                FirebaseFirestore.instance.collection('products').doc(value2.docs[0].id).update({'quantity': int.parse(value2.docs[0]['quantity'].toString()) + int.parse(element['quantity'].toString())});
               });
             }
           });
@@ -126,7 +117,7 @@ class _OrderCardsProfilState extends State<OrderCardsProfil> {
                 Text(
                   "status".tr,
                   overflow: TextOverflow.ellipsis,
-                  style: TextStyle(color: Colors.grey, fontFamily: gilroyMedium, fontSize: 14.sp),
+                  style: TextStyle(color: Colors.grey, fontSize: 14.sp),
                 ),
                 Text(
                   statusMapping[_selectedSortOption.name.toString()].toString(),
@@ -172,7 +163,7 @@ class _OrderCardsProfilState extends State<OrderCardsProfil> {
             TextButton(
               child: Text(
                 'Cancel',
-                style: TextStyle(fontFamily: gilroyMedium, fontSize: 18.sp),
+                style: TextStyle(fontSize: 18.sp),
               ),
               onPressed: () {
                 Navigator.of(context).pop();
@@ -232,62 +223,13 @@ class _OrderCardsProfilState extends State<OrderCardsProfil> {
   Wrap textsWidgetsListview(BuildContext context, AsyncSnapshot<DocumentSnapshot<Map<String, dynamic>>> snapshot) {
     return Wrap(
       children: [
-        textWidgetOrderedPage(
-            order: widget.order,
-            text1: 'dateOrder',
-            text2: widget.order.date!,
-            context: context,
-            labelName: 'date',
-            ontap: false,
-            status: statusMapping[_selectedSortOption.name.toString()].toString()),
-        textWidgetOrderedPage(
-            order: widget.order,
-            text1: 'package',
-            text2: snapshot.data!['package'],
-            context: context,
-            labelName: 'package',
-            ontap: true,
-            status: statusMapping[_selectedSortOption.name.toString()].toString()),
-        textWidgetOrderedPage(
-            order: widget.order,
-            text1: 'clientNumber',
-            text2: snapshot.data!['client_number'],
-            context: context,
-            labelName: 'client_number',
-            ontap: true,
-            status: statusMapping[_selectedSortOption.name.toString()].toString()),
-        textWidgetOrderedPage(
-            order: widget.order,
-            text1: 'userName',
-            text2: snapshot.data!['client_name'],
-            context: context,
-            labelName: 'client_name',
-            ontap: true,
-            status: statusMapping[_selectedSortOption.name.toString()].toString()),
-        textWidgetOrderedPage(
-            order: widget.order,
-            text1: 'clientAddress',
-            text2: snapshot.data!['client_address'],
-            context: context,
-            labelName: 'client_address',
-            ontap: true,
-            status: statusMapping[_selectedSortOption.name.toString()].toString()),
-        textWidgetOrderedPage(
-            order: widget.order,
-            text1: 'discount',
-            text2: snapshot.data!['discount'],
-            context: context,
-            labelName: 'discount',
-            ontap: true,
-            status: statusMapping[_selectedSortOption.name.toString()].toString()),
-        textWidgetOrderedPage(
-            order: widget.order,
-            text1: 'priceProduct',
-            text2: snapshot.data!['sum_price'].toString(),
-            context: context,
-            labelName: 'priceProduct',
-            ontap: false,
-            status: statusMapping[_selectedSortOption.name.toString()].toString()),
+        textWidgetOrderedPage(order: widget.order, text1: 'dateOrder', text2: widget.order.date!, context: context, labelName: 'date', ontap: false, status: statusMapping[_selectedSortOption.name.toString()].toString()),
+        textWidgetOrderedPage(order: widget.order, text1: 'package', text2: snapshot.data!['package'], context: context, labelName: 'package', ontap: true, status: statusMapping[_selectedSortOption.name.toString()].toString()),
+        textWidgetOrderedPage(order: widget.order, text1: 'clientNumber', text2: snapshot.data!['client_number'], context: context, labelName: 'client_number', ontap: true, status: statusMapping[_selectedSortOption.name.toString()].toString()),
+        textWidgetOrderedPage(order: widget.order, text1: 'userName', text2: snapshot.data!['client_name'], context: context, labelName: 'client_name', ontap: true, status: statusMapping[_selectedSortOption.name.toString()].toString()),
+        textWidgetOrderedPage(order: widget.order, text1: 'clientAddress', text2: snapshot.data!['client_address'], context: context, labelName: 'client_address', ontap: true, status: statusMapping[_selectedSortOption.name.toString()].toString()),
+        textWidgetOrderedPage(order: widget.order, text1: 'discount', text2: snapshot.data!['discount'], context: context, labelName: 'discount', ontap: true, status: statusMapping[_selectedSortOption.name.toString()].toString()),
+        textWidgetOrderedPage(order: widget.order, text1: 'priceProduct', text2: snapshot.data!['sum_price'].toString(), context: context, labelName: 'priceProduct', ontap: false, status: statusMapping[_selectedSortOption.name.toString()].toString()),
         textWidgetOrderedPage(
             order: widget.order,
             text1: 'Coupon',
@@ -296,16 +238,8 @@ class _OrderCardsProfilState extends State<OrderCardsProfil> {
             labelName: 'coupon',
             ontap: statusMapping[_selectedSortOption.name.toString()].toString().toLowerCase() == 'shipped' ? false : true,
             status: statusMapping[_selectedSortOption.name.toString()].toString()),
-        textWidgetOrderedPage(
-            order: widget.order, text1: 'note', text2: snapshot.data!['note'], context: context, labelName: 'note', ontap: true, status: statusMapping[_selectedSortOption.name.toString()].toString()),
-        textWidgetOrderedPage(
-            order: widget.order,
-            text1: 'productCount',
-            text2: widget.order.products!.toString(),
-            context: context,
-            labelName: 'Product count',
-            ontap: false,
-            status: statusMapping[_selectedSortOption.name.toString()].toString()),
+        textWidgetOrderedPage(order: widget.order, text1: 'note', text2: snapshot.data!['note'], context: context, labelName: 'note', ontap: true, status: statusMapping[_selectedSortOption.name.toString()].toString()),
+        textWidgetOrderedPage(order: widget.order, text1: 'productCount', text2: widget.order.products!.toString(), context: context, labelName: 'Product count', ontap: false, status: statusMapping[_selectedSortOption.name.toString()].toString()),
       ],
     );
   }

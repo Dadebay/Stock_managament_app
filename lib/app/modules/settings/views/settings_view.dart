@@ -1,9 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:stock_managament_app/app/product/constants/icon_constants.dart';
 import 'package:stock_managament_app/constants/buttons/settings_button.dart';
 import 'package:stock_managament_app/constants/customWidget/constants.dart';
-import 'package:stock_managament_app/constants/customWidget/custom_app_bar.dart';
 
 import '../controllers/settings_controller.dart';
 
@@ -11,49 +11,46 @@ class SettingsView extends GetView<SettingsController> {
   const SettingsView({super.key});
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        appBar: CustomAppBar(backArrow: true, centerTitle: true, actionIcon: false, name: "settings".tr),
-        body: ListView(
-          children: [
-            SettingButton(
-              name: Get.locale!.toLanguageTag() == 'tm'
-                  ? 'Türkmen dili'
-                  : Get.locale!.toLanguageTag() == 'ru'
-                      ? 'Rus dili'
-                      : 'Iňlis dili',
-              onTap: () {
-                changeLanguage();
-              },
-              icon: Container(
-                width: 35,
-                height: 35,
-                decoration: const BoxDecoration(shape: BoxShape.circle, color: Colors.red),
-                child: ClipRRect(
-                  borderRadius: borderRadius30,
-                  child: Image.asset(
-                    Get.locale!.toLanguageTag() == 'tm'
-                        ? tmIcon
-                        : Get.locale!.toLanguageTag() == 'ru'
-                            ? ruIcon
-                            : engIcon,
-                    fit: BoxFit.cover,
-                  ),
-                ),
+    return ListView(
+      children: [
+        SettingButton(
+          name: Get.locale!.toLanguageTag() == 'tm'
+              ? 'Türkmen dili'
+              : Get.locale!.toLanguageTag() == 'ru'
+                  ? 'Rus dili'
+                  : 'Iňlis dili',
+          onTap: () {
+            changeLanguage();
+          },
+          icon: Container(
+            width: 35,
+            height: 35,
+            decoration: const BoxDecoration(shape: BoxShape.circle, color: Colors.red),
+            child: ClipRRect(
+              borderRadius: borderRadius30,
+              child: Image.asset(
+                Get.locale!.toLanguageTag() == 'tm'
+                    ? IconConstants.tmIcon
+                    : Get.locale!.toLanguageTag() == 'ru'
+                        ? IconConstants.ruIcon
+                        : IconConstants.engIcon,
+                fit: BoxFit.cover,
               ),
             ),
-            SettingButton(
-              name: 'versia',
-              onTap: () {},
-              icon: const Text(
-                '1.0.0',
-                style: TextStyle(
-                  color: kPrimaryColor2,
-                  fontFamily: gilroyMedium,
-                ),
-              ),
+          ),
+        ),
+        SettingButton(
+          name: 'versia',
+          onTap: () {},
+          icon: const Text(
+            '1.0.0',
+            style: TextStyle(
+              color: kPrimaryColor2,
             ),
-          ],
-        ));
+          ),
+        ),
+      ],
+    );
   }
 }
 
@@ -84,7 +81,7 @@ void changeLanguage() {
       ),
       title: Text(
         name,
-        style: const TextStyle(color: Colors.black, fontFamily: gilroyMedium, fontSize: 18),
+        style: const TextStyle(color: Colors.black, fontSize: 18),
       ),
     );
   }
@@ -115,19 +112,19 @@ void changeLanguage() {
             ),
           ),
           dividerr(),
-          button('Türkmen', tmIcon, () async {
+          button('Türkmen', IconConstants.tmIcon, () async {
             settingsController.switchLang('tm');
             Get.back();
             // await Restart.restartApp();
           }),
           dividerr(),
-          button('Русский', ruIcon, () async {
+          button('Русский', IconConstants.ruIcon, () async {
             settingsController.switchLang('ru');
             Get.back();
             // await Restart.restartApp();
           }),
           dividerr(),
-          button('English', engIcon, () async {
+          button('English', IconConstants.engIcon, () async {
             settingsController.switchLang('en');
             Get.back();
             // await Restart.restartApp();

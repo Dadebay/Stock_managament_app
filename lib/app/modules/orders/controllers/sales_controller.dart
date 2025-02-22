@@ -23,6 +23,57 @@ class SalesController extends GetxController {
     getData();
   }
 
+  submitSale2({required List<TextEditingController> textControllers, required String status, required BuildContext context}) async {
+    final HomeController homeController = Get.find<HomeController>();
+    double sumCost = 0.0;
+    double sumPrice = 0.0;
+
+    for (var element in selectedProductsList) {
+      final ProductModel product = element['product'];
+      sumCost += double.parse(product.cost.toString().replaceAll(',', '.')) * int.parse(element['count'].toString());
+      sumPrice += double.parse(product.sellPrice.toString().replaceAll(',', '.')) * int.parse(element['count'].toString());
+      int.parse(product.quantity.toString()) - int.parse(element['count'].toString());
+      FirebaseFirestore.instance.collection('products').doc(product.documentID).update({'quantity': int.parse(product.quantity.toString()) - int.parse(element['count'].toString())});
+    }
+    print(sumCost);
+    print(sumPrice);
+    double discountPrice = textControllers[7].text.isEmpty ? 0.0 : double.parse(textControllers[7].text.replaceAll(',', '.'));
+    print(discountPrice);
+    if (discountPrice >= sumPrice || sumPrice - discountPrice < 0) {
+      showSnackBar("Error", "A discount price cannot be greater than the sum price.", Colors.red);
+      homeController.agreeButton.value = false;
+    } else {
+      sumPrice -= discountPrice;
+      print('_______________________________________________');
+      //write sale to sales column
+      await FirebaseFirestore.instance.collection('sales').add({
+        'client_address': textControllers[4].text,
+        'client_name': textControllers[3].text,
+        'client_number': textControllers[2].text,
+        'coupon': textControllers[5].text,
+        'date': textControllers[0].text,
+        'discount': textControllers[7].text,
+        'note': textControllers[6].text,
+        'package': textControllers[1].text,
+        'status': status,
+        'product_count': selectedProductsList.length.toString(),
+        'sum_price': sumPrice.toString(),
+        'sum_cost': sumCost.toString(),
+      }).then((value) async {
+        //write products to sales id
+        print(value.id);
+        writeProductToSaleID(value.id);
+      });
+
+      // write client to clients column
+      findClientOrAddNewOne(textControllers: textControllers, sumPrice: sumPrice.toString());
+
+      Navigator.of(context).pop();
+      homeController.agreeButton.value = false;
+      showSnackBar("Done", "Your purchase submitted", Colors.green);
+    }
+  }
+
   sortSalesCards(int index) async {
     orderCardList.clear();
     loadingDataOrders.value = true;
@@ -50,9 +101,12 @@ class SalesController extends GetxController {
 
   getDataSelectProductsView() async {
     loadingDataSelectProductView.value = true;
-    await FirebaseFirestore.instance.collection('products').get().then((value) {
+    //get doucments order by date asc
+    // await FirebaseFirestore.instance.collection('products').get().then((value) {
+    await FirebaseFirestore.instance.collection('products').orderBy("date", descending: true).get().then((value) {
       productList.clear();
       for (var element in value.docs) {
+        print(element['date']);
         final product = ProductModel(
           name: element['name'],
           brandName: element['brand'].toString(),
@@ -145,54 +199,6 @@ class SalesController extends GetxController {
     }
   }
 
-  sumbitSale({required List<TextEditingController> textControllers, required String status, required BuildContext context}) async {
-    final HomeController homeController = Get.find<HomeController>();
-    double sumCost = 0.0;
-    double sumPrice = 0.0;
-    //TODO: ADD await function if ap not working very vell
-    for (var element in selectedProductsList) {
-      final ProductModel product = element['product'];
-      sumCost += double.parse(product.cost.toString()).toDouble() * int.parse(element['count'].toString());
-      sumPrice += double.parse(product.sellPrice.toString()).toDouble() * int.parse(element['count'].toString());
-      int.parse(product.quantity.toString()) - int.parse(element['count'].toString());
-      FirebaseFirestore.instance.collection('products').doc(product.documentID).update({'quantity': int.parse(product.quantity.toString()) - int.parse(element['count'].toString())});
-    }
-    double discountPrice = textControllers[7].text == "" ? 0.0 : double.parse(textControllers[7].text.toString());
-
-    if (discountPrice >= sumPrice || sumPrice - discountPrice < 0) {
-      showSnackBar("Error", "A discount price cannot be greater than the sum price.", Colors.red);
-      homeController.agreeButton.value = false;
-    } else {
-      sumPrice -= discountPrice;
-      //write sale to sales column-----------------------------------------------------------------
-      await FirebaseFirestore.instance.collection('sales').add({
-        'client_address': textControllers[4].text,
-        'client_name': textControllers[3].text,
-        'client_number': textControllers[2].text,
-        'coupon': textControllers[5].text,
-        'date': textControllers[0].text,
-        'discount': textControllers[7].text,
-        'note': textControllers[6].text,
-        'package': textControllers[1].text,
-        'status': status,
-        'product_count': selectedProductsList.length.toString(),
-        'sum_price': sumPrice.toString(),
-        'sum_cost': sumCost.toString(),
-      }).then((value) async {
-        //write products to sales id -----------------------------------------------------------------
-        writeProductToSaleID(value.id);
-      });
-      // write client to clients column ------------------------------------------------------------
-      findClientOrAddNewOne(textControllers: textControllers, sumPrice: sumPrice.toString());
-      selectedProductsList.sort((a, b) {
-        return a['date'].compareTo(b['date']);
-      });
-      Navigator.of(context).pop();
-      homeController.agreeButton.value = false;
-      showSnackBar("Done", "Your purchase submitted ", Colors.green);
-    }
-  }
-
   writeProductToSaleID(String id) async {
     for (var element in selectedProductsList) {
       final ProductModel product = element['product'];
@@ -210,6 +216,10 @@ class SalesController extends GetxController {
         'package': product.package,
         'quantity': element['count'],
         'sell_price': product.sellPrice,
+      }).then((value) {
+        print("++++product added+++++++++++++++++++++++++++++++++++");
+
+        print(value.id);
       });
     }
   }
@@ -224,6 +234,8 @@ class SalesController extends GetxController {
           element.reference.update({'sum_price': sumClientPrice, 'order_count': element['order_count'] + 1, 'name': textControllers[3].text});
         }
       }
+      print("CLIENTTTT");
+      print(value);
       if (valueAddClient == false) {
         FirebaseFirestore.instance.collection('clients').add({
           'address': textControllers[4].text,

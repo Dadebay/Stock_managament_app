@@ -51,12 +51,13 @@ class _CreateOrderViewState extends State<CreateOrderView> {
                   padding: EdgeInsets.only(top: 10.h, left: 10.w, bottom: 10.h),
                   child: Text(
                     "selectedProducts".tr,
-                    style: TextStyle(color: Colors.black, fontFamily: gilroySemiBold, fontSize: 22.sp),
+                    style: TextStyle(color: Colors.black, fontSize: 22.sp),
                   ),
                 ),
                 ListView.builder(
                   itemCount: salesController.selectedProductsList.length,
                   shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
                   itemBuilder: (BuildContext context, int index) {
                     final ProductModel product = salesController.selectedProductsList[index]['product'];
                     return ProductCard(product: product, orderView: false, addCounterWidget: true);
@@ -73,24 +74,17 @@ class _CreateOrderViewState extends State<CreateOrderView> {
       backgroundColor: Colors.white,
       appBar: CustomAppBar(backArrow: true, centerTitle: true, actionIcon: false, name: 'createOrder'.tr),
       body: ListView(
+        shrinkWrap: true,
         padding: EdgeInsets.symmetric(horizontal: 10.w),
         children: [
           CustomTextField(labelName: "date", borderRadius: true, controller: textControllers[0], focusNode: focusNodes[0], requestfocusNode: focusNodes[1], unFocus: false, readOnly: false),
           selectOrderStatus(),
           CustomTextField(labelName: "package", borderRadius: true, controller: textControllers[1], focusNode: focusNodes[1], requestfocusNode: focusNodes[2], unFocus: false, readOnly: true),
-          Form(
-              key: _formKey,
-              child: Column(
-                children: [
-                  PhoneNumber(mineFocus: focusNodes[2], controller: textControllers[2], requestFocus: focusNodes[3], style: false, unFocus: true),
-                  CustomTextField(labelName: "userName", borderRadius: true, controller: textControllers[3], focusNode: focusNodes[3], requestfocusNode: focusNodes[4], unFocus: false, readOnly: true),
-                ],
-              )),
+          PhoneNumber(mineFocus: focusNodes[2], controller: textControllers[2], requestFocus: focusNodes[3], style: false, unFocus: true),
+          CustomTextField(labelName: "userName", borderRadius: true, controller: textControllers[3], focusNode: focusNodes[3], requestfocusNode: focusNodes[4], unFocus: false, readOnly: true),
           CustomTextField(labelName: "clientAddress", borderRadius: true, controller: textControllers[4], focusNode: focusNodes[4], requestfocusNode: focusNodes[5], unFocus: false, readOnly: true),
-          CustomTextField(
-              labelName: "Coupon", isNumber: true, borderRadius: true, controller: textControllers[5], focusNode: focusNodes[5], requestfocusNode: focusNodes[6], unFocus: false, readOnly: true),
-          CustomTextField(
-              labelName: "Discount", isNumber: true, borderRadius: true, controller: textControllers[7], focusNode: focusNodes[6], requestfocusNode: focusNodes[7], unFocus: false, readOnly: true),
+          CustomTextField(labelName: "Coupon", isNumber: true, borderRadius: true, controller: textControllers[5], focusNode: focusNodes[5], requestfocusNode: focusNodes[6], unFocus: false, readOnly: true),
+          CustomTextField(labelName: "Discount", isNumber: true, borderRadius: true, controller: textControllers[7], focusNode: focusNodes[6], requestfocusNode: focusNodes[7], unFocus: false, readOnly: true),
           CustomTextField(labelName: "note", borderRadius: true, maxline: 3, controller: textControllers[6], focusNode: focusNodes[7], requestfocusNode: focusNodes[0], unFocus: false, readOnly: true),
           selectedProductsView(),
           GestureDetector(
@@ -114,15 +108,16 @@ class _CreateOrderViewState extends State<CreateOrderView> {
           Center(
             child: AgreeButton(
                 onTap: () {
-                  if (_formKey.currentState!.validate()) {
+                  if (textControllers[1].text.isNotEmpty && textControllers[2].text.isNotEmpty && textControllers[3].text.isNotEmpty) {
                     if (salesController.selectedProductsList.isEmpty) {
                       showSnackBar('errorTitle', 'selectMoreProducts', Colors.red);
                     } else {
                       if (homeController.agreeButton.value == false) {
                         homeController.agreeButton.value = true;
 
-                        showSnackBar("error", "submit sale gidip dur garas sykla", Colors.green);
-                        salesController.sumbitSale(textControllers: textControllers, context: context, status: selectedStatus);
+                        showSnackBar("Geçdi", "Azajyk garaşyň", Colors.green);
+                        salesController.submitSale2(textControllers: textControllers, status: selectedStatus, context: context);
+                        // salesController.s(textControllers: textControllers, context: context, status: selectedStatus);
                       } else {
                         showSnackBar("wait", "waitMyManSubtitle", Colors.red);
                       }

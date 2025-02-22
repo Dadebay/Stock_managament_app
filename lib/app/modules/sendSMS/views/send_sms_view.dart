@@ -78,15 +78,17 @@ class _SendSMSViewState extends State<SendSMSView> {
             number: smsController.clients[index]['number'],
             sumPrice: double.parse(smsController.clients[index]['sum_price'].toString()));
         return Row(children: [
-          SizedBox(
-            width: 30.w,
+          Expanded(
+            flex: 1,
             child: Text(
               "${index + 1} - ",
+              overflow: TextOverflow.ellipsis,
               textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.black, fontFamily: gilroyMedium, fontSize: 16.sp),
+              style: TextStyle(color: Colors.black, fontSize: 16.sp),
             ),
           ),
           Expanded(
+            flex: 7,
             child: Container(
               color: Colors.white,
               child: Row(
@@ -106,7 +108,7 @@ class _SendSMSViewState extends State<SendSMSView> {
                       clinet.number,
                       overflow: TextOverflow.ellipsis,
                       textAlign: TextAlign.start,
-                      style: TextStyle(color: Colors.black, fontFamily: gilroySemiBold, fontSize: 14.sp),
+                      style: TextStyle(color: Colors.black, fontSize: 14.sp),
                     ),
                   ),
                 ],
@@ -144,7 +146,7 @@ class _SendSMSViewState extends State<SendSMSView> {
     return Get.defaultDialog(
         title: 'Send message',
         titlePadding: const EdgeInsets.only(top: 20),
-        titleStyle: TextStyle(color: Colors.black, fontFamily: gilroySemiBold, fontSize: 20.sp),
+        titleStyle: TextStyle(color: Colors.black, fontSize: 20.sp),
         contentPadding: EdgeInsets.symmetric(horizontal: 10.w),
         content: SizedBox(
           width: Get.size.width / 1,
