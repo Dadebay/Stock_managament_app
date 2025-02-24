@@ -5,9 +5,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:kartal/kartal.dart';
 import 'package:stock_managament_app/app/modules/home/views/bottom_nav_bar.dart';
-import 'package:stock_managament_app/app/product/constants/icon_constants.dart';
 import 'package:stock_managament_app/app/product/sizes/widget_sizes.dart';
 import 'package:stock_managament_app/app/product/utils/dialog_utils.dart';
 
@@ -45,14 +43,8 @@ class _ConnectionCheckViewState extends State<ConnectionCheckView> {
         children: [
           Expanded(
             child: Center(
-              child: ClipRRect(
-                borderRadius: context.border.highBorderRadius,
-                child: Image.asset(
-                  IconConstants.logo,
-                  fit: BoxFit.cover,
-                  width: WidgetSizes.high2x.value,
-                  height: WidgetSizes.high2x.value,
-                ),
+              child: FlutterLogo(
+                size: WidgetSizes.high2x.value,
               ),
             ),
           ),

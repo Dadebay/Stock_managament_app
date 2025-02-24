@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:kartal/kartal.dart';
 import 'package:stock_managament_app/constants/customWidget/constants.dart';
 
 class PhoneNumber extends StatelessWidget {
@@ -46,23 +47,21 @@ class PhoneNumber extends StatelessWidget {
         decoration: InputDecoration(
           errorMaxLines: 2,
           errorStyle: const TextStyle(fontFamily: gilroyMedium),
-          prefixIcon: const Padding(
-            padding: EdgeInsets.only(
-              left: 15,
-            ),
+          prefixIcon: Padding(
+            padding: context.padding.onlyLeftNormal.copyWith(top: 0),
             child: Text(
               '+ 993',
-              style: TextStyle(color: Colors.grey, fontSize: 18, fontFamily: gilroyMedium),
+              style: context.general.textTheme.titleLarge!.copyWith(color: Colors.grey.shade400, fontSize: 20),
             ),
           ),
-          contentPadding: const EdgeInsets.only(left: 25, top: 16, bottom: 18),
+          contentPadding: context.padding.normal,
           prefixIconConstraints: const BoxConstraints(minWidth: 80),
           isDense: true,
           hintText: '65 656565 ',
           filled: style,
           fillColor: kPrimaryColor,
           alignLabelWithHint: true,
-          hintStyle: TextStyle(color: Colors.grey.shade400, fontFamily: gilroyMedium),
+          hintStyle: context.general.textTheme.titleLarge!.copyWith(color: Colors.grey.shade400, fontSize: 20),
           border: OutlineInputBorder(
             borderRadius: style ? borderRadius10 : borderRadius20,
             borderSide: const BorderSide(

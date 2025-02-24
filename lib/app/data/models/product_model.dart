@@ -33,6 +33,7 @@ class ProductModel {
     this.sellPrice,
   });
 
+  // Firestore'dan gelen DocumentSnapshot'dan ProductModel oluşturur
   factory ProductModel.fromDocument(DocumentSnapshot doc) {
     Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
     return ProductModel(
@@ -52,4 +53,24 @@ class ProductModel {
       sellPrice: data['sell_price'].toString(),
     );
   }
+
+  // Map<String, dynamic>'den ProductModel oluşturur
+  // factory ProductModel.fromMap(Map<String, dynamic> data) {
+  //   return ProductModel(
+  //     documentID: data.,
+  //     brandName: data['brand']?.toString(),
+  //     category: data['category']?.toString(),
+  //     cost: data['cost']?.toString(),
+  //     date: data['date']?.toString(),
+  //     gramm: data['gramm']?.toString(),
+  //     image: data['image']?.toString(),
+  //     location: data['location']?.toString(),
+  //     material: data['material']?.toString(),
+  //     name: data['name']?.toString(),
+  //     note: data['note']?.toString(),
+  //     package: data['package']?.toString(),
+  //     quantity: data['quantity'] != null ? int.parse(data['quantity'].toString()) : 0,
+  //     sellPrice: data['sell_price']?.toString(),
+  //   );
+  // }
 }

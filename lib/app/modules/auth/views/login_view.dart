@@ -22,6 +22,7 @@ class _SignUpViewState extends State<SignUpView> {
   TextEditingController textEditingController = TextEditingController();
   TextEditingController textEditingController1 = TextEditingController();
   final _formKey = GlobalKey<FormState>();
+  final HomeController _homeController = Get.put<HomeController>(HomeController());
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -53,7 +54,6 @@ class _SignUpViewState extends State<SignUpView> {
                 focusNode: focusNode,
                 requestfocusNode: focusNode1,
                 isNumber: false,
-                borderRadius: true,
                 unFocus: false,
                 readOnly: true,
               ),
@@ -65,7 +65,6 @@ class _SignUpViewState extends State<SignUpView> {
                   focusNode: focusNode1,
                   requestfocusNode: focusNode,
                   isNumber: false,
-                  borderRadius: true,
                   unFocus: false,
                   readOnly: true,
                 ),
@@ -77,19 +76,18 @@ class _SignUpViewState extends State<SignUpView> {
                       bool valueLogin = false;
                       FirebaseFirestore.instance.collection('users').get().then((value) {
                         for (var element in value.docs) {
-                          if (textEditingController.text.toLowerCase() == element['username'].toString().toLowerCase() &&
-                              textEditingController1.text.toLowerCase() == element['password'].toString().toLowerCase()) {
+                          if (textEditingController.text.toLowerCase() == element['username'].toString().toLowerCase() && textEditingController1.text.toLowerCase() == element['password'].toString().toLowerCase()) {
                             if (element['active'] == false) {
                               FirebaseFirestore.instance.collection('users').doc(element.id).update({'active': true});
                               FirebaseFirestore.instance.collection('users').doc(element.id).get().then((value) {
-                                Get.find<HomeController>().updateLoginData(true, value['isAdmin']);
+                                _homeController.updateLoginData(true, value['isAdmin']);
                               });
                               Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (BuildContext context) => const BottomNavBar()));
                               valueLogin = true;
-                              Get.find<HomeController>().agreeButton.value = !Get.find<HomeController>().agreeButton.value;
+                              _homeController.agreeButton.value = !_homeController.agreeButton.value;
                             } else {
                               showSnackBar('errorTitle', 'loginError1', Colors.red);
-                              Get.find<HomeController>().agreeButton.value = !Get.find<HomeController>().agreeButton.value;
+                              _homeController.agreeButton.value = !_homeController.agreeButton.value;
                             }
                           }
                         }
@@ -97,7 +95,7 @@ class _SignUpViewState extends State<SignUpView> {
                           textEditingController.clear();
                           textEditingController1.clear();
                           showSnackBar('errorTitle', 'signInDialog', Colors.red);
-                          Get.find<HomeController>().agreeButton.value = !Get.find<HomeController>().agreeButton.value;
+                          _homeController.agreeButton.value = !_homeController.agreeButton.value;
                         }
                       });
                     } else {

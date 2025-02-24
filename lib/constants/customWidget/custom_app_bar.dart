@@ -9,11 +9,12 @@ import 'package:stock_managament_app/constants/customWidget/constants.dart';
 class CustomAppBar extends StatelessWidget implements PreferredSize {
   final bool backArrow;
   final bool? centerTitle;
+  final bool? miniTitle;
   final Widget? icon;
   final bool actionIcon;
   final String name;
 
-  const CustomAppBar({required this.backArrow, required this.actionIcon, required this.name, this.icon, this.centerTitle, super.key});
+  const CustomAppBar({required this.backArrow, required this.actionIcon, required this.name, this.icon, this.centerTitle, super.key, this.miniTitle});
 
   @override
   Widget get child => Text('ad');
@@ -37,21 +38,19 @@ class CustomAppBar extends StatelessWidget implements PreferredSize {
       centerTitle: centerTitle,
       leadingWidth: centerTitle == true ? 40.0 : 0.0,
       leading: backArrow
-          ? Padding(
-              padding: const EdgeInsets.only(left: 8),
-              child: IconButton(
-                color: Colors.transparent,
-                splashColor: Colors.transparent,
-                highlightColor: Colors.transparent,
-                icon: Icon(
-                  IconlyLight.arrowLeftCircle,
-                  color: Colors.black,
-                  size: 22,
-                ),
-                onPressed: () {
-                  Get.back();
-                },
+          ? IconButton(
+              color: Colors.transparent,
+              splashColor: Colors.transparent,
+              highlightColor: Colors.transparent,
+              icon: Icon(
+                IconlyLight.arrowLeftCircle,
+                color: Colors.black,
+                size: 22,
               ),
+              onPressed: () {
+                print("Asdasd");
+                Get.back();
+              },
             )
           : SizedBox.shrink(),
       actions: [if (actionIcon) Padding(padding: const EdgeInsets.only(right: 5), child: icon) else SizedBox.shrink()],
@@ -62,7 +61,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSize {
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
         textAlign: TextAlign.center,
-        style: context.general.textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.bold),
+        style: miniTitle == true ? context.general.textTheme.titleLarge!.copyWith(fontWeight: FontWeight.bold) : context.general.textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.bold),
       ),
     );
   }

@@ -2,7 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:stock_managament_app/constants/customWidget/constants.dart';
+import 'package:kartal/kartal.dart';
 
 class SettingButton extends StatelessWidget {
   final String name;
@@ -24,7 +24,7 @@ class SettingButton extends StatelessWidget {
         name.tr,
         overflow: TextOverflow.ellipsis,
         maxLines: 1,
-        style: const TextStyle(color: Colors.black, fontFamily: gilroyMedium),
+        style: context.general.textTheme.bodyLarge!.copyWith(color: Colors.black, fontWeight: FontWeight.bold),
       ),
       trailing: icon,
     );

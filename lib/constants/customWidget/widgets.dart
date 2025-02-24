@@ -1,14 +1,11 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:lottie/lottie.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
-import 'package:stock_managament_app/app/data/models/order_model.dart';
 import 'package:stock_managament_app/app/product/constants/icon_constants.dart';
 import 'package:stock_managament_app/constants/customWidget/constants.dart';
-import 'package:stock_managament_app/constants/customWidget/custom_text_field.dart';
 
 SnackbarController showSnackBar(String title, String subtitle, Color color) {
   if (SnackbarController.isSnackbarBeingShown) {
@@ -22,11 +19,11 @@ SnackbarController showSnackBar(String title, String subtitle, Color color) {
         ? const SizedBox.shrink()
         : Text(
             title.tr,
-            style: const TextStyle(fontSize: 18, color: Colors.white),
+            style: const TextStyle(fontSize: 18, fontFamily: 'PlusJakartaSans', fontWeight: FontWeight.bold, color: Colors.white),
           ),
     messageText: Text(
       subtitle.tr,
-      style: const TextStyle(fontFamily: gilroyRegular, fontSize: 16, color: Colors.white),
+      style: const TextStyle(fontFamily: 'PlusJakartaSans', fontWeight: FontWeight.w400, fontSize: 16, color: Colors.white),
     ),
     snackPosition: SnackPosition.TOP,
     backgroundColor: color,
@@ -76,134 +73,6 @@ CustomFooter customFooter() {
         child: Center(child: body),
       );
     },
-  );
-}
-
-Widget textWidgetOrderedPage({required bool ontap, required String status, required BuildContext context, required String text1, required String text2, required String labelName, required OrderModel order}) {
-  FocusNode focusNode = FocusNode();
-  final TextEditingController textEditingController = TextEditingController();
-  textEditingController.text = text2;
-  Map<String, bool> statusMapping = {"Shipped": false, "Canceled": false, "Refund": false, "Preparing": true, "Ready to ship": true};
-
-  return GestureDetector(
-    onTap: () {
-      if (ontap) {
-        if (statusMapping[status] == true) {
-          showDialog(
-            context: context,
-            barrierDismissible: true,
-            builder: (BuildContext context) {
-              return AlertDialog(
-                alignment: Alignment.center,
-                title: Text(text1.tr, textAlign: TextAlign.center, style: TextStyle(color: Colors.black, fontFamily: gilroyBold, fontSize: 20.sp)),
-                backgroundColor: Colors.white,
-                shadowColor: Colors.red,
-                content: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [CustomTextField(labelName: text1.toString(), controller: textEditingController, focusNode: focusNode, requestfocusNode: focusNode, unFocus: false, readOnly: true)],
-                ),
-                actionsAlignment: MainAxisAlignment.center,
-                actions: <Widget>[
-                  TextButton(
-                    child: Text('no'.tr, style: TextStyle(fontSize: 18.sp)),
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                  ),
-                  TextButton(
-                    child: Text('yes'.tr, style: TextStyle(fontFamily: gilroyBold, fontSize: 18.sp)),
-                    onPressed: () {
-                      if (text1 == 'discount') {
-                        double sumPrice = double.parse(order.sumPrice.toString());
-                        double discount = textEditingController.text.isEmpty ? 0.0 : double.parse(textEditingController.text.toString());
-                        if (sumPrice == discount) {
-                          showSnackBar('errorTitle', 'notHigherThanSumPrice', Colors.red);
-                        } else if (discount > sumPrice) {
-                          showSnackBar('errorTitle', 'notHigherThanSumPrice', Colors.red);
-                        } else {
-                          FirebaseFirestore.instance.collection('sales').doc(order.orderID).update({labelName: textEditingController.text, 'sum_price': double.parse(order.sumPrice.toString()) - discount}).then((value) {
-                            showSnackBar("copySucces", "changesUpdated", Colors.green);
-                          });
-                          Navigator.of(context).pop();
-                        }
-                      } else {
-                        FirebaseFirestore.instance.collection('sales').doc(order.orderID).update({
-                          labelName: textEditingController.text,
-                        }).then((value) {
-                          showSnackBar("copySucces", "changesUpdated", Colors.green);
-                        });
-                        Navigator.of(context).pop();
-                      }
-                      if (text1 == 'clientNumber') {
-                        FirebaseFirestore.instance.collection('clients').get().then((value) {
-                          bool clientAddValue = false;
-                          for (var element in value.docs) {
-                            if (element['number'] == textEditingController.text) {
-                              clientAddValue = true;
-                              double sumClientPrice = double.parse(element['sum_price'].toString()) + double.parse(order.sumPrice.toString());
-                              element.reference.update({'sum_price': sumClientPrice, 'order_count': element['order_count'] + 1});
-                              FirebaseFirestore.instance.collection('clients').where('number', isEqualTo: text2).get().then((valueaa) {
-                                for (var element22 in valueaa.docs) {
-                                  element22.reference.delete();
-                                }
-                              });
-                            }
-                          }
-                          if (clientAddValue == false) {
-                            for (var element in value.docs) {
-                              if (element['number'] == text2) {
-                                element.reference.update({'number': textEditingController.text});
-                              }
-                            }
-                          }
-                        });
-                      }
-                    },
-                  ),
-                ],
-              );
-            },
-          );
-        } else {
-          showSnackBar("errorTitle", "cannotChangeOrderStatus", Colors.red);
-        }
-      }
-    },
-    child: Container(
-      color: Colors.white,
-      child: Column(
-        children: [
-          Padding(
-            padding: EdgeInsets.only(top: 10.h, bottom: 8.h),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  text1.tr,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(color: Colors.grey, fontSize: 14.sp),
-                ),
-                Text(
-                  text1 == "clientNumber"
-                      ? "+993 $text2"
-                      : text1 == "priceProduct"
-                          ? text2
-                          : text1 == "discount" || text1 == "Coupon"
-                              ? text2
-                              : text2,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(color: Colors.black, fontSize: 14.sp),
-                )
-              ],
-            ),
-          ),
-          Divider(
-            color: Colors.grey.shade200,
-          )
-        ],
-      ),
-    ),
   );
 }
 

@@ -19,7 +19,7 @@ class OrderCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        Get.to(() => OrderCardsProfil(order: order, docID: order.clientName));
+        Get.to(() => OrderCardsProfil(order: order));
       },
       child: Container(
         height: WidgetSizes.high2x.value,

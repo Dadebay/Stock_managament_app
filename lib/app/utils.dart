@@ -6,6 +6,13 @@ class MyTranslations extends Translations {
   @override
   Map<String, Map<String, String>> get keys => {
         'tm': {
+          'orderCreated': 'Sargyt döredildi',
+          'pleaseWait': 'Garaşmagyňyzy haýyş edýäris',
+          'clientSearchTitle': 'Müşderi maglumat',
+          'clientSearchSubtitle': 'Müşderi maglumatlary girizilýär garaşyň',
+          'doneTitle': 'Sagboluň',
+          'doneSubtitle': 'Sargydyňyz maglumat girizildi',
+          //
           'select_language': 'Dil saýlaň',
           'selectMoreProducts': 'Bir ýa-da birnäçe önümi saýlamagyňyzy haýyş edýäris',
           'done': "Soňy",

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_iconly/flutter_iconly.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:kartal/kartal.dart';
 import 'package:stock_managament_app/app/data/models/product_model.dart';
 import 'package:stock_managament_app/app/modules/orders/controllers/sales_controller.dart';
 import 'package:stock_managament_app/constants/cards/product_card.dart';
@@ -26,7 +27,6 @@ class _SelectOrderProductsState extends State<SelectOrderProducts> {
   void initState() {
     super.initState();
     salesController.getDataSelectProductsView();
-    print(salesController.productList.length);
   }
 
   onSearchTextChanged(String text) async {
@@ -56,58 +56,66 @@ class _SelectOrderProductsState extends State<SelectOrderProducts> {
         appBar: const CustomAppBar(backArrow: true, centerTitle: true, actionIcon: false, name: 'selectProducts'),
         body: Column(
           children: [
-            searchWidget(),
+            searchWidget(context),
             Expanded(
               child: Obx(() {
                 return _searchResult.isNotEmpty || controller.text.isNotEmpty
-                    ? ListView.builder(
-                        padding: EdgeInsets.symmetric(horizontal: 5.w),
-                        itemCount: _searchResult.length,
-                        physics: const BouncingScrollPhysics(),
-                        itemBuilder: (context, i) {
-                          return ProductCard(
-                            product: _searchResult[i]['product'],
-                            orderView: false,
-                            addCounterWidget: true,
-                          );
-                        },
-                      )
+                    ? _searchResults(context)
                     : salesController.loadingDataSelectProductView.value == true
                         ? spinKit()
-                        : ListView.builder(
-                            padding: EdgeInsets.symmetric(horizontal: 5.w),
-                            itemCount: salesController.productList.length,
-                            physics: const BouncingScrollPhysics(),
-                            itemBuilder: (BuildContext context, int index) {
-                              return ProductCard(
-                                product: salesController.productList[index]['product'],
-                                orderView: false,
-                                addCounterWidget: true,
-                              );
-                            },
-                          );
+                        : _normalListview(context);
               }),
             ),
           ],
         ));
   }
 
-  Container searchWidget() {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.grey.shade100,
-        borderRadius: borderRadius20,
-        border: Border.all(color: kPrimaryColor1.withOpacity(0.4)),
-      ),
-      margin: const EdgeInsets.all(8.0),
+  ListView _normalListview(BuildContext context) {
+    return ListView.builder(
+      padding: context.padding.horizontalNormal,
+      itemCount: salesController.productList.length,
+      physics: const BouncingScrollPhysics(),
+      itemBuilder: (BuildContext context, int index) {
+        return ProductCard(
+          product: salesController.productList[index]['product'],
+          orderView: false,
+          addCounterWidget: true,
+        );
+      },
+    );
+  }
+
+  ListView _searchResults(BuildContext context) {
+    return ListView.builder(
+      padding: context.padding.horizontalNormal,
+      itemCount: _searchResult.length,
+      physics: const BouncingScrollPhysics(),
+      itemBuilder: (context, i) {
+        return ProductCard(
+          product: _searchResult[i]['product'],
+          orderView: false,
+          addCounterWidget: true,
+        );
+      },
+    );
+  }
+
+  Widget searchWidget(BuildContext context) {
+    return Padding(
+      padding: context.padding.normal,
       child: ListTile(
         leading: const Icon(
           IconlyLight.search,
           color: Colors.black,
         ),
+        tileColor: Colors.grey.withOpacity(.2),
+        shape: RoundedRectangleBorder(
+          borderRadius: context.border.normalBorderRadius,
+          side: BorderSide(color: kPrimaryColor2.withOpacity(.4)),
+        ),
         title: TextField(
           controller: controller,
-          decoration: InputDecoration(hintText: 'search'.tr, border: InputBorder.none),
+          decoration: InputDecoration(hintText: 'search'.tr, hintStyle: context.general.textTheme.bodyLarge!.copyWith(color: Colors.grey, fontSize: 20), border: InputBorder.none),
           onChanged: onSearchTextChanged,
         ),
         contentPadding: EdgeInsets.only(left: 15.w),

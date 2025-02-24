@@ -6,7 +6,6 @@ import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:kartal/kartal.dart';
 import 'package:stock_managament_app/app/modules/orders/views/createOrder/create_order.dart';
-import 'package:stock_managament_app/app/modules/orders/views/orders_view.dart';
 import 'package:stock_managament_app/app/modules/search/views/search_view.dart';
 import 'package:stock_managament_app/app/product/constants/list_constants.dart';
 import 'package:stock_managament_app/app/product/utils/dialog_utils.dart';
@@ -89,9 +88,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
               tooltip: 'settings'.tr,
             ),
           ]),
-      body: const Center(child: OrdersView()
-          // isAdmin == true ? ListConstants.adminPages[selectedIndex] : ListConstants.pages[selectedIndex],
-          ),
+      body: isAdmin == true ? ListConstants.adminPages[selectedIndex] : ListConstants.pages[selectedIndex],
     );
   }
 

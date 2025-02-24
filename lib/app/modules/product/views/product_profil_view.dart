@@ -181,24 +181,14 @@ class _ProductProfilViewState extends State<ProductProfilView> {
   Column textFields(BuildContext context) {
     return Column(
       children: [
-        CustomTextField(
-            readOnly: readOnlyStates[0],
-            labelName: 'productName',
-            maxline: 3,
-            borderRadius: true,
-            controller: textControllers[0],
-            focusNode: focusNodes[0],
-            requestfocusNode: focusNodes[1],
-            unFocus: true),
+        CustomTextField(readOnly: readOnlyStates[0], labelName: 'productName', maxline: 3, controller: textControllers[0], focusNode: focusNodes[0], requestfocusNode: focusNodes[1], unFocus: true),
         CustomTextField(
             onTap: () {
               focusNodes[1].unfocus();
               changeTextFieldWithData('categories', 1, 'category');
             },
             readOnly: readOnlyStates[1],
-            // readOnly: true,
             labelName: 'category',
-            borderRadius: true,
             controller: textControllers[1],
             focusNode: focusNodes[1],
             requestfocusNode: focusNodes[2],
@@ -209,14 +199,12 @@ class _ProductProfilViewState extends State<ProductProfilView> {
               changeTextFieldWithData('brands', 2, 'brand');
             },
             readOnly: readOnlyStates[2],
-            // readOnly: true,
             labelName: 'brand',
-            borderRadius: true,
             controller: textControllers[2],
             focusNode: focusNodes[2],
             requestfocusNode: focusNodes[3],
             unFocus: true),
-        CustomTextField(readOnly: readOnlyStates[3], labelName: 'gramm', borderRadius: true, controller: textControllers[3], focusNode: focusNodes[3], requestfocusNode: focusNodes[4], unFocus: true),
+        CustomTextField(readOnly: readOnlyStates[3], labelName: 'gramm', controller: textControllers[3], focusNode: focusNodes[3], requestfocusNode: focusNodes[4], unFocus: true),
         CustomTextField(
             onTap: () {
               focusNodes[4].unfocus();
@@ -224,12 +212,11 @@ class _ProductProfilViewState extends State<ProductProfilView> {
             },
             readOnly: readOnlyStates[4],
             labelName: 'material',
-            borderRadius: true,
             controller: textControllers[4],
             focusNode: focusNodes[4],
             requestfocusNode: focusNodes[5],
             unFocus: true),
-        CustomTextField(readOnly: readOnlyStates[5], labelName: 'price', borderRadius: true, controller: textControllers[5], focusNode: focusNodes[5], requestfocusNode: focusNodes[6], unFocus: true),
+        CustomTextField(readOnly: readOnlyStates[5], labelName: 'price', controller: textControllers[5], focusNode: focusNodes[5], requestfocusNode: focusNodes[6], unFocus: true),
         CustomTextField(
             onTap: () {
               focusNodes[6].unfocus();
@@ -237,15 +224,12 @@ class _ProductProfilViewState extends State<ProductProfilView> {
             },
             readOnly: readOnlyStates[6],
             labelName: 'location',
-            borderRadius: true,
             controller: textControllers[6],
             focusNode: focusNodes[6],
             requestfocusNode: focusNodes[7],
             unFocus: true),
-        CustomTextField(
-            readOnly: readOnlyStates[7], labelName: 'quantity', borderRadius: true, controller: textControllers[7], focusNode: focusNodes[7], requestfocusNode: focusNodes[8], unFocus: true),
-        CustomTextField(
-            readOnly: readOnlyStates[8], maxline: 3, labelName: 'note', borderRadius: true, controller: textControllers[8], focusNode: focusNodes[8], requestfocusNode: focusNodes[1], unFocus: true),
+        CustomTextField(readOnly: readOnlyStates[7], labelName: 'quantity', controller: textControllers[7], focusNode: focusNodes[7], requestfocusNode: focusNodes[8], unFocus: true),
+        CustomTextField(readOnly: readOnlyStates[8], maxline: 3, labelName: 'note', controller: textControllers[8], focusNode: focusNodes[8], requestfocusNode: focusNodes[1], unFocus: true),
         imageURL.isEmpty || imageURL == ''
             ? AgreeButton(
                 onTap: () {

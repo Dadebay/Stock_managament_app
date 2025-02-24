@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:kartal/kartal.dart';
 import 'package:stock_managament_app/app/product/constants/icon_constants.dart';
 import 'package:stock_managament_app/constants/buttons/settings_button.dart';
 import 'package:stock_managament_app/constants/customWidget/constants.dart';
@@ -42,11 +43,9 @@ class SettingsView extends GetView<SettingsController> {
         SettingButton(
           name: 'versia',
           onTap: () {},
-          icon: const Text(
-            '1.0.0',
-            style: TextStyle(
-              color: kPrimaryColor2,
-            ),
+          icon: Text(
+            '2.0.0',
+            style: context.general.textTheme.bodyLarge!.copyWith(color: kPrimaryColor2, fontWeight: FontWeight.bold),
           ),
         ),
       ],

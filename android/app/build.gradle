@@ -46,7 +46,6 @@ android {
         checkReleaseBuilds false //<- add this line
     }
     defaultConfig {
-        // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
         applicationId "com.gurbanow.stockmanagamentapp"
         minSdkVersion localProperties.getProperty('flutter.minSdkVersion').toInteger()
         targetSdkVersion localProperties.getProperty('flutter.targetSdkVersion').toInteger()
@@ -57,8 +56,6 @@ android {
 
     buildTypes {
         release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
             signingConfig signingConfigs.debug
         }
     }
@@ -70,6 +67,5 @@ flutter {
 
 dependencies {
     implementation platform('com.google.firebase:firebase-bom:31.2.0')
-//    implementation 'com.google.firebase:firebase-analytics'
     implementation 'com.google.firebase:firebase-messaging:21.1.0'
 }

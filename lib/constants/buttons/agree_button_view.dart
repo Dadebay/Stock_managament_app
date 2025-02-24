@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:kartal/kartal.dart';
 import 'package:stock_managament_app/app/modules/home/controllers/home_controller.dart';
 import 'package:stock_managament_app/constants/customWidget/constants.dart';
 
@@ -15,10 +16,10 @@ class AgreeButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(onTap: onTap, child: animatedContaner());
+    return GestureDetector(onTap: onTap, child: animatedContaner(context));
   }
 
-  Widget animatedContaner() {
+  Widget animatedContaner(BuildContext context) {
     return Obx(() {
       return AnimatedContainer(
         decoration: const BoxDecoration(borderRadius: borderRadius20, color: kPrimaryColor2),
@@ -41,7 +42,7 @@ class AgreeButton extends StatelessWidget {
                 textAlign: TextAlign.center,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: const TextStyle(color: Colors.white, fontFamily: gilroyBold, fontSize: 22),
+                style: context.general.textTheme.titleLarge!.copyWith(color: Colors.white, fontWeight: FontWeight.bold),
               ),
       );
     });
