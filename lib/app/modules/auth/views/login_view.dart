@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:kartal/kartal.dart';
 import 'package:stock_managament_app/app/modules/home/controllers/home_controller.dart';
 import 'package:stock_managament_app/app/modules/home/views/bottom_nav_bar.dart';
 import 'package:stock_managament_app/constants/buttons/agree_button_view.dart';
@@ -26,26 +26,24 @@ class _SignUpViewState extends State<SignUpView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        padding: EdgeInsets.symmetric(vertical: 30.h),
-        alignment: Alignment.center,
-        child: Form(
-          key: _formKey,
+      body: Form(
+        key: _formKey,
+        child: Center(
           child: ListView(
             shrinkWrap: true,
-            padding: EdgeInsets.symmetric(horizontal: 10.w),
+            padding: context.padding.horizontalNormal,
             children: [
               Text(
                 'login'.tr.toUpperCase(),
                 textAlign: TextAlign.center,
-                style: TextStyle(color: Colors.amber, fontFamily: gilroyBold, fontSize: 22.sp),
+                style: context.general.textTheme.headlineMedium!.copyWith(fontWeight: FontWeight.bold, color: kPrimaryColor2),
               ),
               Padding(
-                padding: EdgeInsets.symmetric(vertical: 20.h, horizontal: 10.w),
+                padding: context.padding.verticalMedium,
                 child: Text(
                   'appObtained'.tr,
                   textAlign: TextAlign.center,
-                  style: TextStyle(color: Colors.black, fontFamily: gilroyBold, fontSize: 18.sp),
+                  style: context.general.textTheme.titleLarge!.copyWith(fontWeight: FontWeight.w600),
                 ),
               ),
               CustomTextField(
@@ -58,7 +56,7 @@ class _SignUpViewState extends State<SignUpView> {
                 readOnly: true,
               ),
               Padding(
-                padding: EdgeInsets.symmetric(vertical: 20.h),
+                padding: context.padding.verticalNormal,
                 child: CustomTextField(
                   labelName: 'userpassword',
                   controller: textEditingController1,

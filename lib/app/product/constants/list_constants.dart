@@ -20,16 +20,16 @@ class ListConstants {
     {'name': 'Materials', 'searchName': 'material'}
   ];
   static List<Map<String, dynamic>> fieldNames = [
-    {'field': 'dateOrder', 'value': false},
+    {'field': 'date', 'value': false},
     {'field': 'package', 'value': true},
-    {'field': 'clientNumber', 'value': true},
-    {'field': 'userName', 'value': true},
-    {'field': 'clientAddress', 'value': true},
+    {'field': 'client_number', 'value': true},
+    {'field': 'client_name', 'value': true},
+    {'field': 'client_address', 'value': true},
     {'field': 'discount', 'value': true},
     {'field': 'priceProduct', 'value': false},
-    {'field': 'Coupon', 'value': true},
+    {'field': 'coupon', 'value': true},
     {'field': 'note', 'value': true},
-    {'field': 'productCount', 'value': false},
+    {'field': 'product_count', 'value': false},
   ];
 
   static Map<String, Color> colorMapping = {"shipped": Colors.green, "canceled": Colors.red, "refund": Colors.red, "preparing": kPrimaryColor2, "ready to ship": Colors.purple};

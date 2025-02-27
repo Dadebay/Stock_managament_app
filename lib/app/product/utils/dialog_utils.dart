@@ -42,61 +42,106 @@ class DialogUtils {
     ));
   }
 
-  static Future<dynamic> filter() {
+  static Future<dynamic> filter(BuildContext context) {
     final HomeController homeController = Get.find<HomeController>();
 
-    return Get.defaultDialog(
-        title: 'filter'.tr,
-        titleStyle: TextStyle(color: Colors.black, fontSize: 20.sp),
-        content: Container(
-          width: Get.size.width / 1.5,
-          height: Get.size.height / 2,
-          padding: EdgeInsets.symmetric(vertical: 10.h, horizontal: 10.w),
-          child: ListView.builder(
-            itemCount: ListConstants.filters.length,
-            shrinkWrap: true,
-            physics: const BouncingScrollPhysics(),
-            itemBuilder: (BuildContext context, int index) {
-              return ListTile(
-                onTap: () {
-                  Get.defaultDialog(
-                      title: ListConstants.filters[index]['name'],
-                      titleStyle: TextStyle(color: Colors.black, fontSize: 18.sp),
-                      content: Container(
-                        width: Get.size.width / 1.5,
-                        height: Get.size.height / 2,
-                        padding: EdgeInsets.symmetric(vertical: 10.h, horizontal: 10.w),
-                        child: StreamBuilder(
-                            stream: FirebaseFirestore.instance.collection(ListConstants.filters[index]['name'].toLowerCase()).snapshots(),
-                            builder: (context, snapshot) {
-                              if (snapshot.hasData) {
-                                return ListView.builder(
-                                  itemCount: snapshot.data!.docs.length,
-                                  shrinkWrap: true,
-                                  physics: const BouncingScrollPhysics(),
-                                  itemBuilder: (BuildContext context, int indexx) {
-                                    return ListTile(
-                                      onTap: () {
-                                        homeController.filterProducts(ListConstants.filters[index]['searchName'], snapshot.data!.docs[indexx]['name']);
-                                      },
-                                      title: Text(snapshot.data!.docs[indexx]['name']),
-                                    );
-                                  },
-                                );
-                              }
-                              return spinKit();
-                            }),
-                      ));
-                },
-                title: Text(
-                  ListConstants.filters[index]['name'].toString(),
-                  style: TextStyle(color: Colors.black, fontSize: 18.sp),
+    return Get.bottomSheet(
+      Container(
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Padding(
+              padding: context.padding.normal,
+              child: Text(
+                'filter'.tr,
+                style: context.general.textTheme.titleLarge!.copyWith(
+                  color: Colors.black,
+                  fontWeight: FontWeight.bold,
                 ),
-                trailing: const Icon(IconlyLight.arrowRightCircle),
-              );
-            },
-          ),
-        ));
+              ),
+            ),
+            Expanded(
+              child: ListView.builder(
+                itemCount: ListConstants.filters.length,
+                shrinkWrap: true,
+                physics: const BouncingScrollPhysics(),
+                itemBuilder: (BuildContext context, int index) {
+                  return ListTile(
+                    onTap: () {
+                      _miniBottomSheet(index, homeController, context);
+                    },
+                    title: Text(ListConstants.filters[index]['name'].toString(), maxLines: 1, style: context.general.textTheme.titleMedium!.copyWith(fontSize: 20)),
+                    trailing: Icon(IconlyLight.arrowRightCircle, size: WidgetSizes.mini2x.value),
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  static Future<dynamic> _miniBottomSheet(int index, HomeController homeController, BuildContext context) {
+    return Get.bottomSheet(
+      Container(
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Padding(
+              padding: context.padding.normal,
+              child: Text(
+                ListConstants.filters[index]['name'],
+                style: context.general.textTheme.titleLarge!.copyWith(
+                  color: Colors.black,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+            Expanded(
+              child: StreamBuilder(
+                stream: FirebaseFirestore.instance.collection(ListConstants.filters[index]['name'].toLowerCase()).snapshots(),
+                builder: (context, snapshot) {
+                  if (snapshot.hasData) {
+                    return ListView.builder(
+                      itemCount: snapshot.data!.docs.length,
+                      shrinkWrap: true,
+                      physics: const BouncingScrollPhysics(),
+                      itemBuilder: (BuildContext context, int indexx) {
+                        return ListTile(
+                          onTap: () {
+                            homeController.filterProducts(
+                              ListConstants.filters[index]['searchName'],
+                              snapshot.data!.docs[indexx]['name'],
+                            );
+                            Get.back();
+                            Get.back();
+                          },
+                          title: Text(
+                            snapshot.data!.docs[indexx]['name'],
+                            maxLines: 1,
+                            style: context.general.textTheme.titleLarge!.copyWith(fontSize: 18, fontWeight: FontWeight.w500),
+                          ),
+                        );
+                      },
+                    );
+                  }
+                  return Center(child: spinKit());
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   static void showNoConnectionDialog({required VoidCallback onRetry, required BuildContext context}) {

@@ -60,7 +60,7 @@ class _SearchViewState extends State<SearchView> {
                               } else {
                                 final product = controller.text.isEmpty ? ProductModel.fromDocument(searchController.productsList[index]) : ProductModel.fromDocument(searchController.searchResult[index]);
                                 return Padding(
-                                  padding: context.padding.normal,
+                                  padding: widget.whereToSearch == 'orders' ? context.padding.normal : context.padding.horizontalNormal,
                                   child: ProductCard(
                                     product: product,
                                     orderView: false,

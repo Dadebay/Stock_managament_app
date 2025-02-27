@@ -2,11 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
-import 'package:stock_managament_app/app/modules/auth/views/login_view.dart';
+import 'package:stock_managament_app/app/modules/auth/views/connection_check_view.dart';
 import 'package:stock_managament_app/app/product/initialize/app_start_init.dart';
 import 'package:stock_managament_app/app/product/theme/theme_contants.dart';
 import 'package:stock_managament_app/app/utils.dart';
 
+import 'app/modules/home/controllers/home_controller.dart';
 import 'constants/customWidget/constants.dart';
 
 Future<void> main() async {
@@ -24,6 +25,7 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   final storage = GetStorage();
+  final HomeController _homeController = Get.put(HomeController());
 
   @override
   Widget build(BuildContext context) {
@@ -40,8 +42,7 @@ class _MyAppState extends State<MyApp> {
             locale: storage.read('langCode') != null ? Locale(storage.read('langCode')) : const Locale('tm'),
             translations: MyTranslations(),
             defaultTransition: Transition.fade,
-            home: const SignUpView(),
-            // home: const ConnectionCheckView(),
+            home: const ConnectionCheckView(),
           );
         });
   }

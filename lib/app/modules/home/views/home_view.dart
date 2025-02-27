@@ -34,69 +34,100 @@ class _HomeViewState extends State<HomeView> {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: context.padding.horizontalNormal,
-      child: Column(
-        children: [
-          Obx(() {
-            return Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                ProductCountViewer(totalProducts: _homeController.totalProductCount.toString(), text: 'totalProducts'.tr),
-                ProductCountViewer(totalProducts: _homeController.stockInHand.toString(), text: 'stockInHand'.tr),
-              ],
-            );
-          }),
-          Divider(color: kPrimaryColor2.withOpacity(.2)),
-          Obx(() {
-            return Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'products'.tr,
-                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                ),
-                IconButton(
-                  onPressed: () async {
-                    DialogUtils.filter();
-                  },
-                  icon: const Icon(IconlyLight.filter),
-                  color: _homeController.isFiltered.value ? Colors.blue : Colors.black54,
-                ),
-              ],
-            );
-          }),
-          Expanded(
-            flex: 3,
-            child: SmartRefresher(
-              enablePullDown: true,
-              enablePullUp: true,
-              controller: _refreshController,
-              onRefresh: _onRefresh,
-              onLoading: _onLoading,
-              header: const WaterDropHeader(),
-              footer: customFooter(),
-              child: Obx(() {
-                if (_homeController.loadingData.value) {
-                  return spinKit();
-                } else if (_homeController.productsListHomeView.isEmpty) {
-                  return emptyData();
-                } else {
-                  return ListView.separated(
-                    itemCount: _homeController.productsListHomeView.length,
-                    physics: const BouncingScrollPhysics(),
-                    itemBuilder: (context, index) {
+    return Scaffold(
+      body: SmartRefresher(
+        enablePullDown: true,
+        enablePullUp: true,
+        controller: _refreshController,
+        onRefresh: _onRefresh,
+        onLoading: _onLoading,
+        header: const WaterDropHeader(),
+        footer: customFooter(),
+        child: CustomScrollView(
+          slivers: [
+            _sliverAppBar(context),
+            Obx(() {
+              if (_homeController.loadingData.value && _homeController.productsListHomeView.isEmpty) {
+                return SliverFillRemaining(
+                  child: spinKit(),
+                );
+              } else if (_homeController.productsListHomeView.isEmpty) {
+                return SliverFillRemaining(
+                  child: emptyData(),
+                );
+              } else {
+                return SliverList(
+                  delegate: SliverChildBuilderDelegate(
+                    (context, index) {
                       final product = ProductModel.fromDocument(_homeController.productsListHomeView[index]);
-                      return ProductCard(product: product, orderView: false, addCounterWidget: false);
+                      return Padding(
+                        padding: context.padding.horizontalNormal,
+                        child: ProductCard(product: product, orderView: false, addCounterWidget: false),
+                      );
                     },
-                    separatorBuilder: (context, index) => Divider(thickness: 1, color: Colors.grey.shade200),
-                  );
-                }
+                    childCount: _homeController.productsListHomeView.length,
+                  ),
+                );
+              }
+            }),
+          ],
+        ),
+      ),
+    );
+  }
+
+  SliverAppBar _sliverAppBar(BuildContext context) {
+    return SliverAppBar(
+      expandedHeight: 200.0,
+      backgroundColor: Colors.white,
+      shadowColor: Colors.white,
+      foregroundColor: Colors.white,
+      toolbarHeight: 0.0,
+      collapsedHeight: 0.0,
+      elevation: 0.0,
+      floating: false,
+      pinned: false,
+      flexibleSpace: FlexibleSpaceBar(
+        background: Padding(
+          padding: context.padding.horizontalNormal,
+          child: Column(
+            children: [
+              Obx(() {
+                return Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    ProductCountViewer(
+                      totalProducts: _homeController.totalProductCount.toString(),
+                      text: 'totalProducts'.tr,
+                    ),
+                    ProductCountViewer(
+                      totalProducts: _homeController.stockInHand.toString(),
+                      text: 'stockInHand'.tr,
+                    ),
+                  ],
+                );
               }),
-            ),
+              Divider(color: kPrimaryColor2.withOpacity(.2)),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'products'.tr,
+                    style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                  Obx(() => IconButton(
+                        onPressed: () async {
+                          DialogUtils.filter(context);
+                        },
+                        icon: const Icon(IconlyLight.filter),
+                        color: _homeController.isFiltered.value ? Colors.blue : Colors.black54,
+                      )),
+                ],
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }

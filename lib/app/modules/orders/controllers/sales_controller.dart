@@ -17,6 +17,7 @@ class SalesController extends GetxController {
   RxBool loadingDataOrders = false.obs;
   List statuses = ['Preparing', 'Ready to ship', 'Shipped', 'Refund', 'Canceled'];
   CollectionReference collectionReference = FirebaseFirestore.instance.collection('sales');
+  CollectionReference productsReference = FirebaseFirestore.instance.collection('products');
   @override
   void onInit() async {
     super.onInit();
@@ -27,7 +28,7 @@ class SalesController extends GetxController {
     if (newStatus == SortOptions.canceled || newStatus == SortOptions.refund) {
       await _restoreProductQuantities(orderID);
     }
-    await FirebaseFirestore.instance.collection('sales').doc(orderID).update({
+    await collectionReference.doc(orderID).update({
       "status": ListConstants.statusMapping[newStatus.name]!,
     });
     showSnackBar("Done", "Status changed successfully", Colors.green);
@@ -36,11 +37,11 @@ class SalesController extends GetxController {
   }
 
   Future<void> _restoreProductQuantities(String orderID) async {
-    final productsSnapshot = await FirebaseFirestore.instance.collection('sales').doc(orderID).collection('products').get();
+    final productsSnapshot = await collectionReference.doc(orderID).collection('products').get();
     for (var productDoc in productsSnapshot.docs) {
       final productName = productDoc['name'];
       final productQuantity = productDoc['quantity'];
-      final productQuery = await FirebaseFirestore.instance.collection('products').where('name', isEqualTo: productName).get();
+      final productQuery = await productsReference.where('name', isEqualTo: productName).get();
       if (productQuery.docs.isNotEmpty) {
         final productRef = productQuery.docs.first.reference;
         final currentQuantity = productQuery.docs.first['quantity'];
@@ -54,23 +55,17 @@ class SalesController extends GetxController {
     loadingDataOrders.value = true;
     isFiltered.value = true;
     isFilteredStatusName.value = statuses[index];
-    await FirebaseFirestore.instance.collection('sales').where('status', isEqualTo: statuses[index]).get().then((value) {
-      if (value.docs.isEmpty) {
-        orderCardList.clear();
-      } else {
-        orderCardList.value = value.docs;
-      }
-    });
+    QuerySnapshot snapshot = await collectionReference.where('status', isEqualTo: statuses[index]).limit(limit).get();
+    orderCardList.assignAll(snapshot.docs);
     loadingDataOrders.value = false;
     Get.back();
   }
 
-  getData() {
+  getData() async {
     loadingDataOrders.value = true;
     orderCardList.clear();
-    collectionReference.orderBy("date", descending: true).limit(limit).get().then((value) {
-      orderCardList.value = value.docs;
-    });
+    QuerySnapshot snapshot = await collectionReference.orderBy("date", descending: true).limit(limit).get();
+    orderCardList.assignAll(snapshot.docs);
     loadingDataOrders.value = false;
   }
 
@@ -78,7 +73,7 @@ class SalesController extends GetxController {
     productList.clear();
 
     loadingDataSelectProductView.value = true;
-    await FirebaseFirestore.instance.collection('products').orderBy("date", descending: true).get().then((value) {
+    await productsReference.orderBy("date", descending: true).get().then((value) {
       for (var element in value.docs) {
         final product = ProductModel.fromDocument(element);
         productList.add({'product': product, 'count': 0});
@@ -92,34 +87,55 @@ class SalesController extends GetxController {
   }
 
   Future<void> onRefreshController() async {
-    orderCardList.clear();
-    loadingDataOrders.value = true;
-    await collectionReference.orderBy("date", descending: true).limit(limit).get().then((value) {
-      orderCardList.value = value.docs;
-    });
+    getData();
     isFiltered.value = false;
-    loadingDataOrders.value = false;
   }
 
   Future<void> onLoadingController() async {
     int length = orderCardList.length;
     loadingDataOrders.value = true;
-    if (isFiltered.value == true) {
-      collectionReference.where("status", isEqualTo: isFilteredStatusName.value.toLowerCase()).startAfterDocument(orderCardList.last).limit(limit).get().then((value) {
-        orderCardList.addAll(value.docs);
-        if (length == orderCardList.length) {
-          showSnackBar("done", "endOFProduct", Colors.green);
+
+    try {
+      if (isFiltered.value == true) {
+        Query query = collectionReference.where("status", isEqualTo: isFilteredStatusName.value);
+
+        if (orderCardList.isNotEmpty) {
+          print(orderCardList.last);
+          query = query.startAfterDocument(orderCardList.last);
         }
-      });
-    } else {
-      collectionReference.orderBy("date", descending: true).startAfterDocument(orderCardList.last).limit(limit).get().then((value) {
-        orderCardList.addAll(value.docs);
-        if (length == orderCardList.length) {
-          showSnackBar("done", "endOFProduct", Colors.green);
+
+        await query.limit(limit).get().then((value) {
+          print("Gelen Belge Sayısı: ${value.docs.length}");
+          print("Gelen Belgeler: ${value.docs.map((doc) => doc.data()).toList()}");
+          orderCardList.addAll(value.docs);
+
+          if (length == orderCardList.length) {
+            showSnackBar("done", "endOFProduct", Colors.green);
+          }
+        });
+      } else {
+        Query query = collectionReference.orderBy("date", descending: true);
+
+        if (orderCardList.isNotEmpty) {
+          query = query.startAfterDocument(orderCardList.last);
         }
-      });
+
+        await query.limit(limit).get().then((value) {
+          print("Gelen Belge Sayısı: ${value.docs.length}");
+          print("Gelen Belgeler: ${value.docs.map((doc) => doc.data()).toList()}");
+          orderCardList.addAll(value.docs);
+
+          if (length == orderCardList.length) {
+            showSnackBar("done", "endOFProduct", Colors.green);
+          }
+        });
+      }
+    } catch (e) {
+      print("Sorgu Hatası: $e");
+      showSnackBar("Error", e.toString(), Colors.red);
+    } finally {
+      loadingDataOrders.value = false;
     }
-    loadingDataOrders.value = false;
   }
 
   upgradeCount(String id, int count) {

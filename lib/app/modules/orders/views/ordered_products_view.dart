@@ -26,11 +26,13 @@ class OrderCardsProfil extends StatefulWidget {
 class _OrderCardsProfilState extends State<OrderCardsProfil> {
   final SalesController salesController = Get.put(SalesController());
   SortOptions _selectedSortOption = SortOptions.preparing;
-
+  late OrderModel orderData;
   @override
   void initState() {
     super.initState();
-    _updateStatus(widget.order.status.toLowerCase());
+    orderData = widget.order;
+
+    _updateStatus(orderData.status.toLowerCase());
   }
 
   void _updateStatus(String status) {
@@ -64,10 +66,10 @@ class _OrderCardsProfilState extends State<OrderCardsProfil> {
         miniTitle: true,
         centerTitle: true,
         actionIcon: false,
-        name: '${"order".tr}  -  ${widget.order.clientName}',
+        name: '${"order".tr}  -  ${orderData.clientName}',
       ),
       body: StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
-        stream: FirebaseFirestore.instance.collection('sales').doc(widget.order.orderID).snapshots(),
+        stream: FirebaseFirestore.instance.collection('sales').doc(orderData.orderID).snapshots(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return spinKit();
@@ -109,7 +111,8 @@ class _OrderCardsProfilState extends State<OrderCardsProfil> {
                 groupValue: _selectedSortOption,
                 onChanged: (value) {
                   setState(() => _selectedSortOption = value!);
-                  salesController.updateOrderStatus(value!, widget.order.orderID);
+                  salesController.updateOrderStatus(value!, orderData.orderID);
+                  Navigator.of(context).pop();
                 },
               );
             }).toList(),
@@ -121,7 +124,7 @@ class _OrderCardsProfilState extends State<OrderCardsProfil> {
             ),
             TextButton(
               onPressed: () {
-                salesController.updateOrderStatus(_selectedSortOption, widget.order.orderID);
+                salesController.updateOrderStatus(_selectedSortOption, orderData.orderID);
                 Navigator.pop(context);
               },
               child: Text('OK', style: context.general.textTheme.titleLarge!.copyWith(fontWeight: FontWeight.bold)),
@@ -154,34 +157,36 @@ class _OrderCardsProfilState extends State<OrderCardsProfil> {
   }
 
   Widget _buildOrderDetails(DocumentSnapshot<Map<String, dynamic>> snapshot) {
-    List values = [widget.order.date, snapshot['package'], '+993${snapshot['client_number']}', snapshot['client_name'], snapshot['client_address'], '${snapshot['discount']}%', snapshot['sum_price'], snapshot['coupon'], snapshot['note'], widget.order.products.toString()];
+    List values = [orderData.date, snapshot['package'], '${snapshot['client_number']}', snapshot['client_name'], snapshot['client_address'], '${snapshot['discount']}%', snapshot['sum_price'], snapshot['coupon'], snapshot['note'], orderData.products.toString()];
 
     Future<void> showEditDialog(String field, String currentValue) async {
       final controller = TextEditingController(text: currentValue);
       await showDialog(
         context: context,
         builder: (context) => AlertDialog(
-          title: Text(field.tr, style: context.general.textTheme.headlineMedium!.copyWith(fontWeight: FontWeight.bold)),
+          title: Text(field.tr, style: context.general.textTheme.titleLarge!.copyWith(fontWeight: FontWeight.bold)),
           content: CustomTextField(
             labelName: field,
             controller: controller,
             focusNode: FocusNode(),
             requestfocusNode: FocusNode(),
             unFocus: false,
-            readOnly: false,
+            readOnly: true,
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: Text('Cancel', style: context.general.textTheme.bodyLarge!.copyWith(color: Colors.grey)),
+              child: Text('no'.tr, style: context.general.textTheme.bodyLarge!.copyWith(color: Colors.grey)),
             ),
             TextButton(
               onPressed: () async {
-                await FirebaseFirestore.instance.collection('sales').doc(widget.order.orderID).update({field: controller.text});
+                print(field);
+
+                await FirebaseFirestore.instance.collection('sales').doc(orderData.orderID).update({field: controller.text});
                 showSnackBar("Success", "Field updated successfully", Colors.green);
                 Navigator.pop(context);
               },
-              child: Text('Save', style: context.general.textTheme.bodyLarge!.copyWith(fontWeight: FontWeight.bold)),
+              child: Text('yes'.tr, style: context.general.textTheme.bodyLarge!.copyWith(fontWeight: FontWeight.bold)),
             ),
           ],
         ),
@@ -222,7 +227,7 @@ class _OrderCardsProfilState extends State<OrderCardsProfil> {
 
   Widget _buildProductList() {
     return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-      stream: FirebaseFirestore.instance.collection('sales').doc(widget.order.orderID).collection('products').snapshots(),
+      stream: FirebaseFirestore.instance.collection('sales').doc(orderData.orderID).collection('products').snapshots(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return spinKit();

@@ -38,7 +38,7 @@ class _OrdersViewState extends State<OrdersView> {
       onRefresh: _onRefresh,
       onLoading: _onLoading,
       child: Obx(() {
-        if (salesController.loadingDataOrders.value) return spinKit();
+        if (salesController.loadingDataOrders.value && salesController.orderCardList.isEmpty) return spinKit();
         if (salesController.orderCardList.isEmpty) return emptyData();
         return ListView.builder(
           itemCount: salesController.orderCardList.length,

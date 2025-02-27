@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:kartal/kartal.dart';
 import 'package:stock_managament_app/app/data/models/product_model.dart';
 import 'package:stock_managament_app/app/modules/home/controllers/home_controller.dart';
 import 'package:stock_managament_app/constants/buttons/agree_button_view.dart';
@@ -57,27 +58,108 @@ class _ProductProfilViewState extends State<ProductProfilView> {
     }
   }
 
-  Future imgFromGallery() async {
-    final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
-    setState(() {
-      if (pickedFile != null) {
-        _photo = File(pickedFile.path);
-        showImageUploadDialog();
-      }
-    });
+  Future<void> uploadFile(File photo) async {
+    try {
+      _homeController.agreeButton.value = true;
+      DateTime now = DateTime.now();
+      final storageRef = FirebaseStorage.instance.ref().child('images/$now.png');
+      List<int> imageBytes = photo.readAsBytesSync();
+      String base64Image = base64Encode(imageBytes);
+
+      await storageRef.putString(base64Image, format: PutStringFormat.base64, metadata: SettableMetadata(contentType: 'image/png'));
+
+      var downloadURL = await storageRef.getDownloadURL();
+      String url = downloadURL.toString();
+
+      await FirebaseFirestore.instance.collection('products').doc(widget.product.documentID).update({'image': url});
+      imageURL = url;
+      setState(() {});
+      _homeController.agreeButton.value = false;
+      Get.back();
+      _homeController.getData();
+      showSnackBar("copySucces", "uploadImageProcessDone", Colors.green);
+    } catch (e) {
+      Get.back();
+      showSnackBar("Error", e.toString(), Colors.red);
+    }
   }
 
-  Future imgFromCamera() async {
-    final pickedFile = await _picker.pickImage(source: ImageSource.camera);
-    setState(() {
-      if (pickedFile != null) {
-        _photo = File(pickedFile.path);
-        showImageUploadDialog();
-      }
-    });
+  void showImageUploadDialog({required File? photo, required Function() onTap}) {
+    Get.defaultDialog(
+      title: 'selectedImage'.tr,
+      content: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          photo != null
+              ? ClipRRect(
+                  borderRadius: borderRadius20,
+                  child: Image.file(
+                    photo,
+                    width: 300.w,
+                    height: 300.h,
+                    fit: BoxFit.fill,
+                  ),
+                )
+              : Container(
+                  decoration: BoxDecoration(color: Colors.grey[200], borderRadius: BorderRadius.circular(50)),
+                  width: 100,
+                  height: 100,
+                  child: Icon(
+                    Icons.camera_alt,
+                    color: Colors.grey[800],
+                  ),
+                ),
+          const SizedBox(height: 20),
+          AgreeButton(
+            onTap: onTap,
+            text: "uploadImage",
+          ),
+        ],
+      ),
+    );
   }
 
-//5151 mr Komekow taze mekdebin prog  hat ugradyp
+  void pickImage(ImageSource source) async {
+    final pickedFile = await _picker.pickImage(source: source, imageQuality: 50);
+    if (pickedFile != null) {
+      Get.back();
+      setState(() {
+        _photo = File(pickedFile.path);
+        showImageUploadDialog(
+          photo: _photo,
+          onTap: () {
+            uploadFile(_photo!);
+          },
+        );
+      });
+    }
+  }
+
+  void _showPicker(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext bc) {
+        return Container(
+          decoration: const BoxDecoration(color: Colors.white),
+          child: Wrap(
+            children: <Widget>[
+              ListTile(
+                leading: const Icon(Icons.photo_library),
+                title: const Text('Gallery'),
+                onTap: () => pickImage(ImageSource.gallery),
+              ),
+              ListTile(
+                leading: const Icon(Icons.photo_camera),
+                title: const Text('Camera'),
+                onTap: () => pickImage(ImageSource.camera),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
 
   Future<dynamic> changeTextFieldWithData(String name, int indexTile, String changeName) {
     return Get.defaultDialog(
@@ -112,70 +194,6 @@ class _ProductProfilViewState extends State<ProductProfilView> {
                 );
               }),
         ));
-  }
-
-  Future uploadFile() async {
-    if (_photo == null) return;
-    try {
-      _homeController.agreeButton.value = !_homeController.agreeButton.value;
-      DateTime now = DateTime.now();
-      final storageRef = FirebaseStorage.instance.ref().child('images/$now.png');
-      List<int> imageBytes = _photo!.readAsBytesSync();
-      String base64Image = base64Encode(imageBytes);
-      await storageRef.putString(base64Image, format: PutStringFormat.base64, metadata: SettableMetadata(contentType: 'image/png')).then((p0) async {
-        var dowurl = await storageRef.getDownloadURL();
-        String url = dowurl.toString();
-        FirebaseFirestore.instance.collection('products').doc(widget.product.documentID).update({'image': url});
-        imageURL = url;
-        _homeController.agreeButton.value = !_homeController.agreeButton.value;
-        Get.back();
-        _homeController.getData();
-        showSnackBar("copySucces", "uploadImageProcessDone", Colors.green);
-      });
-    } catch (e) {
-      Get.back();
-      showSnackBar("Error", e.toString(), Colors.red);
-    }
-  }
-
-  showImageUploadDialog() {
-    Get.defaultDialog(
-      title: 'selectedImage'.tr,
-      content: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          _photo != null
-              ? ClipRRect(
-                  borderRadius: borderRadius20,
-                  child: Image.file(
-                    _photo!,
-                    width: 300.w,
-                    height: 300.h,
-                    fit: BoxFit.fill,
-                  ),
-                )
-              : Container(
-                  decoration: BoxDecoration(color: Colors.grey[200], borderRadius: BorderRadius.circular(50)),
-                  width: 100,
-                  height: 100,
-                  child: Icon(
-                    Icons.camera_alt,
-                    color: Colors.grey[800],
-                  ),
-                ),
-          const SizedBox(
-            height: 20,
-          ),
-          AgreeButton(
-            onTap: () {
-              uploadFile();
-            },
-            text: "uploadImage",
-          ),
-        ],
-      ),
-    );
   }
 
   Column textFields(BuildContext context) {
@@ -240,8 +258,6 @@ class _ProductProfilViewState extends State<ProductProfilView> {
             : const SizedBox.shrink(),
         AgreeButton(
           onTap: () async {
-            print("I tapped");
-            print(readOnlyStates);
             int i = 0;
             bool changeValue = false;
             List names = ['name', 'category', 'brand', 'gramm', 'material', 'sell_price', 'location', 'quantity', 'note'];
@@ -276,35 +292,6 @@ class _ProductProfilViewState extends State<ProductProfilView> {
     );
   }
 
-  void _showPicker(context) {
-    showModalBottomSheet(
-        context: context,
-        builder: (BuildContext bc) {
-          return Container(
-            decoration: const BoxDecoration(color: Colors.white),
-            child: Wrap(
-              children: <Widget>[
-                ListTile(
-                    leading: const Icon(Icons.photo_library),
-                    title: const Text('Gallery'),
-                    onTap: () {
-                      imgFromGallery();
-                      Navigator.of(context).pop();
-                    }),
-                ListTile(
-                  leading: const Icon(Icons.photo_camera),
-                  title: const Text('Camera'),
-                  onTap: () {
-                    imgFromCamera();
-                    Navigator.of(context).pop();
-                  },
-                ),
-              ],
-            ),
-          );
-        });
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -318,48 +305,39 @@ class _ProductProfilViewState extends State<ProductProfilView> {
             } else if (snapshot.hasError) {
               return errorData();
             } else if (snapshot.hasData) {
-              final product = ProductModel(
-                name: snapshot.data!['name'],
-                brandName: snapshot.data!['brand'].toString(),
-                category: snapshot.data!['category'].toString(),
-                cost: snapshot.data!['cost'].toString(),
-                gramm: snapshot.data!['gramm'].toString(),
-                image: snapshot.data!['image'].toString(),
-                location: snapshot.data!['location'].toString(),
-                material: snapshot.data!['material'].toString(),
-                quantity: snapshot.data!['quantity'],
-                sellPrice: snapshot.data!['sell_price'].toString(),
-                note: snapshot.data!['note'].toString(),
-                package: snapshot.data!['package'].toString(),
-                documentID: snapshot.data!.id,
-              );
+              final product = ProductModel.fromDocument(snapshot.data!);
               changeData(product);
               return ListView(
-                padding: EdgeInsets.symmetric(horizontal: 15.w),
+                padding: context.padding.horizontalNormal,
                 children: [
-                  Container(
-                    width: Get.size.width,
-                    height: Get.size.height / 2,
-                    decoration: const BoxDecoration(color: Colors.grey, borderRadius: borderRadius25),
-                    child: CachedNetworkImage(
-                      fadeInCurve: Curves.ease,
-                      imageUrl: imageURL,
-                      useOldImageOnUrlChange: true,
-                      imageBuilder: (context, imageProvider) => Container(
-                        width: Get.size.width,
-                        decoration: BoxDecoration(
-                          borderRadius: borderRadius25,
-                          image: DecorationImage(
-                            image: imageProvider,
-                            fit: BoxFit.fill,
+                  GestureDetector(
+                    onTap: () {
+                      _showPicker(context);
+                    },
+                    child: Container(
+                      width: Get.size.width,
+                      height: Get.size.height / 2,
+                      decoration: const BoxDecoration(color: Colors.grey, borderRadius: borderRadius25),
+                      child: CachedNetworkImage(
+                        fadeInCurve: Curves.ease,
+                        imageUrl: imageURL,
+                        useOldImageOnUrlChange: true,
+                        imageBuilder: (context, imageProvider) => Container(
+                          width: Get.size.width,
+                          decoration: BoxDecoration(
+                            borderRadius: borderRadius25,
+                            image: DecorationImage(
+                              image: imageProvider,
+                              fit: BoxFit.fill,
+                            ),
                           ),
                         ),
-                      ),
-                      placeholder: (context, url) => const Center(
-                        child: CircularProgressIndicator(),
-                      ),
-                      errorWidget: (context, url, error) => Center(
-                        child: Text('noImage'.tr),
+                        placeholder: (context, url) => const Center(
+                          child: CircularProgressIndicator(),
+                        ),
+                        errorWidget: (context, url, error) => Center(
+                          child: Text('noImage'.tr),
+                        ),
                       ),
                     ),
                   ),
