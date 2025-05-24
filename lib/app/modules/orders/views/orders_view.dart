@@ -4,6 +4,7 @@ import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:stock_managament_app/app/data/models/order_model.dart';
 import 'package:stock_managament_app/app/modules/orders/components/order_card.dart';
 import 'package:stock_managament_app/app/modules/orders/controllers/sales_controller.dart';
+import 'package:stock_managament_app/constants/customWidget/constants.dart';
 import 'package:stock_managament_app/constants/customWidget/widgets.dart';
 
 class OrdersView extends StatefulWidget {
@@ -32,7 +33,7 @@ class _OrdersViewState extends State<OrdersView> {
     return SmartRefresher(
       enablePullDown: true,
       enablePullUp: true,
-      header: const WaterDropHeader(),
+      header: const WaterDropHeader(waterDropColor: kPrimaryColor),
       footer: customFooter(),
       controller: _refreshController,
       onRefresh: _onRefresh,

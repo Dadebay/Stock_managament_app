@@ -74,6 +74,12 @@ class _BottomNavBarState extends State<BottomNavBar> {
               label: 'sales'.tr,
               tooltip: 'sales'.tr,
             ),
+            BottomNavigationBarItem(
+              icon: const Icon(IconlyLight.setting),
+              activeIcon: const Icon(IconlyBold.setting),
+              label: 'settings'.tr,
+              tooltip: 'settings'.tr,
+            ),
             if (isAdmin)
               BottomNavigationBarItem(
                 icon: const Icon(IconlyLight.chat),
@@ -81,12 +87,6 @@ class _BottomNavBarState extends State<BottomNavBar> {
                 label: 'SMS'.tr,
                 tooltip: 'SMS'.tr,
               ),
-            BottomNavigationBarItem(
-              icon: const Icon(IconlyLight.setting),
-              activeIcon: const Icon(IconlyBold.setting),
-              label: 'settings'.tr,
-              tooltip: 'settings'.tr,
-            ),
           ]),
       body: isAdmin == true ? ListConstants.adminPages[selectedIndex] : ListConstants.pages[selectedIndex],
     );

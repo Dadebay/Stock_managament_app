@@ -6,6 +6,7 @@ import 'package:kartal/kartal.dart';
 import 'package:stock_managament_app/app/modules/home/controllers/home_controller.dart';
 import 'package:stock_managament_app/app/modules/orders/controllers/order_controller.dart';
 import 'package:stock_managament_app/app/modules/orders/controllers/sales_controller.dart';
+import 'package:stock_managament_app/app/modules/orders/views/createOrder/orders_progress_view.dart';
 import 'package:stock_managament_app/app/modules/orders/views/createOrder/select_order_products.dart';
 import 'package:stock_managament_app/constants/buttons/agree_button_view.dart';
 import 'package:stock_managament_app/constants/cards/product_card.dart';
@@ -32,8 +33,6 @@ class _CreateOrderViewState extends State<CreateOrderView> {
   final OrderController orderController = Get.put(OrderController());
   String selectedStatus = "Preparing"; // Set an initial value
   List<TextEditingController> textControllers = List.generate(9, (_) => TextEditingController());
-
-  final _formKey = GlobalKey<FormState>();
 
   @override
   void initState() {
@@ -93,11 +92,13 @@ class _CreateOrderViewState extends State<CreateOrderView> {
           CustomTextField(labelName: "Discount", isNumber: true, controller: textControllers[7], focusNode: focusNodes[6], requestfocusNode: focusNodes[7], unFocus: false, readOnly: true),
           CustomTextField(labelName: "note", maxline: 3, controller: textControllers[6], focusNode: focusNodes[7], requestfocusNode: focusNodes[0], unFocus: false, readOnly: true),
           selectedProductsView(context),
-          AgreeButton(
-              onTap: () {
-                Get.to(() => const SelectOrderProducts());
-              },
-              text: 'selectProducts'.tr),
+          Center(
+            child: AgreeButton(
+                onTap: () {
+                  Get.to(() => const SelectOrderProducts());
+                },
+                text: 'selectProducts'.tr),
+          ),
           Center(
             child: AgreeButton(
                 onTap: () {
@@ -106,11 +107,9 @@ class _CreateOrderViewState extends State<CreateOrderView> {
                       showSnackBar('errorTitle', 'selectMoreProducts', Colors.red);
                     } else {
                       if (homeController.agreeButton.value == false) {
-                        homeController.agreeButton.value = true;
-                        showSnackBar("Geçdi", "Azajyk garaşyň", Colors.green);
-                        orderController.submitSale2(textControllers: textControllers, status: selectedStatus, context: context);
+                        Get.to(() => OrderProgressView(textControllers: textControllers, status: selectedStatus));
                       } else {
-                        showSnackBar("wait", "waitMyManSubtitle", Colors.red);
+                        showSnackBar("pleaseWait", "waitMyManSubtitle", Colors.red);
                       }
                     }
                   } else {

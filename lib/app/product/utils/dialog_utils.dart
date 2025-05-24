@@ -43,8 +43,6 @@ class DialogUtils {
   }
 
   static Future<dynamic> filter(BuildContext context) {
-    final HomeController homeController = Get.find<HomeController>();
-
     return Get.bottomSheet(
       Container(
         decoration: const BoxDecoration(
@@ -72,7 +70,7 @@ class DialogUtils {
                 itemBuilder: (BuildContext context, int index) {
                   return ListTile(
                     onTap: () {
-                      _miniBottomSheet(index, homeController, context);
+                      _miniBottomSheet(index, context);
                     },
                     title: Text(ListConstants.filters[index]['name'].toString(), maxLines: 1, style: context.general.textTheme.titleMedium!.copyWith(fontSize: 20)),
                     trailing: Icon(IconlyLight.arrowRightCircle, size: WidgetSizes.mini2x.value),
@@ -86,7 +84,9 @@ class DialogUtils {
     );
   }
 
-  static Future<dynamic> _miniBottomSheet(int index, HomeController homeController, BuildContext context) {
+  static Future<dynamic> _miniBottomSheet(int index, BuildContext context) {
+    final HomeController homeController = Get.find<HomeController>();
+
     return Get.bottomSheet(
       Container(
         decoration: const BoxDecoration(
@@ -122,8 +122,6 @@ class DialogUtils {
                               ListConstants.filters[index]['searchName'],
                               snapshot.data!.docs[indexx]['name'],
                             );
-                            Get.back();
-                            Get.back();
                           },
                           title: Text(
                             snapshot.data!.docs[indexx]['name'],
@@ -174,7 +172,7 @@ class DialogUtils {
                       ),
                     ),
                     AgreeButton(
-                      onTap: () {},
+                      onTap: onRetry,
                       text: 'noConnection3'.tr,
                     ),
                   ],

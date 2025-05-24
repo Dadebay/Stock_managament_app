@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 @immutable
 class IconConstants {
   const IconConstants._();
-  static const String noConnection = 'assets/icons/noconnection.json';
+  static const String noConnection = 'assets/icons/noconnection.gif';
   static const String tmIcon = 'assets/image/tm.png';
   static const String ruIcon = 'assets/image/ru.png';
   static const String engIcon = 'assets/image/uk.png';

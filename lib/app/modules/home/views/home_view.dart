@@ -41,7 +41,7 @@ class _HomeViewState extends State<HomeView> {
         controller: _refreshController,
         onRefresh: _onRefresh,
         onLoading: _onLoading,
-        header: const WaterDropHeader(),
+        header: const WaterDropHeader(waterDropColor: kPrimaryColor),
         footer: customFooter(),
         child: CustomScrollView(
           slivers: [

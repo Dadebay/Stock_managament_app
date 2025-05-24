@@ -7,7 +7,6 @@ import 'package:stock_managament_app/app/product/initialize/app_start_init.dart'
 import 'package:stock_managament_app/app/product/theme/theme_contants.dart';
 import 'package:stock_managament_app/app/utils.dart';
 
-import 'app/modules/home/controllers/home_controller.dart';
 import 'constants/customWidget/constants.dart';
 
 Future<void> main() async {
@@ -25,7 +24,6 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   final storage = GetStorage();
-  final HomeController _homeController = Get.put(HomeController());
 
   @override
   Widget build(BuildContext context) {

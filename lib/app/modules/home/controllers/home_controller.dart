@@ -80,14 +80,20 @@ class HomeController extends GetxController {
     filteredNameToSearch.value = filterSearchName;
     productsListHomeView.clear();
     loadingData.value = true;
+
     try {
-      final QuerySnapshot snapshot = await collectionReference.where(filterName.toLowerCase(), isEqualTo: filterSearchName).get();
+      final QuerySnapshot snapshot = await FirebaseFirestore.instance.collection('products').where(filterName.toLowerCase(), isEqualTo: filterSearchName).get();
+
       productsListHomeView.assignAll(snapshot.docs);
       isFiltered.value = true;
     } catch (e) {
+      if (Get.isSnackbarOpen) {
+        Get.closeCurrentSnackbar();
+      }
       showSnackBar("error", "failedToFilterData", Colors.red);
     } finally {
       loadingData.value = false;
+
       Get.back();
       Get.back();
     }

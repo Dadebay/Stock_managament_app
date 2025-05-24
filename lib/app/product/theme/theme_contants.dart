@@ -18,10 +18,7 @@ class AppThemes {
       appBarTheme: const AppBarTheme(
         centerTitle: true,
         backgroundColor: kPrimaryColor,
-        systemOverlayStyle: SystemUiOverlayStyle(
-          statusBarColor: Colors.white,
-          statusBarBrightness: Brightness.dark,
-        ),
+        systemOverlayStyle: SystemUiOverlayStyle(statusBarColor: Colors.white, systemNavigationBarDividerColor: Colors.white, statusBarBrightness: Brightness.light, systemNavigationBarColor: Colors.white),
         elevation: 0,
       ),
       visualDensity: VisualDensity.adaptivePlatformDensity,

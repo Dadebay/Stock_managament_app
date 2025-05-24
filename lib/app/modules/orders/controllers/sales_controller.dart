@@ -55,6 +55,7 @@ class SalesController extends GetxController {
     loadingDataOrders.value = true;
     isFiltered.value = true;
     isFilteredStatusName.value = statuses[index];
+    print("Seçilen Status: ${statuses[index]}");
     QuerySnapshot snapshot = await collectionReference.where('status', isEqualTo: statuses[index]).limit(limit).get();
     orderCardList.assignAll(snapshot.docs);
     loadingDataOrders.value = false;
