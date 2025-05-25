@@ -4,10 +4,7 @@ import 'package:flutter_iconly/flutter_iconly.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:kartal/kartal.dart';
-import 'package:stock_managament_app/app/data/models/order_model.dart';
-import 'package:stock_managament_app/app/data/models/product_model.dart';
-import 'package:stock_managament_app/app/modules/orders/components/order_card.dart';
-import 'package:stock_managament_app/app/modules/search/controller/search_controller.dart';
+import 'package:stock_managament_app/app/modules/home/controllers/home_controller.dart';
 import 'package:stock_managament_app/constants/cards/product_card.dart';
 import 'package:stock_managament_app/constants/customWidget/custom_app_bar.dart';
 import 'package:stock_managament_app/constants/customWidget/widgets.dart';
@@ -31,12 +28,6 @@ class _SearchViewState extends State<SearchView> {
   }
 
   @override
-  void initState() {
-    super.initState();
-    searchController.getClientStream(widget.whereToSearch);
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
         backgroundColor: Colors.white,
@@ -46,30 +37,29 @@ class _SearchViewState extends State<SearchView> {
             searchWidget(),
             Expanded(
               child: Obx(() {
-                return searchController.loadingData.value == true
-                    ? spinKit()
-                    : searchController.searchResult.isEmpty && controller.text.isNotEmpty
-                        ? emptyData()
-                        : ListView.builder(
-                            itemCount: controller.text.isNotEmpty ? searchController.searchResult.length : searchController.productsList.length,
-                            physics: const BouncingScrollPhysics(),
-                            itemBuilder: (BuildContext context, int index) {
-                              if (widget.whereToSearch == 'orders') {
-                                final order = controller.text.isEmpty ? OrderModel.fromJson(searchController.productsList[index]) : OrderModel.fromJson(searchController.searchResult[index]);
-                                return OrderCard(order: order);
-                              } else {
-                                final product = controller.text.isEmpty ? ProductModel.fromDocument(searchController.productsList[index]) : ProductModel.fromDocument(searchController.searchResult[index]);
-                                return Padding(
-                                  padding: widget.whereToSearch == 'orders' ? context.padding.normal : context.padding.horizontalNormal,
-                                  child: ProductCard(
-                                    product: product,
-                                    orderView: false,
-                                    addCounterWidget: false,
-                                  ),
-                                );
-                              }
-                            },
-                          );
+                return searchController.searchResult.isEmpty
+                    ? emptyData()
+                    : ListView.builder(
+                        itemCount: controller.text.isNotEmpty ? searchController.searchResult.length : searchController.productsList.length,
+                        physics: const BouncingScrollPhysics(),
+                        itemBuilder: (BuildContext context, int index) {
+                          if (widget.whereToSearch == 'orders') {
+                            // final order = controller.text.isEmpty ? OrderModel.fromJson(searchController.productsList[index]) : OrderModel.fromJson(searchController.searchResult[index]);
+                            // return OrderCard(order: order);
+                          } else {
+                            final product = controller.text.isEmpty ? searchController.productsList[index] : searchController.searchResult[index];
+                            return Padding(
+                              padding: widget.whereToSearch == 'orders' ? context.padding.normal : context.padding.horizontalNormal,
+                              child: ProductCard(
+                                product: product,
+                                orderView: false,
+                                addCounterWidget: false,
+                              ),
+                            );
+                          }
+                          return null;
+                        },
+                      );
               }),
             )
           ],
@@ -89,7 +79,7 @@ class _SearchViewState extends State<SearchView> {
             controller: controller,
             decoration: InputDecoration(hintText: 'search'.tr, border: InputBorder.none),
             onChanged: (String value) {
-              searchController.onSearchTextChanged(value.toString(), widget.whereToSearch);
+              searchController.onSearchTextChanged(value.toString());
             },
           ),
           contentPadding: EdgeInsets.only(left: 15.w),
@@ -97,7 +87,7 @@ class _SearchViewState extends State<SearchView> {
             icon: const Icon(CupertinoIcons.xmark_circle),
             onPressed: () {
               controller.clear();
-              searchController.onSearchTextChanged('', widget.whereToSearch);
+              searchController.onSearchTextChanged('');
             },
           ),
         ),

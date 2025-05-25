@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:kartal/kartal.dart';
 import 'package:stock_managament_app/app/modules/home/controllers/home_controller.dart';
+import 'package:stock_managament_app/app/modules/home/controllers/search_model.dart';
 import 'package:stock_managament_app/app/modules/orders/controllers/order_controller.dart';
 import 'package:stock_managament_app/app/modules/orders/controllers/sales_controller.dart';
 import 'package:stock_managament_app/app/modules/orders/views/createOrder/orders_progress_view.dart';
@@ -15,8 +16,6 @@ import 'package:stock_managament_app/constants/customWidget/custom_app_bar.dart'
 import 'package:stock_managament_app/constants/customWidget/custom_text_field.dart';
 import 'package:stock_managament_app/constants/customWidget/phone_number.dart';
 import 'package:stock_managament_app/constants/customWidget/widgets.dart';
-
-import '../../../../data/models/product_model.dart';
 
 class CreateOrderView extends StatefulWidget {
   const CreateOrderView({super.key});
@@ -63,7 +62,7 @@ class _CreateOrderViewState extends State<CreateOrderView> {
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
                     itemBuilder: (BuildContext context, int index) {
-                      final ProductModel product = salesController.selectedProductsList[index]['product'];
+                      final SearchModel product = salesController.selectedProductsList[index]['product'];
                       return ProductCard(product: product, orderView: false, addCounterWidget: true);
                     },
                   ),

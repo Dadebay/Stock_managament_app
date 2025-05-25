@@ -4,7 +4,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:get_storage/get_storage.dart';
+import 'package:stock_managament_app/app/modules/auth/views/auth_service.dart';
 import 'package:stock_managament_app/app/modules/auth/views/login_view.dart';
 import 'package:stock_managament_app/app/modules/home/views/bottom_nav_bar.dart';
 import 'package:stock_managament_app/app/product/sizes/widget_sizes.dart';
@@ -24,10 +24,9 @@ class _ConnectionCheckViewState extends State<ConnectionCheckView> {
     checkConnection();
   }
 
-  GetStorage storage = GetStorage();
-
   void checkConnection() async {
-    bool loginValue = storage.read('login') ?? false;
+    // ignore: unnecessary_null_comparison
+    bool loginValue = AuthStorage().getToken() == null ? false : true;
     try {
       final result = await InternetAddress.lookup('google.com');
       if (result.isNotEmpty && result.first.rawAddress.isNotEmpty) {

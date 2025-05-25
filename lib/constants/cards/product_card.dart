@@ -4,8 +4,8 @@ import 'package:flutter_iconly/flutter_iconly.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:kartal/kartal.dart';
-import 'package:stock_managament_app/app/data/models/product_model.dart';
 import 'package:stock_managament_app/app/modules/home/controllers/home_controller.dart';
+import 'package:stock_managament_app/app/modules/home/controllers/search_model.dart';
 import 'package:stock_managament_app/app/modules/orders/controllers/sales_controller.dart';
 import 'package:stock_managament_app/app/modules/product/views/product_profil_view.dart';
 import 'package:stock_managament_app/app/product/sizes/widget_sizes.dart';
@@ -22,7 +22,7 @@ class ProductCard extends StatefulWidget {
 
   final bool addCounterWidget;
   final bool orderView;
-  final ProductModel product;
+  final SearchModel product;
 
   @override
   State<ProductCard> createState() => _ProductCardState();
@@ -33,18 +33,8 @@ class _ProductCardState extends State<ProductCard> {
   final HomeController homeController = Get.put(HomeController());
   int selectedCount = 0;
 
-  void _updateSelectedCount() {
-    for (var element in salesController.productList) {
-      final ProductModel data = element['product'];
-      if (widget.product.documentID == data.documentID) {
-        selectedCount = int.parse(element['count'].toString());
-      }
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
-    _updateSelectedCount(); // Ensure the count is updated on every build
     return widget.addCounterWidget ? counterWidget(context) : noCounterWidget();
   }
 
@@ -59,7 +49,7 @@ class _ProductCardState extends State<ProductCard> {
       ),
       child: ListTile(
         title: Text(
-          widget.product.name!,
+          widget.product.name,
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
           style: context.general.textTheme.bodyLarge!.copyWith(fontWeight: FontWeight.bold),
@@ -72,19 +62,19 @@ class _ProductCardState extends State<ProductCard> {
               border: Border.all(color: kPrimaryColor2.withOpacity(.3), width: 1),
             ),
             width: 70,
-            child: imageView(imageURl: widget.product.image!)),
+            child: imageView(imageURl: widget.product.img!)),
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Padding(
               padding: context.padding.verticalLow,
               child: Text(
-                "price".tr + widget.product.sellPrice!,
+                "price".tr + widget.product.price,
                 style: context.general.textTheme.bodyMedium!.copyWith(color: Colors.grey),
               ),
             ),
             Text(
-              '${"productCount".tr} : ${widget.product.quantity!}',
+              '${"productCount".tr} : ${widget.product.count}',
               style: context.general.textTheme.bodyMedium!.copyWith(color: Colors.grey),
             ),
           ],
@@ -99,7 +89,7 @@ class _ProductCardState extends State<ProductCard> {
                   selectedCount--;
                   setState(() {});
 
-                  salesController.decreaseCount(widget.product.documentID.toString(), selectedCount);
+                  // salesController.decreaseCount(widget.product.documentID.toString(), selectedCount);
                 }
               },
             ),
@@ -111,7 +101,7 @@ class _ProductCardState extends State<ProductCard> {
             IconButton(
               icon: const Icon(CupertinoIcons.add_circled, color: Colors.black),
               onPressed: () {
-                if (selectedCount >= widget.product.quantity!) {
+                if (selectedCount >= widget.product.count) {
                   showSnackBar("Error", "Not in stock", Colors.red);
                 } else {
                   selectedCount++;
@@ -143,24 +133,24 @@ class _ProductCardState extends State<ProductCard> {
                 height: WidgetSizes.normal2x.value,
                 margin: context.padding.onlyRightNormal,
                 decoration: BoxDecoration(borderRadius: borderRadius15, color: Colors.grey.shade200, border: Border.all(color: kPrimaryColor2.withOpacity(.2))),
-                child: imageView(imageURl: widget.product.image!)),
+                child: imageView(imageURl: widget.product.img!)),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    widget.product.name!,
+                    widget.product.name,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: context.general.textTheme.bodyLarge!.copyWith(fontWeight: FontWeight.bold),
                   ),
                   Text(
-                    "${"quantity".tr}: ${widget.product.quantity}",
+                    "${"quantity".tr}: ${widget.product.count}",
                     overflow: TextOverflow.ellipsis,
                     style: context.general.textTheme.bodyLarge!.copyWith(color: Colors.grey),
                   ),
                   Text(
-                    "${"price".tr} ${widget.product.sellPrice}",
+                    "${"price".tr} ${widget.product.price}",
                     overflow: TextOverflow.ellipsis,
                     style: context.general.textTheme.bodyLarge!.copyWith(color: Colors.grey),
                   ),

@@ -1,112 +1,175 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/material.dart';
+import 'dart:typed_data';
+
 import 'package:get/get.dart';
-import 'package:get_storage/get_storage.dart';
-import 'package:stock_managament_app/constants/customWidget/constants.dart';
-import 'package:stock_managament_app/constants/customWidget/widgets.dart';
+import 'package:stock_managament_app/app/modules/home/controllers/search_model.dart';
+import 'package:stock_managament_app/app/modules/home/controllers/search_service.dart';
 
 class HomeController extends GetxController {
   RxBool agreeButton = false.obs;
-  Query<Map<String, dynamic>> collectionReference = FirebaseFirestore.instance.collection('products').orderBy("date", descending: true);
-  RxString filteredName = "".obs;
-  RxString filteredNameToSearch = "".obs;
-  RxBool isFiltered = false.obs;
-  RxBool loadingData = false.obs;
-  RxBool loginView = false.obs;
-  List<QueryDocumentSnapshot<Object?>> productsListHomeView = [];
-  RxInt stockInHand = 0.obs;
-  GetStorage storage = GetStorage();
-  RxInt totalProductCount = 0.obs;
+}
 
-  @override
-  void onInit() async {
-    super.onInit();
-    getData();
-  }
+class SearchViewController extends GetxController {
+  RxList<SearchModel> historyList = <SearchModel>[].obs;
+  RxList<SearchModel> productsList = <SearchModel>[].obs;
+  RxList<SearchModel> searchResult = <SearchModel>[].obs;
+  RxList<Map<String, dynamic>> selectedProductsToOrder = <Map<String, dynamic>>[].obs;
+  RxBool showInGrid = false.obs;
+  RxInt sumCount = 0.obs;
 
-  getData() async {
-    loadingData.value = true;
-    try {
-      final QuerySnapshot snapshot = await collectionReference.get();
-      productsListHomeView.assignAll(snapshot.docs);
-      stockInHand.value = 0;
-      totalProductCount.value = snapshot.docs.length;
-      for (var element in snapshot.docs) {
-        stockInHand.value += int.parse(element['quantity'].toString());
-      }
-    } catch (e) {
-      showSnackBar("error", "failed to get data ", Colors.red);
+  String _activeFilterType = '';
+  String _activeFilterValue = '';
+  final String _currentSearchText = '';
+
+  void applyFilter(String filterType, String filterValue) {
+    print(filterType);
+    print(filterValue);
+    _activeFilterType = filterType;
+    _activeFilterValue = filterValue;
+    print(_activeFilterType);
+    print(_activeFilterValue);
+
+    if (_currentSearchText.isEmpty) {
+      searchResult.assignAll(productsList);
     }
-    loadingData.value = false;
+    _filterAndSearchProducts();
   }
 
-  Future<void> onRefreshController() async {
-    productsListHomeView.clear();
-
-    stockInHand.value = 0;
-    totalProductCount.value = 0;
-    getData();
-    isFiltered.value = false;
+  Rx<String?> selectedImageFileName = Rx<String?>(null);
+  Rx<Uint8List?> selectedImageBytes = Rx<Uint8List?>(null);
+  void clearSelectedImage() {
+    selectedImageBytes.value = null;
+    selectedImageFileName.value = null;
   }
 
-  Future<void> onLoadingController() async {
-    loadingData.value = true;
-    if (isFiltered.value == true) {
-      try {
-        final QuerySnapshot snapshot = await collectionReference.where(filteredName.value.toLowerCase(), isEqualTo: filteredNameToSearch.value.toLowerCase()).startAfterDocument(productsListHomeView.last).limit(limit).get();
-        productsListHomeView.addAll(snapshot.docs);
-        if (totalProductCount.value == productsListHomeView.length) {
-          showSnackBar("done", "endOFProduct", Colors.green);
+  dynamic onRefreshController() async {
+    productsList.clear();
+    final List<SearchModel> list = await SearchService().getProducts();
+    historyList.assignAll(list);
+    productsList.assignAll(list);
+    calculateTotals();
+    update();
+  }
+
+  void clearFilter() {
+    _activeFilterType = '';
+    _activeFilterValue = '';
+    productsList.assignAll(historyList);
+    Get.back();
+  }
+
+  void decreaseCount(String id, int count) {
+    for (int i = 0; i < selectedProductsToOrder.length; i++) {
+      final product = selectedProductsToOrder[i]['product'];
+      if (product.id.toString() == id) {
+        if (count <= 0) {
+          selectedProductsToOrder.removeAt(i);
+        } else {
+          selectedProductsToOrder[i]['count'] = count;
         }
-      } catch (e) {
-        showSnackBar("error", "loading error", Colors.red);
+        break;
       }
+    }
+    selectedProductsToOrder.refresh();
+  }
+
+  void onSearchTextChanged(String word) {
+    print(word);
+    searchResult.clear();
+    if (word.isEmpty) {
+      searchResult.assignAll(productsList);
+      update();
+      return;
+    }
+    List<String> words = word.trim().toLowerCase().split(' ');
+    searchResult.value = productsList.where((product) {
+      final name = product.name.toLowerCase();
+      final price = product.price.toLowerCase();
+
+      return words.every((w) => name.contains(w) || price.contains(w));
+    }).toList();
+    update();
+  }
+
+  void updateProductLocally(SearchModel updatedProduct) {
+    print("updateProductLocally çağrıldı. Gelen ürün ID: ${updatedProduct.id}, Yeni img: ${updatedProduct.img}");
+
+    final indexInProducts = productsList.indexWhere((item) => item.id == updatedProduct.id);
+    if (indexInProducts != -1) {
+      print("productsList içinde bulundu, güncelleniyor. Eski img: ${productsList[indexInProducts].img}");
+      productsList[indexInProducts] = updatedProduct;
     } else {
-      try {
-        final QuerySnapshot snapshot = await collectionReference.orderBy("date", descending: true).startAfterDocument(productsListHomeView.last).limit(limit).get();
-        productsListHomeView.assignAll(snapshot.docs);
-        if (totalProductCount.value == productsListHomeView.length) {
-          showSnackBar("done", "endOFProduct", Colors.green);
+      print("productsList içinde ürün bulunamadı: ${updatedProduct.id}");
+    }
+
+    final indexInSearch = searchResult.indexWhere((item) => item.id == updatedProduct.id);
+    if (indexInSearch != -1) {
+      print("searchResult içinde bulundu, güncelleniyor. Eski img: ${searchResult[indexInSearch].img}");
+      searchResult[indexInSearch] = updatedProduct;
+    } else {
+      print("searchResult içinde ürün bulunamadı: ${updatedProduct.id}");
+    }
+
+    calculateTotals();
+
+    productsList.refresh();
+    searchResult.refresh();
+    update();
+
+    print("Güncelleme sonrası productsList[$indexInProducts].img: ${productsList.firstWhereOrNull((p) => p.id == updatedProduct.id)?.img}");
+  }
+
+  void calculateTotals() {
+    int totalCount = 0;
+    sumCount.value = 0;
+    for (var product in productsList) {
+      final int count = product.count ?? 0;
+
+      totalCount += count;
+    }
+    sumCount.value = totalCount;
+  }
+
+  void deleteProduct(int id) {
+    productsList.removeWhere((product) => product.id == id);
+    searchResult.removeWhere((product) => product.id == id);
+    calculateTotals();
+
+    update();
+  }
+
+  void _filterAndSearchProducts() {
+    List<SearchModel> GeciciListe = productsList.toList();
+
+    productsList.clear();
+    print(GeciciListe.length);
+    print(_activeFilterType);
+    print(_activeFilterValue);
+    if (_activeFilterType.isNotEmpty && _activeFilterValue.isNotEmpty) {
+      GeciciListe = GeciciListe.where((product) {
+        switch (_activeFilterType) {
+          case 'category':
+            return product.category?.name.toLowerCase() == _activeFilterValue.toLowerCase();
+          case 'brends':
+            return product.brend?.name.toLowerCase() == _activeFilterValue.toLowerCase();
+          case 'location':
+            return product.location?.name.toLowerCase() == _activeFilterValue.toLowerCase();
+          case 'material':
+            return product.material?.name.toLowerCase() == _activeFilterValue.toLowerCase();
+          default:
+            return true;
         }
-      } catch (e) {
-        showSnackBar("error", "loading error", Colors.red);
-      }
+      }).toList();
     }
-    loadingData.value = false;
-  }
-
-  filterProducts(String filterName, String filterSearchName) async {
-    filteredName.value = filterName;
-    filteredNameToSearch.value = filterSearchName;
-    productsListHomeView.clear();
-    loadingData.value = true;
-
-    try {
-      final QuerySnapshot snapshot = await FirebaseFirestore.instance.collection('products').where(filterName.toLowerCase(), isEqualTo: filterSearchName).get();
-
-      productsListHomeView.assignAll(snapshot.docs);
-      isFiltered.value = true;
-    } catch (e) {
-      if (Get.isSnackbarOpen) {
-        Get.closeCurrentSnackbar();
-      }
-      showSnackBar("error", "failedToFilterData", Colors.red);
-    } finally {
-      loadingData.value = false;
-
-      Get.back();
-      Get.back();
+    if (_currentSearchText.isNotEmpty) {
+      List<String> words = _currentSearchText.trim().toLowerCase().split(' ');
+      GeciciListe = GeciciListe.where((product) {
+        final name = product.name.toLowerCase();
+        final price = product.price.toLowerCase();
+        return words.every((w) => name.contains(w) || price.contains(w));
+      }).toList();
     }
-  }
-
-  updateLoginData(bool loginValue, bool adminValue) {
-    loginView.value = true;
-    storage.write('login', loginValue);
-    storage.write('isAdmin', adminValue);
-  }
-
-  setDataFalse() {
-    loginView.value = false;
-    storage.write('login', loginView.value);
+    print(productsList.length);
+    print(GeciciListe.length);
+    productsList.assignAll(GeciciListe);
   }
 }

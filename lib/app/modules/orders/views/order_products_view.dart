@@ -2,17 +2,15 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:kartal/kartal.dart';
-import 'package:stock_managament_app/app/data/models/order_model.dart';
-import 'package:stock_managament_app/app/data/models/product_model.dart';
+import 'package:stock_managament_app/app/modules/orders/controllers/order_model.dart';
 import 'package:stock_managament_app/app/modules/orders/controllers/sales_controller.dart';
 import 'package:stock_managament_app/app/product/constants/list_constants.dart';
-import 'package:stock_managament_app/constants/cards/product_card.dart';
 import 'package:stock_managament_app/constants/customWidget/custom_app_bar.dart';
 import 'package:stock_managament_app/constants/customWidget/custom_text_field.dart';
 import 'package:stock_managament_app/constants/customWidget/widgets.dart';
 
-class OrderCardsProfil extends StatefulWidget {
-  const OrderCardsProfil({
+class OrderProductsView extends StatefulWidget {
+  const OrderProductsView({
     super.key,
     required this.order,
   });
@@ -20,10 +18,10 @@ class OrderCardsProfil extends StatefulWidget {
   final OrderModel order;
 
   @override
-  State<OrderCardsProfil> createState() => _OrderCardsProfilState();
+  State<OrderProductsView> createState() => _OrderProductsViewState();
 }
 
-class _OrderCardsProfilState extends State<OrderCardsProfil> {
+class _OrderProductsViewState extends State<OrderProductsView> {
   final SalesController salesController = Get.put(SalesController());
   SortOptions _selectedSortOption = SortOptions.preparing;
   late OrderModel orderData;
@@ -66,30 +64,30 @@ class _OrderCardsProfilState extends State<OrderCardsProfil> {
         miniTitle: true,
         centerTitle: true,
         actionIcon: false,
-        name: '${"order".tr}  -  ${orderData.clientName}',
+        name: '${"order".tr}  -  ${orderData.clientDetailModel!.name}',
       ),
-      body: StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
-        stream: FirebaseFirestore.instance.collection('sales').doc(orderData.orderID).snapshots(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return spinKit();
-          } else if (snapshot.hasData) {
-            return ListView(
-              padding: context.padding.horizontalNormal,
-              children: [
-                _buildStatusChangeButton(context),
-                Divider(color: Colors.grey.shade200),
-                _buildOrderDetails(snapshot.data!),
-                _buildProductList(),
-                SizedBox(
-                  height: context.padding.onlyBottomMedium.vertical,
-                )
-              ],
-            );
-          }
-          return emptyData();
-        },
-      ),
+      // body: StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
+      //   stream: FirebaseFirestore.instance.collection('sales').doc(orderData.orderID).snapshots(),
+      //   builder: (context, snapshot) {
+      //     if (snapshot.connectionState == ConnectionState.waiting) {
+      //       return spinKit();
+      //     } else if (snapshot.hasData) {
+      //       return ListView(
+      //         padding: context.padding.horizontalNormal,
+      //         children: [
+      //           _buildStatusChangeButton(context),
+      //           Divider(color: Colors.grey.shade200),
+      //           _buildOrderDetails(snapshot.data!),
+      //           _buildProductList(),
+      //           SizedBox(
+      //             height: context.padding.onlyBottomMedium.vertical,
+      //           )
+      //         ],
+      //       );
+      //     }
+      //     return emptyData();
+      //   },
+      // ),
     );
   }
 
@@ -111,7 +109,7 @@ class _OrderCardsProfilState extends State<OrderCardsProfil> {
                 groupValue: _selectedSortOption,
                 onChanged: (value) {
                   setState(() => _selectedSortOption = value!);
-                  salesController.updateOrderStatus(value!, orderData.orderID);
+                  // salesController.updateOrderStatus(value!, orderData.orderID);
                   Navigator.of(context).pop();
                 },
               );
@@ -124,7 +122,7 @@ class _OrderCardsProfilState extends State<OrderCardsProfil> {
             ),
             TextButton(
               onPressed: () {
-                salesController.updateOrderStatus(_selectedSortOption, orderData.orderID);
+                // salesController.updateOrderStatus(_selectedSortOption, orderData.orderID);
                 Navigator.pop(context);
               },
               child: Text('OK', style: context.general.textTheme.titleLarge!.copyWith(fontWeight: FontWeight.bold)),
@@ -182,7 +180,7 @@ class _OrderCardsProfilState extends State<OrderCardsProfil> {
               onPressed: () async {
                 print(field);
 
-                await FirebaseFirestore.instance.collection('sales').doc(orderData.orderID).update({field: controller.text});
+                // await FirebaseFirestore.instance.collection('sales').doc(orderData.orderID).update({field: controller.text});
                 showSnackBar("Success", "Field updated successfully", Colors.green);
                 Navigator.pop(context);
               },
@@ -225,33 +223,35 @@ class _OrderCardsProfilState extends State<OrderCardsProfil> {
     );
   }
 
-  Widget _buildProductList() {
-    return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-      stream: FirebaseFirestore.instance.collection('sales').doc(orderData.orderID).collection('products').snapshots(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return spinKit();
-        } else if (snapshot.hasError) {
-          return errorData();
-        } else if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-          return emptyData();
-        } else {
-          return ListView.builder(
-            shrinkWrap: true,
-            scrollDirection: Axis.vertical,
-            itemCount: snapshot.data!.docs.length,
-            physics: const NeverScrollableScrollPhysics(),
-            itemBuilder: (context, index) {
-              final product = ProductModel.fromDocument(snapshot.data!.docs[index]);
-              return ProductCard(
-                product: product,
-                orderView: true,
-                addCounterWidget: false,
-              );
-            },
-          );
-        }
-      },
-    );
-  }
+  // Widget _buildProductList() {
+  //   // return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+  //   //   stream: FirebaseFirestore.instance.collection('sales').doc(orderData.orderID).collection('products').snapshots(),
+  //   //   builder: (context, snapshot) {
+  //   //     if (snapshot.connectionState == ConnectionState.waiting) {
+  //   //       return spinKit();
+  //   //     } else if (snapshot.hasError) {
+  //   //       return errorData();
+  //   //     } else if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+  //   //       return emptyData();
+  //   //     } else {
+  //   //       return ListView.builder(
+  //   //         shrinkWrap: true,
+  //   //         scrollDirection: Axis.vertical,
+  //   //         itemCount: snapshot.data!.docs.length,
+  //   //         physics: const NeverScrollableScrollPhysics(),
+  //   //         itemBuilder: (context, index) {
+  //   //           return null;
+
+  //   //           // final product = SearchModel.fromDocument(snapshot.data!.docs[index]);
+  //   //           // return ProductCard(
+  //   //           //   product: product,
+  //   //           //   orderView: true,
+  //   //           //   addCounterWidget: false,
+  //   //           // );
+  //   //         },
+  //   //       );
+  //   //     }
+  //   //   },
+  //   // );
+  // }
 }

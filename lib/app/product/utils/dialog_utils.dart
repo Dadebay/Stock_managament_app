@@ -1,14 +1,16 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_iconly/flutter_iconly.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:kartal/kartal.dart';
+import 'package:stock_managament_app/app/modules/home/controllers/four_in_one_model.dart';
+import 'package:stock_managament_app/app/modules/home/controllers/four_in_one_page_service.dart';
 import 'package:stock_managament_app/app/modules/home/controllers/home_controller.dart';
 import 'package:stock_managament_app/app/modules/orders/controllers/sales_controller.dart';
 import 'package:stock_managament_app/app/product/constants/icon_constants.dart';
 import 'package:stock_managament_app/app/product/constants/list_constants.dart';
 import 'package:stock_managament_app/app/product/sizes/widget_sizes.dart';
+import 'package:stock_managament_app/constants/customWidget/constants.dart';
 import 'package:stock_managament_app/constants/customWidget/widgets.dart';
 
 import '../../../constants/buttons/agree_button_view.dart';
@@ -42,104 +44,171 @@ class DialogUtils {
     ));
   }
 
-  static Future<dynamic> filter(BuildContext context) {
-    return Get.bottomSheet(
-      Container(
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Padding(
-              padding: context.padding.normal,
-              child: Text(
-                'filter'.tr,
-                style: context.general.textTheme.titleLarge!.copyWith(
-                  color: Colors.black,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-            Expanded(
-              child: ListView.builder(
-                itemCount: ListConstants.filters.length,
-                shrinkWrap: true,
-                physics: const BouncingScrollPhysics(),
-                itemBuilder: (BuildContext context, int index) {
-                  return ListTile(
-                    onTap: () {
-                      _miniBottomSheet(index, context);
-                    },
-                    title: Text(ListConstants.filters[index]['name'].toString(), maxLines: 1, style: context.general.textTheme.titleMedium!.copyWith(fontSize: 20)),
-                    trailing: Icon(IconlyLight.arrowRightCircle, size: WidgetSizes.mini2x.value),
-                  );
-                },
-              ),
-            ),
-          ],
+  void showSelectableDialog({
+    required BuildContext context,
+    required String title,
+    required String url,
+    required TextEditingController targetController,
+    required void Function(String id) onIdSelected,
+  }) {
+    Get.defaultDialog(
+      title: title,
+      titleStyle: TextStyle(color: Colors.black, fontSize: 22.sp, fontWeight: FontWeight.bold),
+      titlePadding: const EdgeInsets.only(top: 20),
+      content: Container(
+        height: Get.size.height / 2,
+        width: Get.size.width,
+        padding: EdgeInsets.symmetric(vertical: 10.h, horizontal: 10.w),
+        child: FutureBuilder<List<FourInOneModel>>(
+          future: FourInOnePageService().getData(url: url),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return spinKit();
+            } else if (snapshot.hasError) {
+              return errorData();
+            } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+              return emptyData();
+            }
+
+            final items = snapshot.data!;
+            return ListView.builder(
+              itemCount: items.length,
+              itemBuilder: (context, index) {
+                final item = items[index];
+                return ListTile(
+                  minVerticalPadding: 10.h,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                  title: Text(
+                    item.name,
+                    style: TextStyle(color: Colors.black, fontSize: 18.sp),
+                  ),
+                  trailing: const Icon(IconlyLight.arrowRightCircle),
+                  onTap: () {
+                    targetController.text = item.name;
+                    print(item.id);
+                    print(item.name);
+                    onIdSelected(item.id.toString());
+                    Get.back();
+                  },
+                );
+              },
+            );
+          },
         ),
       ),
     );
   }
 
-  static Future<dynamic> _miniBottomSheet(int index, BuildContext context) {
-    final HomeController homeController = Get.find<HomeController>();
+  static filterDialogSearchView(BuildContext context) {
+    final SearchViewController searchViewController = Get.find();
 
-    return Get.bottomSheet(
-      Container(
+    return Get.bottomSheet(Container(
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      height: Get.size.height / 2,
+      padding: EdgeInsets.symmetric(vertical: 10.h, horizontal: 10.w),
+      child: Column(
+        children: [
+          Text(
+            'filter'.tr,
+            style: context.general.textTheme.titleLarge!.copyWith(
+              color: Colors.black,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          Expanded(
+            child: ListView.builder(
+              itemCount: ListConstants.searchViewFilters.length,
+              shrinkWrap: true,
+              physics: const BouncingScrollPhysics(),
+              itemBuilder: (BuildContext context, int index) {
+                return ListTile(
+                  onTap: () => filterHelper(index: index, context: context),
+                  minVerticalPadding: 10.h,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                  title: Text(
+                    ListConstants.searchViewFilters[index]['name'].toString(),
+                    style: context.general.textTheme.titleMedium!.copyWith(fontSize: 20),
+                  ),
+                  trailing: const Icon(IconlyLight.arrowRightCircle),
+                );
+              },
+            ),
+          ),
+          ElevatedButton(
+              onPressed: () {
+                searchViewController.clearFilter();
+              },
+              style: ElevatedButton.styleFrom(backgroundColor: kPrimaryColor, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)), foregroundColor: Colors.white, padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10)),
+              child: Text(
+                "Clear Filter",
+                style: TextStyle(color: Colors.white, fontSize: 18.sp, fontWeight: FontWeight.bold),
+              ))
+        ],
+      ),
+    ));
+  }
+
+  static filterHelper({required int index, required BuildContext context}) {
+    final SearchViewController searchViewController = Get.find();
+    final String filterTypeForController = ListConstants.searchViewFilters[index]['searchName'].toString();
+    final String dialogTitle = ListConstants.searchViewFilters[index]['name'].toString();
+    Get.bottomSheet(Container(
+        height: Get.size.height / 1.8,
+        padding: EdgeInsets.symmetric(vertical: 10.h, horizontal: 10.w),
         decoration: const BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
         ),
         child: Column(
-          mainAxisSize: MainAxisSize.min,
           children: [
-            Padding(
-              padding: context.padding.normal,
-              child: Text(
-                ListConstants.filters[index]['name'],
-                style: context.general.textTheme.titleLarge!.copyWith(
-                  color: Colors.black,
-                  fontWeight: FontWeight.bold,
-                ),
+            Text(
+              "${"Select".tr} ${dialogTitle.tr}",
+              style: context.general.textTheme.titleLarge!.copyWith(
+                color: Colors.black,
+                fontWeight: FontWeight.bold,
               ),
             ),
             Expanded(
-              child: StreamBuilder(
-                stream: FirebaseFirestore.instance.collection(ListConstants.filters[index]['name'].toLowerCase()).snapshots(),
+              child: FutureBuilder<List<FourInOneModel>>(
+                future: FourInOnePageService().getData(url: ListConstants.four_in_one_names[index]['url'].toString()),
                 builder: (context, snapshot) {
-                  if (snapshot.hasData) {
-                    return ListView.builder(
-                      itemCount: snapshot.data!.docs.length,
-                      shrinkWrap: true,
-                      physics: const BouncingScrollPhysics(),
-                      itemBuilder: (BuildContext context, int indexx) {
-                        return ListTile(
-                          onTap: () {
-                            homeController.filterProducts(
-                              ListConstants.filters[index]['searchName'],
-                              snapshot.data!.docs[indexx]['name'],
-                            );
-                          },
-                          title: Text(
-                            snapshot.data!.docs[indexx]['name'],
-                            maxLines: 1,
-                            style: context.general.textTheme.titleLarge!.copyWith(fontSize: 18, fontWeight: FontWeight.w500),
-                          ),
-                        );
-                      },
-                    );
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return spinKit();
+                  } else if (snapshot.hasError) {
+                    return errorData();
+                  } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                    return emptyData();
                   }
-                  return Center(child: spinKit());
+                  final filterValues = snapshot.data!;
+
+                  return ListView.builder(
+                    itemCount: filterValues.length,
+                    shrinkWrap: true,
+                    itemBuilder: (context, i) {
+                      return ListTile(
+                        minVerticalPadding: 10.h,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                        onTap: () {
+                          searchViewController.applyFilter(filterTypeForController, filterValues[i].name);
+                          Get.back();
+                          Get.back();
+                        },
+                        trailing: const Icon(IconlyLight.arrowRightCircle),
+                        title: Text(
+                          filterValues[i].name,
+                          style: context.general.textTheme.titleMedium!.copyWith(fontSize: 20),
+                        ),
+                      );
+                    },
+                  );
                 },
               ),
             ),
           ],
-        ),
-      ),
-    );
+        )));
   }
 
   static void showNoConnectionDialog({required VoidCallback onRetry, required BuildContext context}) {

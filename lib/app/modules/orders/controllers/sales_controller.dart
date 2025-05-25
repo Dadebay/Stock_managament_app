@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:stock_managament_app/app/data/models/product_model.dart';
+import 'package:stock_managament_app/app/modules/home/controllers/search_model.dart';
 import 'package:stock_managament_app/constants/customWidget/constants.dart';
 import 'package:stock_managament_app/constants/customWidget/widgets.dart';
 
@@ -74,16 +74,16 @@ class SalesController extends GetxController {
     productList.clear();
 
     loadingDataSelectProductView.value = true;
-    await productsReference.orderBy("date", descending: true).get().then((value) {
-      for (var element in value.docs) {
-        final product = ProductModel.fromDocument(element);
-        productList.add({'product': product, 'count': 0});
-      }
-      for (var element in selectedProductsList) {
-        final ProductModel product = element['product'];
-        upgradeCount(product.documentID.toString(), int.parse(element['count'].toString()));
-      }
-    });
+    // await productsReference.orderBy("date", descending: true).get().then((value) {
+    //   for (var element in value.docs) {
+    //     final product = SearchModel.fromDocument(element);
+    //     productList.add({'product': product, 'count': 0});
+    //   }
+    //   for (var element in selectedProductsList) {
+    //     final SearchModel product = element['product'];
+    //     upgradeCount(product.documentID.toString(), int.parse(element['count'].toString()));
+    //   }
+    // });
     loadingDataSelectProductView.value = false;
   }
 
@@ -140,47 +140,47 @@ class SalesController extends GetxController {
   }
 
   upgradeCount(String id, int count) {
-    for (var element in productList) {
-      final ProductModel product = element['product'];
-      if (product.documentID.toString() == id.toString()) {
-        element['count'] = count.toString();
-      }
-    }
+    // for (var element in productList) {
+    //   final SearchModel product = element['product'];
+    //   if (product.documentID.toString() == id.toString()) {
+    //     element['count'] = count.toString();
+    //   }
+    // }
     productList.refresh();
   }
 
   decreaseCount(String id, int count) {
     upgradeCount(id, count);
     if (selectedProductsList.isNotEmpty) {
-      for (var element in selectedProductsList) {
-        final ProductModel product = element['product'];
-        if (product.documentID.toString() == id.toString()) {
-          element['count'] = count;
-        }
-      }
+      // for (var element in selectedProductsList) {
+      //   final SearchModel product = element['product'];
+      //   // if (product.documentID.toString() == id.toString()) {
+      //   //   element['count'] = count;
+      //   // }
+      // }
       selectedProductsList.removeWhere((element) => element['count'].toString() == '0');
       selectedProductsList.refresh();
     }
   }
 
-  addProductMain({required int count, required ProductModel product}) {
+  addProductMain({required int count, required SearchModel product}) {
     if (selectedProductsList.isEmpty) {
       selectedProductsList.add({'product': product, 'count': count});
     } else {
       bool value = false;
 
-      for (var element in selectedProductsList) {
-        final ProductModel productMine = element['product'];
-        if (product.documentID.toString() == productMine.documentID) {
-          element['count'] = count;
-          value = true;
-        }
-      }
+      // for (var element in selectedProductsList) {
+      //   // final SearchModel productMine = element['product'];
+      //   // if (product.documentID.toString() == productMine.documentID) {
+      //   //   element['count'] = count;
+      //   //   value = true;
+      //   // }
+      // }
       if (value == false) {
         selectedProductsList.add({'product': product, 'count': count});
       }
     }
-    upgradeCount(product.documentID.toString(), count);
+    // upgradeCount(product.documentID.toString(), count);
 
     selectedProductsList.refresh();
   }

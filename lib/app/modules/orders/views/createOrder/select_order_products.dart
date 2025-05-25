@@ -4,7 +4,7 @@ import 'package:flutter_iconly/flutter_iconly.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:kartal/kartal.dart';
-import 'package:stock_managament_app/app/data/models/product_model.dart';
+import 'package:stock_managament_app/app/modules/home/controllers/search_model.dart';
 import 'package:stock_managament_app/app/modules/orders/controllers/sales_controller.dart';
 import 'package:stock_managament_app/constants/cards/product_card.dart';
 import 'package:stock_managament_app/constants/customWidget/constants.dart';
@@ -36,8 +36,8 @@ class _SelectOrderProductsState extends State<SelectOrderProducts> {
       return;
     }
     for (var userDetail in salesController.productList) {
-      final ProductModel product = userDetail['product'];
-      String name = product.name!;
+      final SearchModel product = userDetail['product'];
+      String name = product.name;
       if (name.toLowerCase().contains(text.toLowerCase())) {
         _searchResult.add({
           'product': product,

@@ -5,6 +5,7 @@ import 'package:flutter_iconly/flutter_iconly.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:kartal/kartal.dart';
+import 'package:stock_managament_app/app/modules/home/controllers/home_controller.dart';
 import 'package:stock_managament_app/app/modules/orders/views/createOrder/create_order.dart';
 import 'package:stock_managament_app/app/modules/search/views/search_view.dart';
 import 'package:stock_managament_app/app/product/constants/list_constants.dart';
@@ -20,6 +21,8 @@ class BottomNavBar extends StatefulWidget {
 }
 
 class _BottomNavBarState extends State<BottomNavBar> {
+  final SearchViewController _searchViewController = Get.put(SearchViewController());
+
   int selectedIndex = 0;
   final storage = GetStorage();
   bool isAdmin = false;
@@ -37,7 +40,17 @@ class _BottomNavBarState extends State<BottomNavBar> {
         backArrow: false,
         actionIcon: true,
         icon: selectedIndex == 0
-            ? IconButton(onPressed: () => Get.to(() => const SearchView(whereToSearch: 'products')), icon: const Icon(IconlyLight.search))
+            ? Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  IconButton(
+                      onPressed: () async {
+                        await _searchViewController.onRefreshController();
+                      },
+                      icon: const Icon(Icons.refresh, color: kPrimaryColor)),
+                  IconButton(onPressed: () => Get.to(() => const SearchView(whereToSearch: 'products')), icon: const Icon(IconlyLight.search)),
+                ],
+              )
             : selectedIndex == 1
                 ? _ordersIcons()
                 : const SizedBox.shrink(),

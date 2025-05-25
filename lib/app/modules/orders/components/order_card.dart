@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:kartal/kartal.dart';
-import 'package:stock_managament_app/app/data/models/order_model.dart';
-import 'package:stock_managament_app/app/modules/orders/views/ordered_products_view.dart';
+import 'package:stock_managament_app/app/modules/orders/controllers/order_model.dart';
+import 'package:stock_managament_app/app/modules/orders/views/order_products_view.dart';
 import 'package:stock_managament_app/app/product/constants/list_constants.dart';
 import 'package:stock_managament_app/app/product/sizes/widget_sizes.dart';
 import 'package:stock_managament_app/constants/customWidget/constants.dart';
@@ -19,7 +19,7 @@ class OrderCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        Get.to(() => OrderCardsProfil(order: order));
+        Get.to(() => OrderProductsView(order: order));
       },
       child: Container(
         height: WidgetSizes.high2x.value,
@@ -33,7 +33,7 @@ class OrderCard extends StatelessWidget {
         ),
         child: Column(
           children: [
-            topPart(order.clientName, order.status, context),
+            topPart(order.clientDetailModel!.name, order.status, context),
             Expanded(
                 child: Padding(
               padding: context.padding.low,
@@ -57,7 +57,7 @@ class OrderCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
-                      textWidget(text1: "clientNumber", text2: '+993${order.clientNumber}', context: context),
+                      textWidget(text1: "clientNumber", text2: '+993${order.clientDetailModel!.phone}', context: context),
                       textWidget(text1: "productCount", text2: order.products.toString(), context: context),
                     ],
                   ))
@@ -68,7 +68,7 @@ class OrderCard extends StatelessWidget {
               color: kPrimaryColor2.withOpacity(.5),
               thickness: 1,
             ),
-            bottomPart(order.sumPrice, context),
+            bottomPart(order.totalsum, context),
           ],
         ),
       ),

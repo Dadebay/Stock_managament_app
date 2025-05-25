@@ -1,9 +1,9 @@
 // ignore_for_file: use_build_context_synchronously
 
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:kartal/kartal.dart';
+import 'package:stock_managament_app/app/modules/auth/views/auth_service.dart';
 import 'package:stock_managament_app/app/modules/home/controllers/home_controller.dart';
 import 'package:stock_managament_app/app/modules/home/views/bottom_nav_bar.dart';
 import 'package:stock_managament_app/constants/buttons/agree_button_view.dart';
@@ -24,7 +24,7 @@ class _SignUpViewState extends State<SignUpView> {
   TextEditingController textEditingController = TextEditingController();
   TextEditingController textEditingController1 = TextEditingController();
   final _formKey = GlobalKey<FormState>();
-  final HomeController _homeController = Get.put<HomeController>(HomeController());
+  final HomeController homeController = Get.put<HomeController>(HomeController());
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -71,33 +71,20 @@ class _SignUpViewState extends State<SignUpView> {
               ),
               Center(
                 child: AgreeButton(
-                  onTap: () {
+                  onTap: () async {
                     if (_formKey.currentState!.validate()) {
-                      bool valueLogin = false;
-                      FirebaseFirestore.instance.collection('users').get().then((value) {
-                        for (var element in value.docs) {
-                          if (textEditingController.text.toLowerCase() == element['username'].toString().toLowerCase() && textEditingController1.text.toLowerCase() == element['password'].toString().toLowerCase()) {
-                            if (element['active'] == false) {
-                              FirebaseFirestore.instance.collection('users').doc(element.id).update({'active': true});
-                              FirebaseFirestore.instance.collection('users').doc(element.id).get().then((value) {
-                                _homeController.updateLoginData(true, value['isAdmin']);
-                              });
-                              Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (BuildContext context) => const BottomNavBar()));
-                              valueLogin = true;
-                              _homeController.agreeButton.value = !_homeController.agreeButton.value;
-                            } else {
-                              showSnackBar('errorTitle', 'loginError1', Colors.red);
-                              _homeController.agreeButton.value = !_homeController.agreeButton.value;
-                            }
-                          }
-                        }
-                        if (valueLogin == false) {
+                      homeController.agreeButton.value = !homeController.agreeButton.value;
+
+                      await SignInService().login(username: textEditingController.text, password: textEditingController1.text).then((value) {
+                        if (value != null) {
+                          Get.offAll(() => const BottomNavBar());
+                        } else {
                           textEditingController.clear();
                           textEditingController1.clear();
-                          showSnackBar('errorTitle', 'signInDialog', Colors.red);
-                          _homeController.agreeButton.value = !_homeController.agreeButton.value;
+                          showSnackBar('errorTitle', 'alreadyExist', Colors.red);
                         }
                       });
+                      homeController.agreeButton.value = !homeController.agreeButton.value;
                     } else {
                       showSnackBar('errorTitle', 'loginErrorFillBlanks', Colors.red);
                     }
