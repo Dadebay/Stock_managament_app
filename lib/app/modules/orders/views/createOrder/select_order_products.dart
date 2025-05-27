@@ -4,8 +4,9 @@ import 'package:flutter_iconly/flutter_iconly.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:kartal/kartal.dart';
+import 'package:stock_managament_app/app/modules/home/controllers/home_controller.dart';
 import 'package:stock_managament_app/app/modules/home/controllers/search_model.dart';
-import 'package:stock_managament_app/app/modules/orders/controllers/sales_controller.dart';
+import 'package:stock_managament_app/app/modules/home/controllers/search_service.dart';
 import 'package:stock_managament_app/constants/cards/product_card.dart';
 import 'package:stock_managament_app/constants/customWidget/constants.dart';
 import 'package:stock_managament_app/constants/customWidget/custom_app_bar.dart';
@@ -19,33 +20,24 @@ class SelectOrderProducts extends StatefulWidget {
 }
 
 class _SelectOrderProductsState extends State<SelectOrderProducts> {
-  final SalesController salesController = Get.put(SalesController());
   TextEditingController controller = TextEditingController();
-  final List _searchResult = [];
+  final SearchViewController _searchViewController = Get.find<SearchViewController>();
 
-  @override
-  void initState() {
-    super.initState();
-    salesController.getDataSelectProductsView();
-  }
+  List<SearchModel> _searchResult = [];
 
-  onSearchTextChanged(String text) async {
+  void onSearchTextChanged(String word) {
     _searchResult.clear();
-    if (text.isEmpty) {
-      setState(() {});
+    if (word.isEmpty) {
+      _searchResult.assignAll(_searchViewController.productsList);
       return;
     }
-    for (var userDetail in salesController.productList) {
-      final SearchModel product = userDetail['product'];
-      String name = product.name;
-      if (name.toLowerCase().contains(text.toLowerCase())) {
-        _searchResult.add({
-          'product': product,
-          'count': userDetail['count'],
-        });
-      }
-    }
+    List<String> words = word.trim().toLowerCase().split(' ');
+    _searchResult = _searchViewController.productsList.where((product) {
+      final name = product.name.toLowerCase();
+      final price = product.price.toLowerCase();
 
+      return words.every((w) => name.contains(w) || price.contains(w));
+    }).toList();
     setState(() {});
   }
 
@@ -58,31 +50,48 @@ class _SelectOrderProductsState extends State<SelectOrderProducts> {
           children: [
             searchWidget(context),
             Expanded(
-              child: Obx(() {
-                return _searchResult.isNotEmpty || controller.text.isNotEmpty
-                    ? _searchResults(context)
-                    : salesController.loadingDataSelectProductView.value == true
-                        ? spinKit()
-                        : _normalListview(context);
-              }),
-            ),
+                child: FutureBuilder<List<SearchModel>>(
+                    future: SearchService().getProducts(),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return spinKit();
+                      } else if (snapshot.hasError) {
+                        return errorData();
+                      } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                        return emptyData();
+                      }
+                      WidgetsBinding.instance.addPostFrameCallback((_) {
+                        _searchViewController.historyList.assignAll(snapshot.data!.toList());
+                        _searchViewController.productsList.assignAll(snapshot.data!.toList());
+                        _searchViewController.calculateTotals();
+                      });
+                      return Obx(() {
+                        return _searchViewController.productsList.isEmpty
+                            ? emptyData()
+                            : _searchResult.isEmpty && controller.text.isNotEmpty
+                                ? emptyData()
+                                : controller.text.isEmpty
+                                    ? ListView.builder(
+                                        padding: const EdgeInsets.only(bottom: 16),
+                                        itemCount: _searchViewController.productsList.length,
+                                        physics: const BouncingScrollPhysics(),
+                                        itemBuilder: (context, index) {
+                                          final product = _searchViewController.productsList[index];
+                                          return Padding(
+                                            padding: context.padding.horizontalNormal,
+                                            child: ProductCard(
+                                              product: product,
+                                              orderView: true,
+                                              addCounterWidget: true,
+                                            ),
+                                          );
+                                        },
+                                      )
+                                    : _searchResults(context);
+                      });
+                    })),
           ],
         ));
-  }
-
-  ListView _normalListview(BuildContext context) {
-    return ListView.builder(
-      padding: context.padding.horizontalNormal,
-      itemCount: salesController.productList.length,
-      physics: const BouncingScrollPhysics(),
-      itemBuilder: (BuildContext context, int index) {
-        return ProductCard(
-          product: salesController.productList[index]['product'],
-          orderView: false,
-          addCounterWidget: true,
-        );
-      },
-    );
   }
 
   ListView _searchResults(BuildContext context) {
@@ -92,7 +101,7 @@ class _SelectOrderProductsState extends State<SelectOrderProducts> {
       physics: const BouncingScrollPhysics(),
       itemBuilder: (context, i) {
         return ProductCard(
-          product: _searchResult[i]['product'],
+          product: _searchResult[i],
           orderView: false,
           addCounterWidget: true,
         );

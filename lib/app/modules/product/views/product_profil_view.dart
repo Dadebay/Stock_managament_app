@@ -33,7 +33,7 @@ class _ProductProfilViewState extends State<ProductProfilView> {
   String imageURL = "";
   List<TextEditingController> textControllers = List.generate(10, (_) => TextEditingController());
 
-  final HomeController _homeController = Get.put(HomeController());
+  final HomeController _homeController = Get.find<HomeController>();
   File? _photo;
   final ImagePicker _picker = ImagePicker();
   @override
@@ -46,7 +46,6 @@ class _ProductProfilViewState extends State<ProductProfilView> {
   final SearchViewController controller = Get.find<SearchViewController>();
 
   void changeData() {
-    print(widget.product.location!.name.toString());
     selectedIds = List<String?>.filled(fieldCount, null);
     imageURL = widget.product.img!;
     textControllers[0].text = widget.product.name;
@@ -231,13 +230,11 @@ class _ProductProfilViewState extends State<ProductProfilView> {
         finalImageFileName = "${widget.product.name}_updated.png";
       }
     }
-    print(productData);
 
     await SearchService().updateProductWithImage(id: widget.product.id, fields: productData, imageBytes: controller.selectedImageBytes.value, imageFileName: finalImageFileName).then((_) {
       Get.back();
       showSnackBar("Success", "Product updated successfully", Colors.green);
     }).catchError((error) {
-      print(error.toString());
       showSnackBar("Error", "Failed to update product: $error", Colors.red);
     });
   }

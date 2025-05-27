@@ -13,6 +13,7 @@ import 'package:stock_managament_app/constants/customWidget/widgets.dart';
 
 class OrderService {
   final OrderController orderController = Get.find();
+
   Future<List<OrderModel>> getOrders() async {
     final data = await ApiService().getRequest(ApiConstants.order, requiresToken: true);
     if (data is Map && data['results'] != null) {
@@ -25,11 +26,13 @@ class OrderService {
   }
 
   Future<List<SearchModel>> getOrderProduct(int id) async {
-    final data = await ApiService().getRequest("${ApiConstants.order}$id/", requiresToken: true);
-    if (data is Map && data['product_detail'] != null) {
-      return (data['product_detail'] as List).map((item) => SearchModel.fromJson(item)).toList().reversed.toList();
-    } else if (data is List) {
-      return (data).map((item) => SearchModel.fromJson(item)).toList().reversed.toList();
+    final data = await ApiService().getRequest("${ApiConstants.getOrderProducts}$id/", requiresToken: true);
+    print(id);
+    print(id);
+    print(data);
+    if (data is List) {
+      print(data);
+      return (data).map((item) => SearchModel.fromJson(item['product'])).toList();
     } else {
       return [];
     }
@@ -59,6 +62,10 @@ class OrderService {
       requiresToken: true,
       handleSuccess: (responseJson) {
         print(responseJson);
+        print(responseJson);
+        print(responseJson);
+        print(responseJson);
+        print(responseJson);
         if (responseJson.isNotEmpty) {
           orderController.addOrder(OrderModel.fromJson(responseJson));
           Get.back();
@@ -75,7 +82,6 @@ class OrderService {
 
     final token = await auth.getToken();
     final url = Uri.parse("${ApiConstants.order}${model.id}/");
-    print(url);
     final headers = {
       'Content-Type': 'application/json; charset=UTF-8',
       'Authorization': 'Bearer $token',
@@ -96,13 +102,7 @@ class OrderService {
       "count": model.count,
       // 'products': model.products
     });
-    print(body);
-    print(model.products);
-
     final response = await http.put(url, headers: headers, body: body);
-    print(body);
-    print(response.statusCode);
-    print(response.body);
 
     if (response.statusCode == 200 || response.statusCode == 201) {
       final jsonResponse = json.decode(response.body);

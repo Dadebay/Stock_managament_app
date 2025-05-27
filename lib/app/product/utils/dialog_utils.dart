@@ -6,7 +6,7 @@ import 'package:kartal/kartal.dart';
 import 'package:stock_managament_app/app/modules/home/controllers/four_in_one_model.dart';
 import 'package:stock_managament_app/app/modules/home/controllers/four_in_one_page_service.dart';
 import 'package:stock_managament_app/app/modules/home/controllers/home_controller.dart';
-import 'package:stock_managament_app/app/modules/orders/controllers/sales_controller.dart';
+import 'package:stock_managament_app/app/modules/orders/controllers/order_controller.dart';
 import 'package:stock_managament_app/app/product/constants/icon_constants.dart';
 import 'package:stock_managament_app/app/product/constants/list_constants.dart';
 import 'package:stock_managament_app/app/product/sizes/widget_sizes.dart';
@@ -16,34 +16,6 @@ import 'package:stock_managament_app/constants/customWidget/widgets.dart';
 import '../../../constants/buttons/agree_button_view.dart';
 
 class DialogUtils {
-  static Future<dynamic> appBarOrderFilter() {
-    final SalesController salesController = Get.put(SalesController());
-
-    return Get.bottomSheet(Container(
-      padding: EdgeInsets.symmetric(vertical: 10.h, horizontal: 10.w),
-      decoration: const BoxDecoration(color: Colors.white, borderRadius: BorderRadius.only(topLeft: Radius.circular(20), topRight: Radius.circular(20))),
-      child: Wrap(
-        children: [
-          filterTextWidget('filter'.tr),
-          ListView.builder(
-            itemCount: salesController.statuses.length,
-            shrinkWrap: true,
-            physics: const BouncingScrollPhysics(),
-            itemBuilder: (BuildContext context, int index) {
-              return ListTile(
-                onTap: () {
-                  salesController.sortSalesCards(index);
-                },
-                title: Text(salesController.statuses[index]),
-                trailing: const Icon(IconlyLight.arrowRightCircle),
-              );
-            },
-          ),
-        ],
-      ),
-    ));
-  }
-
   void showSelectableDialog({
     required BuildContext context,
     required String title,
@@ -85,8 +57,6 @@ class DialogUtils {
                   trailing: const Icon(IconlyLight.arrowRightCircle),
                   onTap: () {
                     targetController.text = item.name;
-                    print(item.id);
-                    print(item.name);
                     onIdSelected(item.id.toString());
                     Get.back();
                   },
@@ -97,6 +67,56 @@ class DialogUtils {
         ),
       ),
     );
+  }
+
+  static orderFilterDialog() {
+    List nameMapping = ['Preparing', 'Shipped', 'Cancelled', 'Refund', 'Ready to ship'];
+    List numberMapping = [1, 2, 3, 4, 5];
+    final OrderController orderViewController = Get.find();
+    return Get.defaultDialog(
+        title: 'Filter by status',
+        titleStyle: TextStyle(color: Colors.black, fontSize: 24.sp, fontWeight: FontWeight.bold),
+        titlePadding: const EdgeInsets.only(top: 20),
+        content: Container(
+          width: Get.size.width,
+          height: Get.size.height / 2,
+          padding: EdgeInsets.symmetric(vertical: 10.h, horizontal: 10.w),
+          child: Column(
+            children: [
+              Expanded(
+                child: ListView.builder(
+                  itemCount: nameMapping.length,
+                  shrinkWrap: true,
+                  physics: const BouncingScrollPhysics(),
+                  itemBuilder: (BuildContext context, int index) {
+                    return ListTile(
+                      onTap: () {
+                        orderViewController.filterByStatus(numberMapping[index].toString());
+                        Get.back();
+                      },
+                      minVerticalPadding: 10.h,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                      title: Text(
+                        nameMapping[index].toString(),
+                        style: TextStyle(color: const Color.fromARGB(255, 115, 109, 109), fontSize: 18.sp, fontWeight: FontWeight.w500),
+                      ),
+                      trailing: const Icon(IconlyLight.arrowRightCircle),
+                    );
+                  },
+                ),
+              ),
+              ElevatedButton(
+                  onPressed: () {
+                    orderViewController.clearFilter();
+                  },
+                  style: ElevatedButton.styleFrom(backgroundColor: kPrimaryColor2, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)), foregroundColor: Colors.white, padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10)),
+                  child: Text(
+                    "Clear Filter",
+                    style: TextStyle(color: Colors.white, fontSize: 18.sp, fontWeight: FontWeight.bold),
+                  ))
+            ],
+          ),
+        ));
   }
 
   static filterDialogSearchView(BuildContext context) {

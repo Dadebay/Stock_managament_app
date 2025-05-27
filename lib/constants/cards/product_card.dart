@@ -6,7 +6,6 @@ import 'package:get/get.dart';
 import 'package:kartal/kartal.dart';
 import 'package:stock_managament_app/app/modules/home/controllers/home_controller.dart';
 import 'package:stock_managament_app/app/modules/home/controllers/search_model.dart';
-import 'package:stock_managament_app/app/modules/orders/controllers/sales_controller.dart';
 import 'package:stock_managament_app/app/modules/product/views/product_profil_view.dart';
 import 'package:stock_managament_app/app/product/sizes/widget_sizes.dart';
 import 'package:stock_managament_app/constants/customWidget/constants.dart';
@@ -29,9 +28,8 @@ class ProductCard extends StatefulWidget {
 }
 
 class _ProductCardState extends State<ProductCard> {
-  final SalesController salesController = Get.put(SalesController());
-  final HomeController homeController = Get.put(HomeController());
-  int selectedCount = 0;
+  final HomeController homeController = Get.find<HomeController>();
+  final SearchViewController seacrhViewController = Get.find<SearchViewController>();
 
   @override
   Widget build(BuildContext context) {
@@ -79,40 +77,46 @@ class _ProductCardState extends State<ProductCard> {
             ),
           ],
         ),
-        trailing: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            IconButton(
-              icon: const Icon(CupertinoIcons.minus_circle, color: Colors.black),
-              onPressed: () {
-                if (selectedCount > 0) {
-                  selectedCount--;
-                  setState(() {});
+        trailing: Obx(() {
+          final selectedCount = seacrhViewController.getProductCount(widget.product.id.toString());
 
-                  // salesController.decreaseCount(widget.product.documentID.toString(), selectedCount);
-                }
-              },
-            ),
-            Text(
-              selectedCount.toString(),
-              style: TextStyle(color: Colors.black, fontSize: 18.sp),
-              maxLines: 1,
-            ),
-            IconButton(
-              icon: const Icon(CupertinoIcons.add_circled, color: Colors.black),
-              onPressed: () {
-                if (selectedCount >= widget.product.count) {
-                  showSnackBar("Error", "Not in stock", Colors.red);
-                } else {
-                  selectedCount++;
-                  setState(() {});
-                  // salesController.upgradeCount(widget.product.documentID.toString(), selectedCount);
-                  salesController.addProductMain(product: widget.product, count: selectedCount);
-                }
-              },
-            ),
-          ],
-        ),
+          return Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              IconButton(
+                icon: const Icon(CupertinoIcons.minus_circle, color: Colors.black),
+                onPressed: () {
+                  if (selectedCount > 0) {
+                    seacrhViewController.decreaseCount(widget.product.id.toString(), selectedCount - 1);
+
+                    setState(() {});
+                  }
+                },
+              ),
+              SizedBox(
+                width: 15.w,
+                child: Text(
+                  selectedCount.toString(),
+                  style: TextStyle(color: Colors.black, fontSize: 18.sp),
+                  maxLines: 1,
+                  textAlign: TextAlign.center,
+                ),
+              ),
+              IconButton(
+                icon: const Icon(CupertinoIcons.add_circled, color: Colors.black),
+                onPressed: () {
+                  if (selectedCount >= widget.product.count) {
+                    showSnackBar("Error", "Not in stock", Colors.red);
+                  } else {
+                    seacrhViewController.addOrUpdateProduct(product: widget.product, count: selectedCount + 1);
+
+                    setState(() {});
+                  }
+                },
+              ),
+            ],
+          );
+        }),
       ),
     );
   }

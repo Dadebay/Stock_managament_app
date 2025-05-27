@@ -40,9 +40,7 @@ class CustomTextField extends StatelessWidget {
         onTap: onTap,
         controller: controller,
         validator: (value) {
-          if (value!.isEmpty) {
-            return 'errorEmpty'.tr;
-          }
+          if (value == null || value.isEmpty) return 'textfield_error'.tr;
           return null;
         },
         onEditingComplete: () {

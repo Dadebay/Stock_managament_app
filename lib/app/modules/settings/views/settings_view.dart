@@ -54,7 +54,7 @@ class SettingsView extends GetView<SettingsController> {
 }
 
 void changeLanguage() {
-  final SettingsController settingsController = Get.put(SettingsController());
+  final SettingsController settingsController = Get.find<SettingsController>();
   Container dividerr() {
     return Container(
       color: Colors.white,

@@ -3,6 +3,7 @@
 import 'package:get_storage/get_storage.dart';
 import 'package:stock_managament_app/api_constants.dart';
 import 'package:stock_managament_app/api_service.dart';
+import 'package:stock_managament_app/app/modules/auth/views/enter_model.dart';
 
 class AuthStorage {
   final storage = GetStorage();
@@ -17,6 +18,11 @@ class AuthStorage {
   Future<bool> setToken(String token) async {
     await storage.write('AccessToken', token);
     return storage.read('AccessToken') == null ? false : true;
+  }
+
+  Future<bool> setAdmin(bool token) async {
+    await storage.write('isAdmin', token);
+    return storage.read('isAdmin') == null ? false : true;
   }
 
   Future<String?> getToken() async {
@@ -47,6 +53,24 @@ class AuthStorage {
 
 class SignInService {
   final AuthStorage _auth = AuthStorage();
+  Future<List<EnterModel>> getClients(String userName, String password) async {
+    final uri = Uri.parse(ApiConstants.users);
+    final data = await ApiService().getRequest(uri.toString(), requiresToken: true);
+    if (data is Map && data['results'] != null) {
+      return (data['results'] as List).map((item) => EnterModel.fromJson(item)).toList();
+    } else if (data is List) {
+      List<EnterModel> list = [];
+      list = (data).map((item) => EnterModel.fromJson(item)).toList();
+      for (var element in list) {
+        if (element.username == userName && element.password == password) {
+          await _auth.setAdmin(true);
+        }
+      }
+      return list;
+    } else {
+      return [];
+    }
+  }
 
   Future login({required String username, required String password}) async {
     return ApiService().handleApiRequest(
@@ -59,6 +83,7 @@ class SignInService {
       requiresToken: false,
       handleSuccess: (responseJson) async {
         if (responseJson['access'] != null) {
+          getClients(username, password);
           await _auth.setToken(responseJson['access']);
           await _auth.setRefreshToken(responseJson['refresh']);
         }

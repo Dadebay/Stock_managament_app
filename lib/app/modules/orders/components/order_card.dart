@@ -25,8 +25,9 @@ class OrderCard extends StatelessWidget {
         height: WidgetSizes.high2x.value,
         margin: context.padding.normal,
         decoration: BoxDecoration(
-          borderRadius: borderRadius15,
+          borderRadius: borderRadius20,
           color: Colors.white,
+          border: Border.all(color: ListConstants.statusMapping.firstWhere((s) => s['sortName'] == order.status)['color'], width: 1),
           boxShadow: [
             BoxShadow(color: Colors.grey.shade200, blurRadius: 3, spreadRadius: 3),
           ],
@@ -44,8 +45,8 @@ class OrderCard extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
-                        textWidget(text1: "dateOrder", text2: order.date, context: context),
-                        textWidget(text1: "status", text2: order.status, context: context),
+                        textWidget(text1: "dateOrder", text2: order.date.substring(0, 10), context: context),
+                        textWidget(text1: "status", text2: ListConstants.statusMapping.firstWhere((s) => s['sortName'] == order.status)['name'], context: context),
                       ],
                     ),
                   ),
@@ -57,8 +58,8 @@ class OrderCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
-                      textWidget(text1: "clientNumber", text2: '+993${order.clientDetailModel!.phone}', context: context),
-                      textWidget(text1: "productCount", text2: order.products.toString(), context: context),
+                      textWidget(text1: "clientNumber", text2: order.clientDetailModel!.phone == '' ? 'no_phone'.tr : '+993${order.clientDetailModel!.phone}', context: context),
+                      textWidget(text1: "productCount", text2: order.count.toString(), context: context),
                     ],
                   ))
                 ],
@@ -100,7 +101,7 @@ class OrderCard extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(text1.tr, overflow: TextOverflow.ellipsis, style: context.general.textTheme.bodyLarge!.copyWith(color: Colors.grey, fontWeight: FontWeight.w400)),
-        Text(text2, overflow: TextOverflow.ellipsis, style: context.general.textTheme.bodyLarge!.copyWith(color: Colors.black, fontWeight: FontWeight.bold)),
+        Text(text2.tr, overflow: TextOverflow.ellipsis, style: context.general.textTheme.bodyLarge!.copyWith(color: Colors.black, fontWeight: FontWeight.bold)),
       ],
     );
   }
@@ -108,7 +109,7 @@ class OrderCard extends StatelessWidget {
   Container topPart(String text, String status, BuildContext context) {
     return Container(
       padding: context.padding.low,
-      decoration: BoxDecoration(color: ListConstants.colorMapping[status.toLowerCase()], borderRadius: borderRadius15),
+      decoration: BoxDecoration(color: ListConstants.statusMapping.firstWhere((s) => s['sortName'] == order.status)['color'], borderRadius: borderRadius15),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [

@@ -3,31 +3,20 @@ import 'package:flutter/material.dart';
 import 'package:flutter_iconly/flutter_iconly.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:kartal/kartal.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:stock_managament_app/app/modules/sendSMS/controllers/client_model.dart';
+import 'package:stock_managament_app/app/modules/sendSMS/controllers/clients_controller.dart';
+import 'package:stock_managament_app/app/modules/sendSMS/controllers/clients_service.dart';
+import 'package:stock_managament_app/app/modules/sendSMS/views/client_card.dart';
+import 'package:stock_managament_app/app/modules/sendSMS/views/search_widget.dart';
+import 'package:stock_managament_app/app/product/constants/list_constants.dart';
 import 'package:stock_managament_app/constants/buttons/agree_button_view.dart';
 import 'package:stock_managament_app/constants/customWidget/constants.dart';
 import 'package:stock_managament_app/constants/customWidget/custom_text_field.dart';
 import 'package:stock_managament_app/constants/customWidget/widgets.dart';
 
 import '../controllers/send_sms_controller.dart';
-
-class Client {
-  String name;
-  final String number;
-  final String address;
-  final String date;
-  int orderCount;
-  double sumPrice;
-
-  Client({
-    required this.address,
-    required this.date,
-    required this.orderCount,
-    required this.name,
-    required this.number,
-    required this.sumPrice,
-  });
-}
 
 class SendSMSView extends StatefulWidget {
   const SendSMSView({super.key});
@@ -38,92 +27,70 @@ class SendSMSView extends StatefulWidget {
 
 class _SendSMSViewState extends State<SendSMSView> {
   final SendSMSController smsController = Get.put(SendSMSController());
-  @override
-  void initState() {
-    super.initState();
-    smsController.getAllClients();
-  }
+  final ClientsController clientsController = Get.find();
+  TextEditingController searchEditingController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        floatingActionButton: FloatingActionButton(
-          backgroundColor: kPrimaryColor2,
-          onPressed: () {
-            sendMessage();
-          },
-          child: const Icon(
-            IconlyLight.send,
-            color: Colors.white,
-          ),
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: kPrimaryColor2,
+        onPressed: () {
+          sendMessage();
+        },
+        child: const Icon(
+          IconlyLight.send,
+          color: Colors.white,
         ),
-        backgroundColor: Colors.white,
-        body: Obx(() {
-          return smsController.loadData.value
-              ? spinKit()
-              : smsController.clients.isEmpty
-                  ? emptyData()
-                  : mineBody();
-        }));
-  }
+      ),
+      backgroundColor: Colors.white,
+      body: FutureBuilder<List<ClientModel>>(
+        future: ClientsService().getClients(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return spinKit();
+          } else if (snapshot.hasError) {
+            return errorData();
+          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+            return emptyData();
+          }
+          final clients = snapshot.data!;
+          clientsController.clients.assignAll(clients);
+          return Obx(() {
+            final isSearching = searchEditingController.text.isNotEmpty;
+            final hasResult = clientsController.searchResult.isNotEmpty;
+            final displayList = (isSearching && hasResult) ? clientsController.searchResult.toList() : clientsController.clients.toList();
 
-  Widget mineBody() {
-    return ListView.separated(
-      itemBuilder: (context, index) {
-        Client clinet = Client(
-            date: smsController.clients[index]['date'],
-            address: smsController.clients[index]['address'],
-            orderCount: int.parse(smsController.clients[index]['order_count'].toString()),
-            name: smsController.clients[index]['name'],
-            number: smsController.clients[index]['number'],
-            sumPrice: double.parse(smsController.clients[index]['sum_price'].toString()));
-        return Row(children: [
-          Expanded(
-            flex: 1,
-            child: Text(
-              "${index + 1} - ",
-              overflow: TextOverflow.ellipsis,
-              textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.black, fontSize: 16.sp),
-            ),
-          ),
-          Expanded(
-            flex: 7,
-            child: Container(
-              color: Colors.white,
-              child: Row(
-                children: [
-                  Expanded(
-                    flex: 3,
-                    child: Text(
-                      clinet.name,
-                      maxLines: 1,
-                      textAlign: TextAlign.start,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(color: Colors.grey, fontFamily: gilroyRegular, fontSize: 14.sp),
-                    ),
-                  ),
-                  Expanded(
-                    child: Text(
-                      clinet.number,
-                      overflow: TextOverflow.ellipsis,
-                      textAlign: TextAlign.start,
-                      style: TextStyle(color: Colors.black, fontSize: 14.sp),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          )
-        ]);
-      },
-      separatorBuilder: (context, index) {
-        return const Divider(
-          height: 5,
-          thickness: 1,
-        );
-      },
-      itemCount: smsController.clients.length,
+            return Column(
+              children: [
+                SearchWidget(
+                  controller: searchEditingController,
+                  onChanged: (value) => clientsController.onSearchTextChanged(value),
+                  onClear: () {
+                    searchEditingController.clear();
+                    clientsController.searchResult.clear();
+                  },
+                ),
+                Expanded(
+                  child: (searchEditingController.text.isNotEmpty && clientsController.searchResult.isEmpty)
+                      ? emptyData()
+                      : ListView.builder(
+                          padding: context.padding.onlyBottomHigh,
+                          itemCount: displayList.length,
+                          itemBuilder: (context, index) {
+                            return ClientCard(
+                              client: displayList[index],
+                              count: (displayList.length - index),
+                              topTextColumnSize: ListConstants.clientNames,
+                            );
+                          },
+                        ),
+                ),
+              ],
+            );
+          });
+        },
+      ),
     );
   }
 

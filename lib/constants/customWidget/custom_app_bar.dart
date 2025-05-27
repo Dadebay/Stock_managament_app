@@ -11,10 +11,20 @@ class CustomAppBar extends StatelessWidget implements PreferredSize {
   final bool? centerTitle;
   final bool? miniTitle;
   final Widget? icon;
+  final Widget? leadingWidget; // <-- EKLENDİ
   final bool actionIcon;
   final String name;
 
-  const CustomAppBar({required this.backArrow, required this.actionIcon, required this.name, this.icon, this.centerTitle, super.key, this.miniTitle});
+  const CustomAppBar({
+    required this.backArrow,
+    required this.actionIcon,
+    required this.name,
+    this.icon,
+    this.leadingWidget, // <-- EKLENDİ
+    this.centerTitle,
+    super.key,
+    this.miniTitle,
+  });
 
   @override
   Widget get child => Text('ad');
@@ -27,33 +37,34 @@ class CustomAppBar extends StatelessWidget implements PreferredSize {
     return AppBar(
       elevation: 0,
       bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(1),
-          child: Padding(
-            padding: context.padding.horizontalNormal,
-            child: Divider(
-              color: kPrimaryColor2.withOpacity(.5),
-            ),
-          )),
+        preferredSize: const Size.fromHeight(1),
+        child: Padding(
+          padding: context.padding.horizontalNormal,
+          child: Divider(
+            color: kPrimaryColor2.withOpacity(.5),
+          ),
+        ),
+      ),
       scrolledUnderElevation: 0.0,
       centerTitle: centerTitle,
       leadingWidth: centerTitle == true ? 40.0 : 0.0,
-      leading: backArrow
-          ? IconButton(
-              color: Colors.transparent,
-              splashColor: Colors.transparent,
-              highlightColor: Colors.transparent,
-              icon: Icon(
-                IconlyLight.arrowLeftCircle,
-                color: Colors.black,
-                size: 22,
-              ),
-              onPressed: () {
-                print("Asdasd");
-                Get.back();
-              },
-            )
-          : SizedBox.shrink(),
-      actions: [if (actionIcon) Padding(padding: const EdgeInsets.only(right: 5), child: icon) else SizedBox.shrink()],
+      leading: leadingWidget ??
+          (backArrow
+              ? IconButton(
+                  color: Colors.transparent,
+                  splashColor: Colors.transparent,
+                  highlightColor: Colors.transparent,
+                  icon: Icon(
+                    IconlyLight.arrowLeftCircle,
+                    color: Colors.black,
+                    size: 22,
+                  ),
+                  onPressed: () {
+                    Get.back();
+                  },
+                )
+              : SizedBox.shrink()),
+      actions: [if (actionIcon) Padding(padding: const EdgeInsets.only(right: 5), child: icon) else const SizedBox.shrink()],
       automaticallyImplyLeading: false,
       backgroundColor: Colors.white,
       title: Text(

@@ -33,6 +33,42 @@ SnackbarController showSnackBar(String title, String subtitle, Color color) {
   );
 }
 
+Future<DateTime?> showDateTimePickerWidget({
+  required BuildContext context,
+  DateTime? initialDate,
+  DateTime? firstDate,
+  DateTime? lastDate,
+}) async {
+  initialDate ??= DateTime.now();
+  firstDate ??= initialDate.subtract(const Duration(days: 365 * 100));
+  lastDate ??= firstDate.add(const Duration(days: 365 * 200));
+
+  final DateTime? selectedDate = await showDatePicker(
+    context: context,
+    initialDate: initialDate,
+    firstDate: firstDate,
+    lastDate: lastDate,
+  );
+
+  if (selectedDate == null) return null;
+
+  final TimeOfDay? selectedTime = await showTimePicker(
+    // ignore: use_build_context_synchronously
+    context: context,
+    initialTime: TimeOfDay.fromDateTime(selectedDate),
+  );
+
+  return selectedTime == null
+      ? selectedDate
+      : DateTime(
+          selectedDate.year,
+          selectedDate.month,
+          selectedDate.day,
+          selectedTime.hour,
+          selectedTime.minute,
+        );
+}
+
 Center spinKit() {
   return Center(
     child: Lottie.asset(IconConstants.loadingLottie, width: 70.w, height: 70.h),

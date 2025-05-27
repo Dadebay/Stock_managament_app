@@ -24,7 +24,7 @@ class ClientDetailModel {
       id: json['id'] ?? 0,
       name: json['name'] ?? '',
       address: json['address'] ?? '',
-      phone: json['phone'] != null ? (json['phone'].toString().startsWith("+993") ? json['phone'].toString() : "+993${json['phone'].toString()}") : null,
+      phone: json['phone'] != null ? json['phone'].toString().replaceAll('+993', '') : '',
       description: json['description'] ?? '',
       ordercount: json['ordercount']?.toString() ?? '',
       sumprice: json['sumprice']?.toString() ?? '',

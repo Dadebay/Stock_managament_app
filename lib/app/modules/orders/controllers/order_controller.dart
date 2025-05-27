@@ -1,17 +1,19 @@
 import 'package:get/get.dart';
 import 'package:stock_managament_app/app/modules/home/controllers/search_model.dart';
 import 'package:stock_managament_app/app/modules/orders/controllers/order_model.dart';
+import 'package:stock_managament_app/app/modules/orders/controllers/order_service.dart';
 
 class OrderController extends GetxController {
   RxList<OrderModel> allOrders = <OrderModel>[].obs;
   RxList<OrderModel> searchResult = <OrderModel>[].obs;
-
+  RxBool loading = false.obs;
   RxDouble sumCost = 0.0.obs;
   RxDouble sumPrice = 0.0.obs;
   RxInt sumProductCount = 0.obs;
 
   dynamic filterByStatus(String status) {
     List<OrderModel> orderCardList = [];
+
     if (searchResult.isEmpty) {
       searchResult.assignAll(allOrders);
     }
@@ -25,6 +27,17 @@ class OrderController extends GetxController {
     update();
   }
 
+  dynamic onRefreshController() async {
+    loading.value = true;
+    allOrders.clear();
+    print("Mana geldi0000000000000000000000000000000000000000000");
+    final List<OrderModel> list = await OrderService().getOrders();
+    allOrders.assignAll(list);
+    calculateTotals();
+    update();
+    loading.value = false;
+  }
+
   dynamic clearFilter() {
     allOrders.assignAll(searchResult);
     Get.back();
@@ -32,7 +45,11 @@ class OrderController extends GetxController {
   }
 
   void addOrder(OrderModel model) {
+    print(allOrders.length);
     allOrders.insert(0, model);
+    print("All orders add date --------------------------------------------------------------------------");
+    print(allOrders.length);
+
     calculateTotals();
   }
 

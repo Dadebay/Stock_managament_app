@@ -24,7 +24,7 @@ class _SignUpViewState extends State<SignUpView> {
   TextEditingController textEditingController = TextEditingController();
   TextEditingController textEditingController1 = TextEditingController();
   final _formKey = GlobalKey<FormState>();
-  final HomeController homeController = Get.put<HomeController>(HomeController());
+  final HomeController homeController = Get.find<HomeController>();
   @override
   Widget build(BuildContext context) {
     return Scaffold(

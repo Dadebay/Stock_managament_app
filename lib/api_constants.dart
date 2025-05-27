@@ -11,5 +11,7 @@ class ApiConstants {
   static const String products = '${baseUrl}product/';
   static const String purchases = '${baseUrl}purshaces/';
   static const String order = '${baseUrl}order/';
+  static const String getOrderProducts = '${baseUrl}getOrder/';
   static const String getData = '${baseUrl}getresult/';
+  static const String users = '${baseUrl}users/';
 }

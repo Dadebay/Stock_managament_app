@@ -64,18 +64,10 @@ class SearchService {
         contentType: MediaType('image', extension), // Dinamik içerik tipi
       ));
     }
-    print("Mana geldi-----------------------------------------------------------------------------");
-    request.fields.forEach((key, value) {
-      print('$key: $value');
-    });
     try {
       final streamedResponse = await request.send();
       final responseBody = await streamedResponse.stream.bytesToString();
       final statusCode = streamedResponse.statusCode;
-
-      print('Update Status Code: $statusCode');
-      print('Update Response Body: $responseBody');
-
       if (statusCode == 200) {
         final jsonData = jsonDecode(responseBody);
         final updatedModel = SearchModel.fromJson(jsonData);
@@ -98,7 +90,6 @@ class SearchService {
         throw Exception(errorMessage);
       }
     } catch (e) {
-      print('Error updating product: $e');
       throw Exception('Error during product update: $e');
     }
   }

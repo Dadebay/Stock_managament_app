@@ -15,19 +15,50 @@ class SearchViewController extends GetxController {
   RxList<Map<String, dynamic>> selectedProductsToOrder = <Map<String, dynamic>>[].obs;
   RxBool showInGrid = false.obs;
   RxInt sumCount = 0.obs;
+  void addOrUpdateProduct({required SearchModel product, required int count}) {
+    final index = selectedProductsToOrder.indexWhere(
+      (element) => element['product'].id.toString() == product.id.toString(),
+    );
+    if (index != -1) {
+      selectedProductsToOrder[index]['count'] = count;
+    } else {
+      selectedProductsToOrder.add({'product': product, 'count': count});
+    }
+    selectedProductsToOrder.refresh();
+  }
+
+  void decreaseCount(String id, int count) {
+    for (int i = 0; i < selectedProductsToOrder.length; i++) {
+      final product = selectedProductsToOrder[i]['product'];
+      if (product.id.toString() == id) {
+        if (count <= 0) {
+          selectedProductsToOrder.removeAt(i);
+        } else {
+          selectedProductsToOrder[i]['count'] = count;
+        }
+        break;
+      }
+    }
+    selectedProductsToOrder.refresh();
+  }
+
+  int getProductCount(String id) {
+    for (var element in selectedProductsToOrder) {
+      final SearchModel product = element['product'];
+      if (product.id.toString() == id) {
+        return element['count'] ?? 0;
+      }
+    }
+    return 0;
+  }
 
   String _activeFilterType = '';
   String _activeFilterValue = '';
   final String _currentSearchText = '';
 
   void applyFilter(String filterType, String filterValue) {
-    print(filterType);
-    print(filterValue);
     _activeFilterType = filterType;
     _activeFilterValue = filterValue;
-    print(_activeFilterType);
-    print(_activeFilterValue);
-
     if (_currentSearchText.isEmpty) {
       searchResult.assignAll(productsList);
     }
@@ -57,23 +88,7 @@ class SearchViewController extends GetxController {
     Get.back();
   }
 
-  void decreaseCount(String id, int count) {
-    for (int i = 0; i < selectedProductsToOrder.length; i++) {
-      final product = selectedProductsToOrder[i]['product'];
-      if (product.id.toString() == id) {
-        if (count <= 0) {
-          selectedProductsToOrder.removeAt(i);
-        } else {
-          selectedProductsToOrder[i]['count'] = count;
-        }
-        break;
-      }
-    }
-    selectedProductsToOrder.refresh();
-  }
-
   void onSearchTextChanged(String word) {
-    print(word);
     searchResult.clear();
     if (word.isEmpty) {
       searchResult.assignAll(productsList);
@@ -91,31 +106,18 @@ class SearchViewController extends GetxController {
   }
 
   void updateProductLocally(SearchModel updatedProduct) {
-    print("updateProductLocally çağrıldı. Gelen ürün ID: ${updatedProduct.id}, Yeni img: ${updatedProduct.img}");
-
     final indexInProducts = productsList.indexWhere((item) => item.id == updatedProduct.id);
     if (indexInProducts != -1) {
-      print("productsList içinde bulundu, güncelleniyor. Eski img: ${productsList[indexInProducts].img}");
       productsList[indexInProducts] = updatedProduct;
-    } else {
-      print("productsList içinde ürün bulunamadı: ${updatedProduct.id}");
     }
-
     final indexInSearch = searchResult.indexWhere((item) => item.id == updatedProduct.id);
     if (indexInSearch != -1) {
-      print("searchResult içinde bulundu, güncelleniyor. Eski img: ${searchResult[indexInSearch].img}");
       searchResult[indexInSearch] = updatedProduct;
-    } else {
-      print("searchResult içinde ürün bulunamadı: ${updatedProduct.id}");
     }
-
     calculateTotals();
-
     productsList.refresh();
     searchResult.refresh();
     update();
-
-    print("Güncelleme sonrası productsList[$indexInProducts].img: ${productsList.firstWhereOrNull((p) => p.id == updatedProduct.id)?.img}");
   }
 
   void calculateTotals() {
@@ -123,7 +125,6 @@ class SearchViewController extends GetxController {
     sumCount.value = 0;
     for (var product in productsList) {
       final int count = product.count ?? 0;
-
       totalCount += count;
     }
     sumCount.value = totalCount;
@@ -133,17 +134,12 @@ class SearchViewController extends GetxController {
     productsList.removeWhere((product) => product.id == id);
     searchResult.removeWhere((product) => product.id == id);
     calculateTotals();
-
     update();
   }
 
   void _filterAndSearchProducts() {
     List<SearchModel> GeciciListe = productsList.toList();
-
     productsList.clear();
-    print(GeciciListe.length);
-    print(_activeFilterType);
-    print(_activeFilterValue);
     if (_activeFilterType.isNotEmpty && _activeFilterValue.isNotEmpty) {
       GeciciListe = GeciciListe.where((product) {
         switch (_activeFilterType) {
@@ -168,8 +164,6 @@ class SearchViewController extends GetxController {
         return words.every((w) => name.contains(w) || price.contains(w));
       }).toList();
     }
-    print(productsList.length);
-    print(GeciciListe.length);
     productsList.assignAll(GeciciListe);
   }
 }

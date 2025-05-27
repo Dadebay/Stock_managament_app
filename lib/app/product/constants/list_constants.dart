@@ -12,7 +12,12 @@ enum SortOptions { preparing, readyToShip, shipped, canceled, refund }
 enum ColumnSize { small, medium, large }
 
 class ListConstants {
-  static List adminPages = [const HomeView(), const OrdersView(), const SettingsView(), const SendSMSView()];
+  static List adminPages = [
+    const HomeView(),
+    const OrdersView(),
+    const SendSMSView(),
+    const SettingsView(),
+  ];
   static List pages = [const HomeView(), const OrdersView(), const SettingsView()];
   static List adminName = ['products', 'sales', 'settings', 'Send SMS'];
   static List names = ['products', 'sales', 'settings'];
@@ -33,7 +38,20 @@ class ListConstants {
     'gram',
     'description',
   ];
-
+  static List<Map<String, dynamic>> statusMapping2 = [
+    {'name': 'Preparing', 'sortName': "1", 'size': ColumnSize.small.toString(), 'color': kPrimaryColor2},
+    {'name': 'Ready to ship', 'sortName': "5", 'size': ColumnSize.small.toString(), 'color': Colors.purple},
+    {'name': 'Shipped', 'sortName': "2", 'size': ColumnSize.small.toString(), 'color': Colors.green},
+    {'name': 'Canceled', 'sortName': "3", 'size': ColumnSize.small.toString(), 'color': Colors.red},
+    {'name': 'Refund', 'sortName': "4", 'size': ColumnSize.small.toString(), 'color': Colors.grey},
+  ];
+  static List<Map<String, String>> clientNames = [
+    {'name': 'Client Name', 'sortName': "name", 'size': ColumnSize.medium.toString()},
+    {'name': 'Address', 'sortName': "address", 'size': ColumnSize.medium.toString()},
+    {'name': 'Client number', 'sortName': "number", 'size': ColumnSize.small.toString()},
+    {'name': 'Order count', 'sortName': "order_count", 'size': ColumnSize.small.toString()},
+    {'name': 'Sum price', 'sortName': "sum_price", 'size': ColumnSize.small.toString()},
+  ];
   static List<Map<String, dynamic>> fieldNames = [
     {'field': 'date', 'value': false},
     {'field': 'package', 'value': true},
@@ -58,7 +76,12 @@ class ListConstants {
     {'name': 'locations', 'pageView': "Locations", "countName": 'location', "id": "3", 'size': ColumnSize.small.toString(), "url": ApiConstants.locations},
     {'name': 'materials', 'pageView': "Materials", "countName": 'materials', "id": "4", 'size': ColumnSize.small.toString(), "url": ApiConstants.materials},
   ];
-  static Map<String, Color> colorMapping = {"shipped": Colors.green, "canceled": Colors.red, "refund": Colors.red, "preparing": kPrimaryColor2, "ready to ship": Colors.purple};
-  static Map<String, String> statusMapping = {"preparing": 'Preparing', "readyToShip": 'Ready to ship', "shipped": "Shipped", "canceled": "Canceled", "refund": 'Refund'};
-  static Map<String, SortOptions> statusSortOption = {"preparing": SortOptions.preparing, "readyToShip": SortOptions.readyToShip, "shipped": SortOptions.shipped, "canceled": SortOptions.canceled, "refund": SortOptions.refund};
+  static List<Map<String, dynamic>> statusMapping = [
+    {'name': 'Preparing', 'sortName': "0", 'size': ColumnSize.small.toString(), 'color': kPrimaryColor2},
+    {'name': 'Preparing', 'sortName': "1", 'size': ColumnSize.small.toString(), 'color': kPrimaryColor2},
+    {'name': 'Shipped', 'sortName': "2", 'size': ColumnSize.small.toString(), 'color': Colors.green},
+    {'name': 'Canceled', 'sortName': "3", 'size': ColumnSize.small.toString(), 'color': Colors.red},
+    {'name': 'Refund', 'sortName': "4", 'size': ColumnSize.small.toString(), 'color': Colors.grey},
+    {'name': 'Ready to ship', 'sortName': "5", 'size': ColumnSize.small.toString(), 'color': Colors.purple},
+  ];
 }

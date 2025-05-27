@@ -4,9 +4,14 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:stock_managament_app/app/modules/auth/views/auth_service.dart';
 import 'package:stock_managament_app/app/modules/auth/views/login_view.dart';
+import 'package:stock_managament_app/app/modules/home/controllers/home_controller.dart';
 import 'package:stock_managament_app/app/modules/home/views/bottom_nav_bar.dart';
+import 'package:stock_managament_app/app/modules/orders/controllers/order_controller.dart';
+import 'package:stock_managament_app/app/modules/sendSMS/controllers/clients_controller.dart';
+import 'package:stock_managament_app/app/modules/settings/controllers/settings_controller.dart';
 import 'package:stock_managament_app/app/product/sizes/widget_sizes.dart';
 import 'package:stock_managament_app/app/product/utils/dialog_utils.dart';
 
@@ -18,6 +23,12 @@ class ConnectionCheckView extends StatefulWidget {
 }
 
 class _ConnectionCheckViewState extends State<ConnectionCheckView> {
+  final SearchViewController _searchViewController = Get.put(SearchViewController());
+  final HomeController homeController = Get.put<HomeController>(HomeController());
+  final OrderController orderController = Get.put<OrderController>(OrderController());
+  final SettingsController settingsController = Get.put(SettingsController());
+  final ClientsController clientsController = Get.put(ClientsController());
+
   @override
   void initState() {
     super.initState();
@@ -25,8 +36,7 @@ class _ConnectionCheckViewState extends State<ConnectionCheckView> {
   }
 
   void checkConnection() async {
-    // ignore: unnecessary_null_comparison
-    bool loginValue = AuthStorage().getToken() == null ? false : true;
+    bool loginValue = await AuthStorage().getToken() == null ? false : true;
     try {
       final result = await InternetAddress.lookup('google.com');
       if (result.isNotEmpty && result.first.rawAddress.isNotEmpty) {

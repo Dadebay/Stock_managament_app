@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_iconly/flutter_iconly.dart';
 import 'package:get/get.dart';
 import 'package:kartal/kartal.dart';
-import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:stock_managament_app/app/modules/home/components/product_count_widget.dart';
 import 'package:stock_managament_app/app/modules/home/controllers/home_controller.dart';
 import 'package:stock_managament_app/app/modules/home/controllers/search_model.dart';
@@ -21,11 +20,6 @@ class HomeView extends StatefulWidget {
 
 class _HomeViewState extends State<HomeView> {
   final SearchViewController _searchViewController = Get.find<SearchViewController>();
-  final RefreshController _refreshController = RefreshController(initialRefresh: false);
-
-  Future<void> _onRefresh() async {
-    _refreshController.refreshCompleted();
-  }
 
   @override
   Widget build(BuildContext context) {

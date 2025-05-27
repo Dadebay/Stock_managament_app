@@ -4,15 +4,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:kartal/kartal.dart';
-import 'package:stock_managament_app/app/modules/home/controllers/home_controller.dart';
 import 'package:stock_managament_app/constants/customWidget/constants.dart';
+
+import '../../app/modules/home/controllers/home_controller.dart';
 
 class AgreeButton extends StatelessWidget {
   final Function() onTap;
   final String text;
+  final bool? showBorder;
 
-  AgreeButton({super.key, required this.onTap, required this.text});
-  final HomeController homeController = Get.put(HomeController());
+  AgreeButton({super.key, required this.onTap, required this.text, this.showBorder});
+  final HomeController homeController = Get.find<HomeController>();
 
   @override
   Widget build(BuildContext context) {
@@ -22,19 +24,18 @@ class AgreeButton extends StatelessWidget {
   Widget animatedContaner(BuildContext context) {
     return Obx(() {
       return AnimatedContainer(
-        decoration: const BoxDecoration(borderRadius: borderRadius20, color: kPrimaryColor2),
-        margin: EdgeInsets.symmetric(horizontal: 0, vertical: 8.h),
-        padding: EdgeInsets.symmetric(vertical: 10.h, horizontal: homeController.agreeButton.value ? 0 : 10.h),
+        decoration: BoxDecoration(borderRadius: BorderRadius.circular(20), color: showBorder == true ? Colors.transparent : kPrimaryColor2, border: Border.all(color: kPrimaryColor2)),
+        margin: context.padding.onlyTopNormal,
+        padding: context.padding.normal.copyWith(top: 15, bottom: 15),
         width: homeController.agreeButton.value ? 60.w : Get.size.width,
         duration: const Duration(milliseconds: 800),
+        alignment: Alignment.center,
         child: homeController.agreeButton.value
-            ? Center(
-                child: SizedBox(
-                  width: 34.w,
-                  height: 29.h,
-                  child: const CircularProgressIndicator(
-                    color: Colors.white,
-                  ),
+            ? SizedBox(
+                width: 34.w,
+                height: 25.h,
+                child: const CircularProgressIndicator(
+                  color: Colors.white,
                 ),
               )
             : Text(
@@ -42,7 +43,7 @@ class AgreeButton extends StatelessWidget {
                 textAlign: TextAlign.center,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: context.general.textTheme.titleLarge!.copyWith(color: Colors.white, fontWeight: FontWeight.bold),
+                style: context.general.textTheme.titleLarge!.copyWith(fontWeight: FontWeight.bold, fontSize: 20.sp, color: showBorder == true ? kPrimaryColor2 : Colors.white),
               ),
       );
     });
