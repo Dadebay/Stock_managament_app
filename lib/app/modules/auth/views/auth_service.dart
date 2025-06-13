@@ -1,9 +1,11 @@
 // ignore_for_file: file_names, require_trailing_commas, avoid_void_async, avoid_bool_literals_in_conditional_expressions, depend_on_referenced_packages
 
+import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:stock_managament_app/api_constants.dart';
 import 'package:stock_managament_app/api_service.dart';
 import 'package:stock_managament_app/app/modules/auth/views/enter_model.dart';
+import 'package:stock_managament_app/app/modules/auth/views/login_view.dart';
 
 class AuthStorage {
   final storage = GetStorage();
@@ -60,9 +62,12 @@ class SignInService {
       return (data['results'] as List).map((item) => EnterModel.fromJson(item)).toList();
     } else if (data is List) {
       List<EnterModel> list = [];
+      print(data);
       list = (data).map((item) => EnterModel.fromJson(item)).toList();
       for (var element in list) {
+        print(element.username);
         if (element.username == userName && element.password == password) {
+          print("geldi Mana");
           await _auth.setAdmin(true);
         }
       }
@@ -70,6 +75,16 @@ class SignInService {
     } else {
       return [];
     }
+  }
+
+  Future<dynamic> logOut(BuildContext context) async {
+    final uri = Uri.parse(ApiConstants.logOut);
+    print(uri);
+    print(uri);
+    print(uri);
+    await ApiService().getRequest(uri.toString(), requiresToken: true);
+    await AuthStorage().logout();
+    Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => const SignUpView()));
   }
 
   Future login({required String username, required String password}) async {
@@ -83,7 +98,6 @@ class SignInService {
       requiresToken: false,
       handleSuccess: (responseJson) async {
         if (responseJson['access'] != null) {
-          getClients(username, password);
           await _auth.setToken(responseJson['access']);
           await _auth.setRefreshToken(responseJson['refresh']);
         }

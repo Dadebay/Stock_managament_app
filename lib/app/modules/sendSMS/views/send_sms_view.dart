@@ -1,6 +1,5 @@
 import 'package:background_sms/background_sms.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_iconly/flutter_iconly.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:kartal/kartal.dart';
@@ -12,7 +11,6 @@ import 'package:stock_managament_app/app/modules/sendSMS/views/client_card.dart'
 import 'package:stock_managament_app/app/modules/sendSMS/views/search_widget.dart';
 import 'package:stock_managament_app/app/product/constants/list_constants.dart';
 import 'package:stock_managament_app/constants/buttons/agree_button_view.dart';
-import 'package:stock_managament_app/constants/customWidget/constants.dart';
 import 'package:stock_managament_app/constants/customWidget/custom_text_field.dart';
 import 'package:stock_managament_app/constants/customWidget/widgets.dart';
 
@@ -33,16 +31,16 @@ class _SendSMSViewState extends State<SendSMSView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: kPrimaryColor2,
-        onPressed: () {
-          sendMessage();
-        },
-        child: const Icon(
-          IconlyLight.send,
-          color: Colors.white,
-        ),
-      ),
+      // floatingActionButton: FloatingActionButton(
+      //   backgroundColor: kPrimaryColor2,
+      //   onPressed: () {
+      //     sendMessage();
+      //   },
+      //   child: const Icon(
+      //     IconlyLight.send,
+      //     color: Colors.white,
+      //   ),
+      // ),
       backgroundColor: Colors.white,
       body: FutureBuilder<List<ClientModel>>(
         future: ClientsService().getClients(),

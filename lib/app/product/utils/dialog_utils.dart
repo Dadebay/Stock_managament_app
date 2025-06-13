@@ -264,6 +264,7 @@ class DialogUtils {
                       onTap: onRetry,
                       text: 'noConnection3'.tr,
                     ),
+                    SizedBox(height: WidgetSizes.normal.value),
                   ],
                 ),
               ),

@@ -25,7 +25,7 @@ if (flutterVersionName == null) {
 }
 
 android {
-    namespace "com.gurbanow.stockmanagamentapp"
+    namespace "com.gurbanov.tous"
     compileSdk 34
     ndkVersion flutter.ndkVersion
 
@@ -46,7 +46,7 @@ android {
         checkReleaseBuilds false //<- add this line
     }
     defaultConfig {
-        applicationId "com.gurbanow.stockmanagamentapp"
+        applicationId "com.gurbanov.tous"
         minSdkVersion localProperties.getProperty('flutter.minSdkVersion').toInteger()
         targetSdkVersion localProperties.getProperty('flutter.targetSdkVersion').toInteger()
         versionCode localProperties.getProperty('flutter.versionCode').toInteger()

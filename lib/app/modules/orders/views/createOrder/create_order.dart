@@ -4,11 +4,14 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:kartal/kartal.dart';
 import 'package:stock_managament_app/app/modules/home/controllers/home_controller.dart';
+// import 'package:stock_managament_app/app/modules/home/controllers/home_controller.dart';
 import 'package:stock_managament_app/app/modules/home/controllers/search_model.dart';
 import 'package:stock_managament_app/app/modules/orders/controllers/order_controller.dart';
 import 'package:stock_managament_app/app/modules/orders/controllers/order_model.dart';
 import 'package:stock_managament_app/app/modules/orders/controllers/order_service.dart';
 import 'package:stock_managament_app/app/modules/orders/views/createOrder/select_order_products.dart';
+import 'package:stock_managament_app/app/modules/sendSMS/controllers/client_model.dart';
+import 'package:stock_managament_app/app/modules/sendSMS/controllers/clients_service.dart';
 import 'package:stock_managament_app/app/product/constants/list_constants.dart';
 import 'package:stock_managament_app/constants/buttons/agree_button_view.dart';
 import 'package:stock_managament_app/constants/cards/product_card.dart';
@@ -27,17 +30,33 @@ class OrderCreateView extends StatefulWidget {
 class _OrderCreateViewState extends State<OrderCreateView> {
   List<FocusNode> focusNodes = List.generate(9, (_) => FocusNode());
   final SearchViewController _searchController = Get.find<SearchViewController>();
+  final HomeController _homeController = Get.find<HomeController>();
 
   final OrderController salesController = Get.find<OrderController>();
   String selectedStatus = "Preparing"; // Set an initial value
   List<TextEditingController> textControllers = List.generate(9, (_) => TextEditingController());
-  final _formKey = GlobalKey<FormState>();
+  RxList<ClientModel> allClients = <ClientModel>[].obs;
+  Future<void> fetchClients() async {
+    allClients.value = await ClientsService().getClients();
+  }
 
   @override
   void initState() {
+    fetchClients();
+    _homeController.agreeButton.value = false;
     textControllers[0].text = DateTime.now().toString().substring(0, 19);
     _searchController.selectedProductsToOrder.clear();
     super.initState();
+  }
+
+  List<ClientModel> clientSuggestions = [];
+
+  void onClientSearchChanged(String input) {
+    setState(() {
+      clientSuggestions = allClients.where((client) {
+        return client.phone.contains(input) || client.name.toLowerCase().contains(input.toLowerCase());
+      }).toList();
+    });
   }
 
   @override
@@ -103,27 +122,52 @@ class _OrderCreateViewState extends State<OrderCreateView> {
             unFocus: true,
             readOnly: true,
           ),
-          Form(
-              key: _formKey,
-              child: Column(
-                children: [
-                  PhoneNumber(
-                    mineFocus: focusNodes[2],
-                    controller: textControllers[2],
-                    requestFocus: focusNodes[3],
-                    style: false,
-                    unFocus: true,
-                  ),
-                  CustomTextField(
-                    labelName: "userName",
-                    controller: textControllers[3],
-                    focusNode: focusNodes[3],
-                    requestfocusNode: focusNodes[4],
-                    unFocus: true,
-                    readOnly: true,
-                  ),
-                ],
-              )),
+          Column(
+            children: [
+              PhoneNumber(
+                mineFocus: focusNodes[2],
+                controller: textControllers[2],
+                requestFocus: focusNodes[3],
+                style: false,
+                unFocus: true,
+                onChanged: (value) => onClientSearchChanged(value),
+              ),
+              clientSuggestions.isEmpty
+                  ? const SizedBox.shrink()
+                  : Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text(" ${"clients".tr} - ${clientSuggestions.length}", style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.bold)),
+                        ),
+                        ...clientSuggestions.map((client) => ListTile(
+                              title: Text(
+                                client.name,
+                                style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.bold),
+                              ),
+                              subtitle: Text("+993 ${client.phone} - ${client.address}", maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 14.sp)),
+                              onTap: () {
+                                setState(() {
+                                  textControllers[2].text = client.phone;
+                                  textControllers[3].text = client.name;
+                                  textControllers[4].text = client.address;
+                                  clientSuggestions.clear();
+                                });
+                              },
+                            )),
+                      ],
+                    ),
+              CustomTextField(
+                labelName: "userName",
+                controller: textControllers[3],
+                focusNode: focusNodes[3],
+                requestfocusNode: focusNodes[4],
+                unFocus: true,
+                readOnly: true,
+              ),
+            ],
+          ),
           CustomTextField(
             labelName: "clientAddress",
             controller: textControllers[4],
@@ -185,37 +229,31 @@ class _OrderCreateViewState extends State<OrderCreateView> {
             products.add({'id': element['product'].id, 'count': element['count']});
           }
 
-          final isValid = _formKey.currentState?.validate() ?? false;
-
-          if (isValid) {
-            final OrderModel model = OrderModel(
+          final OrderModel model = OrderModel(
+            id: 0,
+            status: key.toString(),
+            date: textControllers[0].text.substring(0, 10),
+            gaplama: textControllers[1].text,
+            coupon: textControllers[5].text,
+            discount: textControllers[7].text,
+            description: textControllers[6].text,
+            name: "${textControllers[3].text} - ${textControllers[2].text}",
+            clientID: 0,
+            clientDetailModel: ClientDetailModel(
               id: 0,
-              status: key.toString(),
-              date: textControllers[0].text.substring(0, 10),
-              gaplama: textControllers[1].text,
-              coupon: textControllers[5].text,
-              discount: textControllers[7].text,
+              name: textControllers[3].text,
+              address: textControllers[4].text,
+              phone: textControllers[2].text,
               description: textControllers[6].text,
-              name: "${textControllers[3].text} - ${textControllers[2].text}",
-              clientID: 0,
-              clientDetailModel: ClientDetailModel(
-                id: 0,
-                name: textControllers[3].text,
-                address: textControllers[4].text,
-                phone: textControllers[2].text,
-                description: textControllers[6].text,
-                ordercount: '',
-                sumprice: '',
-              ),
-              products: [],
-              count: _searchController.selectedProductsToOrder.length,
-              totalsum: '',
-              totalchykdajy: '',
-            );
-            await OrderService().createOrder(model: model, products: products);
-          } else {
-            showSnackBar('errorTitle', 'loginErrorFillBlanks', Colors.red);
-          }
+              ordercount: '',
+              sumprice: '',
+            ),
+            products: [],
+            count: _searchController.selectedProductsToOrder.length,
+            totalsum: '',
+            totalchykdajy: '',
+          );
+          await OrderService().createOrder(model: model, products: products);
         },
         text: 'agree');
   }

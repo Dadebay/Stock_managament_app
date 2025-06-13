@@ -7,6 +7,25 @@
   "client": [
     {
       "client_info": {
+        "mobilesdk_app_id": "1:808707795977:android:3c87766f01d5ecea9a5cd8",
+        "android_client_info": {
+          "package_name": "com.gurbanov.tous"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAqW9gdT5oBCCtyZu_6LTdQzGlYp1lahEw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
         "mobilesdk_app_id": "1:808707795977:android:a56ff87f44d59b0a9a5cd8",
         "android_client_info": {
           "package_name": "com.gurbanow.stockmanagamentapp"

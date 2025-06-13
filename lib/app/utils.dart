@@ -15,6 +15,7 @@ class MyTranslations extends Translations {
           'client_number': 'Telefon belgisi',
           'client_address': 'Ulanyjy salgysy',
           'client_name': 'Ulanyjy ady',
+          'clients': 'Meňzeş ulanyjylar',
           'coupon': 'Coupon',
           'product_count': 'Jemi haryt sany ',
           "Preparing": "Taýýarlanýar",

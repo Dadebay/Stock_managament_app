@@ -5,6 +5,7 @@ class ClientsController extends GetxController {
   RxList<ClientModel> clients = <ClientModel>[].obs;
   RxList<ClientModel> searchResult = <ClientModel>[].obs;
   RxInt currentPage = 1.obs;
+
   onSearchTextChanged(String word) {
     searchResult.clear();
     if (word.isEmpty) {

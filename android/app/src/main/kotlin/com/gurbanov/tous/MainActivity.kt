@@ -1,4 +1,4 @@
-package com.gurbanow.stock_managament_app
+package com.gurbanov.tous
 
 import io.flutter.embedding.android.FlutterActivity
 

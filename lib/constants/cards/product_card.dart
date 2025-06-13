@@ -17,9 +17,12 @@ class ProductCard extends StatefulWidget {
     required this.product,
     required this.orderView,
     required this.addCounterWidget,
+    this.externalCount,
   });
 
   final bool addCounterWidget;
+  final int? externalCount;
+
   final bool orderView;
   final SearchModel product;
 
@@ -72,7 +75,7 @@ class _ProductCardState extends State<ProductCard> {
               ),
             ),
             Text(
-              '${"productCount".tr} : ${widget.product.count}',
+              '${"productCount".tr} : ${widget.externalCount ?? widget.product.count}',
               style: context.general.textTheme.bodyMedium!.copyWith(color: Colors.grey),
             ),
           ],
@@ -149,7 +152,7 @@ class _ProductCardState extends State<ProductCard> {
                     style: context.general.textTheme.bodyLarge!.copyWith(fontWeight: FontWeight.bold),
                   ),
                   Text(
-                    "${"quantity".tr}: ${widget.product.count}",
+                    "${"quantity".tr}: ${widget.externalCount ?? widget.product.count}",
                     overflow: TextOverflow.ellipsis,
                     style: context.general.textTheme.bodyLarge!.copyWith(color: Colors.grey),
                   ),

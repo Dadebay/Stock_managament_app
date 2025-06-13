@@ -4,6 +4,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:stock_managament_app/app/modules/auth/views/auth_service.dart';
 import 'package:stock_managament_app/app/modules/auth/views/login_view.dart';
@@ -12,7 +13,6 @@ import 'package:stock_managament_app/app/modules/home/views/bottom_nav_bar.dart'
 import 'package:stock_managament_app/app/modules/orders/controllers/order_controller.dart';
 import 'package:stock_managament_app/app/modules/sendSMS/controllers/clients_controller.dart';
 import 'package:stock_managament_app/app/modules/settings/controllers/settings_controller.dart';
-import 'package:stock_managament_app/app/product/sizes/widget_sizes.dart';
 import 'package:stock_managament_app/app/product/utils/dialog_utils.dart';
 
 class ConnectionCheckView extends StatefulWidget {
@@ -45,7 +45,11 @@ class _ConnectionCheckViewState extends State<ConnectionCheckView> {
         });
       }
     } on SocketException catch (_) {
-      DialogUtils.showNoConnectionDialog(onRetry: () {}, context: context);
+      DialogUtils.showNoConnectionDialog(
+          onRetry: () {
+            Get.back();
+          },
+          context: context);
     }
   }
 
@@ -56,9 +60,7 @@ class _ConnectionCheckViewState extends State<ConnectionCheckView> {
         children: [
           Expanded(
             child: Center(
-              child: FlutterLogo(
-                size: WidgetSizes.high2x.value,
-              ),
+              child: Image.asset('assets/image/ic_launcher.webp', width: 200.w, height: 200.h),
             ),
           ),
           const LinearProgressIndicator(),

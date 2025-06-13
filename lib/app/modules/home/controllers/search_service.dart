@@ -18,9 +18,9 @@ class SearchService {
   Future<List<SearchModel>> getProducts() async {
     final data = await ApiService().getRequest(ApiConstants.products, requiresToken: true);
     if (data is Map && data['results'] != null) {
-      return (data['results'] as List).map((item) => SearchModel.fromJson(item)).toList().reversed.toList();
+      return (data['results'] as List).map((item) => SearchModel.fromJson(item)).toList();
     } else if (data is List) {
-      return (data).map((item) => SearchModel.fromJson(item)).toList().reversed.toList();
+      return (data).map((item) => SearchModel.fromJson(item)).toList();
     } else {
       return [];
     }

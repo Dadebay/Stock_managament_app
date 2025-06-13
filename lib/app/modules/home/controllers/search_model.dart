@@ -154,3 +154,32 @@ class LocationModel {
     );
   }
 }
+
+class ProductModel {
+  final int id;
+  final int count;
+  final SearchModel? product;
+
+  ProductModel({
+    required this.id,
+    required this.count,
+    required this.product,
+  });
+
+  factory ProductModel.fromJson(Map<String, dynamic> json) {
+    return ProductModel(
+      id: json['id'] ?? 0,
+      count: json['count'] ?? 0,
+      product: SearchModel.fromJson(json['product']),
+    );
+  }
+
+  // Nesneyi JSON'a çevirme
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'count': count,
+      'product': product,
+    };
+  }
+}

@@ -90,6 +90,8 @@ class ApiService {
         default:
           throw UnsupportedError('Unsupported HTTP method: $method');
       }
+      print(response.body);
+      print(response.statusCode);
       if ([200, 201, 204].contains(response.statusCode)) {
         if (response.statusCode == 204) {
           await handleSuccess!({"statusCode": response.statusCode});
@@ -102,11 +104,20 @@ class ApiService {
         return responseJson ?? response.statusCode;
       } else {
         final responseJson = response.body.isNotEmpty ? json.decode(response.body) : {};
-        _handleApiError(
-          response.statusCode,
-          responseJson['message']?.toString() ?? 'anErrorOccurred'.tr,
-        );
-        return response.statusCode;
+        String a = responseJson;
+        if (a.isEmpty) {
+          _handleApiError(
+            response.statusCode,
+            responseJson['message']?.toString() ?? 'anErrorOccurred'.tr,
+          );
+        } else {
+          _handleApiError(
+            response.statusCode,
+            a.toString(),
+          );
+        }
+
+        return null;
       }
     } on SocketException {
       showSnackBar('networkError'.tr, 'noInternet'.tr, Colors.red);
@@ -122,6 +133,9 @@ class ApiService {
         break;
       case 401:
         errorMessage = '${'unauthorized'.tr}: $message';
+        break;
+      case 403:
+        errorMessage = message;
         break;
       case 404:
         errorMessage = '${'notFound'.tr}: $message';

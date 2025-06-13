@@ -30,7 +30,12 @@ class _BottomNavBarState extends State<BottomNavBar> {
   @override
   void initState() {
     super.initState();
+    findAdmin();
+  }
+
+  findAdmin() async {
     isAdmin = storage.read('isAdmin') ?? false;
+    setState(() {});
   }
 
   @override
@@ -55,7 +60,9 @@ class _BottomNavBarState extends State<BottomNavBar> {
         selectedLabelStyle: context.general.textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.bold),
         unselectedLabelStyle: context.textTheme.bodyLarge,
         currentIndex: selectedIndex,
-        onTap: (index) => setState(() => selectedIndex = index),
+        onTap: (index) {
+          setState(() => selectedIndex = index);
+        },
         items: buildBottomNavItems(),
       ),
       body: isAdmin ? ListConstants.adminPages[selectedIndex] : ListConstants.pages[selectedIndex],
@@ -151,10 +158,10 @@ class _BottomNavBarState extends State<BottomNavBar> {
       items.insert(
         2,
         BottomNavigationBarItem(
-          icon: const Icon(IconlyLight.chat),
-          activeIcon: const Icon(IconlyBold.chat),
-          label: 'SMS'.tr,
-          tooltip: 'SMS'.tr,
+          icon: const Icon(IconlyLight.user3),
+          activeIcon: const Icon(IconlyBold.user3),
+          label: 'profil'.tr,
+          tooltip: 'profil'.tr,
         ),
       );
     }

@@ -14,7 +14,8 @@ class PhoneNumber extends StatelessWidget {
   final bool style;
   final bool? disabled;
   final bool unFocus;
-  const PhoneNumber({required this.mineFocus, required this.controller, required this.requestFocus, required this.style, this.disabled, required this.unFocus});
+  const PhoneNumber({required this.mineFocus, required this.controller, this.onChanged, required this.requestFocus, required this.style, this.disabled, required this.unFocus});
+  final ValueChanged<String>? onChanged;
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +23,7 @@ class PhoneNumber extends StatelessWidget {
       padding: EdgeInsets.only(top: 15.h),
       child: TextFormField(
         enabled: disabled ?? true,
-        style: const TextStyle(color: Colors.black, fontSize: 18, fontFamily: gilroyMedium),
+        style: const TextStyle(color: Colors.black, fontSize: 18, fontWeight: FontWeight.w500),
         cursorColor: Colors.black,
         textInputAction: TextInputAction.next,
         keyboardType: TextInputType.number,
@@ -42,6 +43,7 @@ class PhoneNumber extends StatelessWidget {
         onEditingComplete: () {
           unFocus ? FocusScope.of(context).unfocus() : requestFocus.requestFocus();
         },
+        onChanged: onChanged,
         enableSuggestions: false,
         autocorrect: false,
         decoration: InputDecoration(

@@ -6,6 +6,7 @@ import 'package:stock_managament_app/app/modules/sendSMS/controllers/clients_con
 
 class ClientsService {
   final ClientsController clientsController = Get.find();
+
   Future<List<ClientModel>> getClients() async {
     final uri = Uri.parse(ApiConstants.clients);
     final data = await ApiService().getRequest(uri.toString(), requiresToken: true);

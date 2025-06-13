@@ -55,40 +55,28 @@ class _OrderProductsViewState extends State<OrderProductsView> {
     if (_currentOrder.id == 0) {
       return SizedBox(height: 300, child: Center(child: Text("Order ID is missing".tr)));
     }
-    return FutureBuilder<List<SearchModel>>(
+    return FutureBuilder<List<ProductModel>>(
       future: OrderService().getOrderProduct(_currentOrder.id),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) return spinKit();
         if (snapshot.hasError) return SizedBox(height: 300, child: Center(child: Text('Error: ${snapshot.error}'.tr)));
         if (!snapshot.hasData || snapshot.data!.isEmpty) {
-          if (_currentOrder.products.isNotEmpty) {
-            final products = _currentOrder.products;
-            return ListView.builder(
-              itemCount: products.length,
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              padding: EdgeInsets.symmetric(horizontal: 10.w),
-              itemBuilder: (context, index) => ProductCard(
-                product: products[index],
-                addCounterWidget: false,
-                orderView: true,
-              ),
-            );
-          }
           return SizedBox(height: 300, child: emptyData());
         }
 
         final products = snapshot.data!;
-        print(products);
+
         return ListView.builder(
             itemCount: products.length,
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
             padding: EdgeInsets.symmetric(horizontal: 10.w),
             itemBuilder: (context, index) {
-              print(products[index].name);
+              final productModel = products[index];
+              print(productModel.count);
               return ProductCard(
-                product: products[index],
+                product: productModel.product!,
+                externalCount: productModel.count,
                 addCounterWidget: false,
                 orderView: true,
               );
