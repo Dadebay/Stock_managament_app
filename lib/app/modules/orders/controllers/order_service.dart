@@ -2,7 +2,6 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:http/http.dart' as http;
 import 'package:stock_managament_app/api_constants.dart';
 import 'package:stock_managament_app/api_service.dart';
 import 'package:stock_managament_app/app/modules/auth/views/auth_service.dart';
@@ -51,6 +50,7 @@ class OrderService {
       'products': products,
     };
     print(body);
+    print(products);
     return ApiService().handleApiRequest(
       endpoint: ApiConstants.order,
       method: 'POST',
@@ -82,7 +82,11 @@ class OrderService {
       'Content-Type': 'application/json; charset=UTF-8',
       'Authorization': 'Bearer $token',
     };
-
+    List<Map<String, int>> products = [];
+    for (var element in model.products) {
+      print(element.count);
+      products.add({'id': element.id, 'count': element.count});
+    }
     final body = json.encode({
       'status': int.parse(model.status),
       'gaplama': model.gaplama,
@@ -96,18 +100,23 @@ class OrderService {
       'coupon': model.coupon,
       'description': model.description,
       "count": model.count,
-      // 'products': model.products
+      'products': products
     });
-    final response = await http.put(url, headers: headers, body: body);
 
-    if (response.statusCode == 200 || response.statusCode == 201) {
-      final jsonResponse = json.decode(response.body);
-      final updatedOrder = OrderModel.fromJson(jsonResponse);
-      Get.back();
+    print(body);
+    return null;
+    // print(response.body);
+    // print(response.statusCode);
+    // final response = await http.put(url, headers: headers, body: body);
 
-      return updatedOrder;
-    } else {
-      return null;
-    }
+    // if (response.statusCode == 200 || response.statusCode == 201) {
+    //   final jsonResponse = json.decode(response.body);
+    //   final updatedOrder = OrderModel.fromJson(jsonResponse);
+    //   Get.back();
+
+    //   return updatedOrder;
+    // } else {
+    //   return null;
+    // }
   }
 }

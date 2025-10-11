@@ -105,18 +105,17 @@ class SearchViewController extends GetxController {
     update();
   }
 
-  void updateProductLocally(SearchModel updatedProduct) {
-    final indexInProducts = productsList.indexWhere((item) => item.id == updatedProduct.id);
-    if (indexInProducts != -1) {
-      productsList[indexInProducts] = updatedProduct;
-    }
-    final indexInSearch = searchResult.indexWhere((item) => item.id == updatedProduct.id);
-    if (indexInSearch != -1) {
-      searchResult[indexInSearch] = updatedProduct;
+  void updateProductLocally(int id, SearchModel model) {
+    print("Den geldi--------------------------------------------- $id");
+
+    for (var item in productsList) {
+      if (item.id.toString() == id.toString()) {
+        print("Den geldi--------------------------------------------- ");
+        productsList[productsList.indexOf(item)] = model;
+      }
     }
     calculateTotals();
     productsList.refresh();
-    searchResult.refresh();
     update();
   }
 

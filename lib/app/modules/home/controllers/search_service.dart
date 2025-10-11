@@ -35,7 +35,7 @@ class SearchService {
     }
   }
 
-  Future<void> updateProductWithImage({
+  Future<SearchModel> updateProductWithImage({
     required int id,
     required Map<String, String> fields,
     Uint8List? imageBytes,
@@ -47,34 +47,43 @@ class SearchService {
     if (token == null) {
       throw Exception('Authentication token not found.');
     }
+
     request.headers['Authorization'] = 'Bearer $token';
     request.fields.addAll(fields);
-
-    if (imageBytes != null && imageFileName != null && imageFileName.isNotEmpty) {
+    if (imageBytes != null && (imageFileName!.isNotEmpty)) {
       String extension = imageFileName.split('.').last.toLowerCase();
-      if (extension.isEmpty) {
-        extension = 'png'; // Varsayılan bir uzantı, eğer dosya adında yoksa
-      }
+      if (extension.isEmpty) extension = 'png';
       extension = (extension == 'jpg') ? 'jpeg' : extension;
+
+      print('imageBytes length: ${imageBytes.length}');
+      print('Adding image file: $imageFileName');
 
       request.files.add(http.MultipartFile.fromBytes(
         'img',
         imageBytes,
         filename: imageFileName,
-        contentType: MediaType('image', extension), // Dinamik içerik tipi
+        contentType: MediaType('image', extension),
       ));
     }
+    request.fields.forEach((key, value) {
+      print("$key: $value");
+    });
+    for (var file in request.files) {
+      print("File: ${file.filename}, ContentType: ${file.contentType}");
+    }
+
     try {
       final streamedResponse = await request.send();
       final responseBody = await streamedResponse.stream.bytesToString();
       final statusCode = streamedResponse.statusCode;
+      print("Update response body: $responseBody");
+
       if (statusCode == 200) {
         final jsonData = jsonDecode(responseBody);
         final updatedModel = SearchModel.fromJson(jsonData);
-        searchViewController.updateProductLocally(updatedModel);
-        // SnackBar zaten ProductProfilView içinde gösteriliyor.
+
+        return updatedModel;
       } else {
-        // Hata durumunu daha iyi ele almak için
         String errorMessage = "Failed to update product. Status code: $statusCode";
         try {
           final errorJson = jsonDecode(responseBody);
@@ -84,7 +93,6 @@ class SearchService {
             errorMessage = errorJson.toString();
           }
         } catch (e) {
-          // JSON parse edilemezse, ham body'yi kullan
           errorMessage += "\nResponse: $responseBody";
         }
         throw Exception(errorMessage);

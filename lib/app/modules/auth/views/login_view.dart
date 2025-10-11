@@ -73,7 +73,8 @@ class _SignUpViewState extends State<SignUpView> {
                 child: AgreeButton(
                   onTap: () async {
                     if (_formKey.currentState!.validate()) {
-                      homeController.agreeButton.value = !homeController.agreeButton.value;
+                      homeController.agreeButton.toggle();
+
                       await SignInService().login(username: textEditingController.text, password: textEditingController1.text).then((value) async {
                         if (value != null) {
                           await SignInService().getClients(textEditingController.text, textEditingController1.text);
@@ -84,7 +85,7 @@ class _SignUpViewState extends State<SignUpView> {
                           showSnackBar('errorTitle', 'alreadyExist', Colors.red);
                         }
                       });
-                      homeController.agreeButton.value = !homeController.agreeButton.value;
+                      homeController.agreeButton.toggle();
                     } else {
                       showSnackBar('errorTitle', 'loginErrorFillBlanks', Colors.red);
                     }

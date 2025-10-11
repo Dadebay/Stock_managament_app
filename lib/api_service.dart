@@ -90,8 +90,11 @@ class ApiService {
         default:
           throw UnsupportedError('Unsupported HTTP method: $method');
       }
-      print(response.body);
+      print(endpoint);
+      print(body);
       print(response.statusCode);
+
+      print(response.body);
       if ([200, 201, 204].contains(response.statusCode)) {
         if (response.statusCode == 204) {
           await handleSuccess!({"statusCode": response.statusCode});

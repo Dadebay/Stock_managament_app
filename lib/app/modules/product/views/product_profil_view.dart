@@ -7,7 +7,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:kartal/kartal.dart';
-import 'package:stock_managament_app/api_constants.dart';
 import 'package:stock_managament_app/app/modules/home/controllers/home_controller.dart';
 import 'package:stock_managament_app/app/modules/home/controllers/search_model.dart';
 import 'package:stock_managament_app/app/modules/home/controllers/search_service.dart';
@@ -29,43 +28,56 @@ class ProductProfilView extends StatefulWidget {
 }
 
 class _ProductProfilViewState extends State<ProductProfilView> {
-  List<FocusNode> focusNodes = List.generate(10, (_) => FocusNode());
-  String imageURL = "";
-  List<TextEditingController> textControllers = List.generate(10, (_) => TextEditingController());
+  final SearchViewController controller = Get.find<SearchViewController>();
 
-  final HomeController _homeController = Get.find<HomeController>();
+  late SearchModel currentProduct;
+  late List<String?> selectedIds;
+  final int fieldCount = 11;
+  late List<FocusNode> focusNodes;
+  late List<TextEditingController> textControllers;
   File? _photo;
   final ImagePicker _picker = ImagePicker();
+
   @override
   void initState() {
     super.initState();
-    changeData();
-  }
-
-  final int fieldCount = 9;
-  final SearchViewController controller = Get.find<SearchViewController>();
-
-  void changeData() {
+    currentProduct = widget.product;
+    focusNodes = List.generate(fieldCount, (_) => FocusNode());
+    textControllers = List.generate(fieldCount, (_) => TextEditingController());
     selectedIds = List<String?>.filled(fieldCount, null);
-    imageURL = widget.product.img!;
-    textControllers[0].text = widget.product.name;
-    textControllers[1].text = widget.product.price.toString();
-    textControllers[2].text = widget.product.count.toString();
-
-    textControllers[3].text = widget.product.category!.name;
-    textControllers[4].text = widget.product.brend!.name;
-    textControllers[5].text = widget.product.material!.name.toString();
-    textControllers[6].text = widget.product.location!.name.toString();
-    textControllers[7].text = widget.product.gramm.toString();
-
-    textControllers[8].text = widget.product.description.toString();
-    selectedIds[3] = widget.product.category?.id.toString(); // category
-    selectedIds[4] = widget.product.brend?.id.toString(); // brend
-    selectedIds[5] = widget.product.location?.id.toString(); // location
-    selectedIds[6] = widget.product.material?.id.toString();
+    _populateTextFields();
   }
 
-  late List<String?> selectedIds;
+  @override
+  void dispose() {
+    for (var controller in textControllers) {
+      controller.dispose();
+    }
+    for (var node in focusNodes) {
+      node.dispose();
+    }
+    controller.clearSelectedImage();
+    super.dispose();
+  }
+
+  void _populateTextFields() {
+    textControllers[0].text = currentProduct.name;
+    textControllers[1].text = currentProduct.price;
+    textControllers[2].text = currentProduct.createdAT.length > 15 ? currentProduct.createdAT.toString().replaceAll("T", " ").substring(0, 16) : currentProduct.createdAT.toString().replaceAll("T", " ");
+    textControllers[3].text = currentProduct.category?.name ?? '';
+    textControllers[4].text = currentProduct.brend?.name ?? '';
+    textControllers[5].text = currentProduct.location?.name ?? '';
+    textControllers[6].text = currentProduct.material?.name ?? '';
+    textControllers[7].text = currentProduct.gramm;
+    textControllers[8].text = currentProduct.count.toString();
+    textControllers[9].text = currentProduct.description;
+    textControllers[10].text = currentProduct.gaplama;
+
+    selectedIds[3] = currentProduct.category?.id.toString();
+    selectedIds[4] = currentProduct.brend?.id.toString();
+    selectedIds[5] = currentProduct.location?.id.toString();
+    selectedIds[6] = currentProduct.material?.id.toString();
+  }
 
   void _showPicker(BuildContext context) {
     void pickImage(ImageSource source) async {
@@ -76,6 +88,7 @@ class _ProductProfilViewState extends State<ProductProfilView> {
         controller.selectedImageBytes.value = await _photo!.readAsBytes();
         controller.selectedImageFileName.value = _photo!.path.split('/').last;
         setState(() {});
+        await _handleUpdate();
       }
     }
 
@@ -103,100 +116,38 @@ class _ProductProfilViewState extends State<ProductProfilView> {
     );
   }
 
-  Column textFields(BuildContext context) {
+  Widget _buildTextFields(BuildContext context) {
+    List editFields = [true, false, false, true, true, true, true, true, false, true, true];
     return Column(
-      children: [
-        CustomTextField(readOnly: true, labelName: 'productName', maxline: 3, controller: textControllers[0], focusNode: focusNodes[0], requestfocusNode: focusNodes[1], unFocus: false),
-        CustomTextField(readOnly: false, labelName: 'price', controller: textControllers[1], focusNode: focusNodes[5], requestfocusNode: focusNodes[6], unFocus: false),
-        CustomTextField(readOnly: false, labelName: 'quantity', controller: textControllers[2], focusNode: focusNodes[7], requestfocusNode: focusNodes[8], unFocus: false),
-        CustomTextField(
-            onTap: () {
-              focusNodes[1].unfocus();
+      children: List.generate(fieldCount, (index) {
+        final label = ListConstants.fieldLabels[index];
+        final isSelectableField = index == 3 || index == 4 || index == 5 || index == 6;
+
+        return CustomTextField(
+          onTap: () {
+            if (isSelectableField) {
+              final fieldName = ListConstants.apiFieldNames[index];
+              final url = ListConstants.four_in_one_names.firstWhere((element) => element['countName'] == fieldName)['url'].toString();
               DialogUtils().showSelectableDialog(
                 context: context,
-                title: 'Category',
-                url: ApiConstants.categories,
-                targetController: textControllers[3],
+                title: label,
+                url: url,
+                targetController: textControllers[index],
                 onIdSelected: (id) {
-                  selectedIds[3] = id;
+                  selectedIds[index] = id;
                 },
               );
-            },
-            readOnly: true,
-            labelName: 'category',
-            controller: textControllers[3],
-            focusNode: focusNodes[1],
-            requestfocusNode: focusNodes[2],
-            unFocus: true),
-        CustomTextField(
-            onTap: () {
-              focusNodes[2].unfocus();
-              DialogUtils().showSelectableDialog(
-                context: context,
-                title: 'Brands',
-                url: ApiConstants.brends,
-                targetController: textControllers[4],
-                onIdSelected: (id) {
-                  selectedIds[4] = id;
-                },
-              );
-            },
-            readOnly: true,
-            labelName: 'brand',
-            controller: textControllers[4],
-            focusNode: focusNodes[2],
-            requestfocusNode: focusNodes[3],
-            unFocus: true),
-        CustomTextField(
-            onTap: () {
-              focusNodes[4].unfocus();
-              DialogUtils().showSelectableDialog(
-                context: context,
-                title: 'Materials',
-                url: ApiConstants.materials,
-                targetController: textControllers[5],
-                onIdSelected: (id) {
-                  selectedIds[5] = id;
-                },
-              );
-            },
-            readOnly: true,
-            labelName: 'material',
-            controller: textControllers[5],
-            focusNode: focusNodes[4],
-            requestfocusNode: focusNodes[5],
-            unFocus: true),
-        CustomTextField(
-            onTap: () {
-              focusNodes[6].unfocus();
-              DialogUtils().showSelectableDialog(
-                context: context,
-                title: 'Locations',
-                url: ApiConstants.locations,
-                targetController: textControllers[6],
-                onIdSelected: (id) {
-                  selectedIds[6] = id;
-                },
-              );
-            },
-            readOnly: true,
-            labelName: 'location',
-            controller: textControllers[6],
-            focusNode: focusNodes[6],
-            requestfocusNode: focusNodes[7],
-            unFocus: true),
-        CustomTextField(readOnly: true, labelName: 'gramm', controller: textControllers[7], focusNode: focusNodes[3], requestfocusNode: focusNodes[4], unFocus: true),
-        CustomTextField(readOnly: true, maxline: 3, labelName: 'note', controller: textControllers[8], focusNode: focusNodes[8], requestfocusNode: focusNodes[1], unFocus: true),
-        AgreeButton(
-          onTap: () async {
-            _handleUpdate();
+            }
           },
-          text: "agree",
-        ),
-        SizedBox(
-          height: 30.h,
-        )
-      ],
+          labelName: label,
+          readOnly: editFields[index],
+          controller: textControllers[index],
+          focusNode: focusNodes[index],
+          requestfocusNode: (index < fieldCount - 1) ? focusNodes[index + 1] : focusNodes[0],
+          maxline: (ListConstants.apiFieldNames[index] == 'description') ? 3 : 1,
+          unFocus: false,
+        );
+      }),
     );
   }
 
@@ -204,99 +155,89 @@ class _ProductProfilViewState extends State<ProductProfilView> {
     Map<String, String> productData = {};
     for (int i = 0; i < fieldCount; i++) {
       final key = ListConstants.apiFieldNames[i];
-
-      if (ListConstants.apiFieldNames[i] == 'category' || ListConstants.apiFieldNames[i] == 'brends' || ListConstants.apiFieldNames[i] == 'materials' || ListConstants.apiFieldNames[i] == 'location') {
-        final selectedId = selectedIds[i];
-        if (selectedId == null || selectedId.isEmpty) {
-          productData[key] = '';
-          continue;
-        }
-        productData[key] = selectedId == 0 ? '' : selectedId.toString();
-        if (productData[key] == '0') {
-          productData[key] = '';
-        }
+      if ([3, 4, 5, 6].contains(i)) {
+        productData[key] = selectedIds[i].toString() == '0' ? '' : selectedIds[i] ?? '';
       } else {
-        if (textControllers[i].text == '' || textControllers[i].text.isEmpty) {
-          productData[key] = '';
-          continue;
-        }
         productData[key] = textControllers[i].text;
       }
     }
+
     String? finalImageFileName;
     if (controller.selectedImageBytes.value != null) {
-      finalImageFileName = controller.selectedImageFileName.value; // Resim seçildiyse dosya adını al
-      if (finalImageFileName == null || finalImageFileName.isEmpty) {
-        finalImageFileName = "${widget.product.name}_updated.png";
-      }
+      finalImageFileName = controller.selectedImageFileName.value ?? "${currentProduct.name}_updated.png";
     }
+    print("barik geldi0000---------------------------------");
+    try {
+      final updatedProduct = await SearchService().updateProductWithImage(
+        id: currentProduct.id,
+        fields: productData,
+        imageBytes: controller.selectedImageBytes.value,
+        imageFileName: finalImageFileName,
+      );
 
-    await SearchService().updateProductWithImage(id: widget.product.id, fields: productData, imageBytes: controller.selectedImageBytes.value, imageFileName: finalImageFileName).then((_) {
-      Get.back();
+      setState(() {
+        currentProduct = updatedProduct;
+        controller.updateProductLocally(widget.product.id, currentProduct);
+        _populateTextFields();
+        _photo = null;
+      });
+
       showSnackBar("Success", "Product updated successfully", Colors.green);
-    }).catchError((error) {
+    } catch (error) {
       showSnackBar("Error", "Failed to update product: $error", Colors.red);
-    });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        backgroundColor: Colors.white,
-        appBar: CustomAppBar(backArrow: true, centerTitle: true, actionIcon: false, name: widget.product.name),
-        body: ListView(
-          padding: context.padding.horizontalNormal,
-          children: [
-            GestureDetector(
-              onTap: () {
-                _showPicker(context);
-              },
-              child: Container(
-                width: Get.size.width,
-                height: Get.size.height / 2.5,
-                margin: const EdgeInsets.only(top: 10),
-                decoration: BoxDecoration(
-                    color: Colors.grey.shade200,
-                    boxShadow: const [
-                      BoxShadow(
-                        color: Colors.grey,
-                        blurRadius: 5.0,
-                      ),
-                    ],
-                    borderRadius: borderRadius25),
-                child: _photo != null
-                    ? ClipRRect(
-                        borderRadius: borderRadius25,
-                        child: Image.file(
-                          _photo!,
-                          fit: BoxFit.cover,
-                        ),
-                      )
-                    : CachedNetworkImage(
-                        fadeInCurve: Curves.ease,
-                        imageUrl: imageURL,
-                        useOldImageOnUrlChange: true,
-                        imageBuilder: (context, imageProvider) => Container(
-                          width: Get.size.width,
-                          decoration: BoxDecoration(
-                            borderRadius: borderRadius25,
-                            image: DecorationImage(
-                              image: imageProvider,
-                              fit: BoxFit.cover,
-                            ),
-                          ),
-                        ),
-                        placeholder: (context, url) => const Center(
-                          child: CircularProgressIndicator(),
-                        ),
-                        errorWidget: (context, url, error) => Center(
-                          child: Text('noImage'.tr),
-                        ),
-                      ),
+      backgroundColor: Colors.white,
+      appBar: CustomAppBar(
+        backArrow: true,
+        centerTitle: true,
+        actionIcon: false,
+        name: currentProduct.name,
+      ),
+      body: ListView(
+        padding: context.padding.horizontalNormal,
+        children: [
+          GestureDetector(
+            onTap: () => _showPicker(context),
+            child: Container(
+              width: Get.size.width,
+              height: Get.size.height / 2.5,
+              margin: const EdgeInsets.only(top: 10),
+              decoration: BoxDecoration(
+                color: Colors.grey.shade200,
+                boxShadow: const [BoxShadow(color: Colors.grey, blurRadius: 5.0)],
+                borderRadius: borderRadius25,
               ),
+              child: _photo != null
+                  ? ClipRRect(
+                      borderRadius: borderRadius25,
+                      child: Image.file(_photo!, fit: BoxFit.cover),
+                    )
+                  : CachedNetworkImage(
+                      imageUrl: currentProduct.img!,
+                      imageBuilder: (context, imageProvider) => Container(
+                        decoration: BoxDecoration(
+                          borderRadius: borderRadius25,
+                          image: DecorationImage(image: imageProvider, fit: BoxFit.cover),
+                        ),
+                      ),
+                      placeholder: (context, url) => const Center(child: CircularProgressIndicator()),
+                      errorWidget: (context, url, error) => Center(child: Text('noImage'.tr)),
+                    ),
             ),
-            textFields(context)
-          ],
-        ));
+          ),
+          _buildTextFields(context),
+          AgreeButton(
+            onTap: _handleUpdate,
+            text: "Update Product",
+          ),
+          SizedBox(height: 30.h),
+        ],
+      ),
+    );
   }
 }

@@ -19,25 +19,47 @@ class ListConstants {
     const SettingsView(),
   ];
   static List pages = [const HomeView(), const OrdersView(), const SettingsView()];
-  static List adminName = ['products', 'sales', 'settings', 'Send SMS'];
-  static List names = ['products', 'sales', 'settings'];
+  static List adminName = [
+    'products',
+    'sales',
+    'users',
+    'settings',
+  ];
+  static List names = ['products', 'sales', 'users', 'settings'];
   static List filters = [
     {'name': 'Brands', 'searchName': 'brends'},
     {'name': 'Categories', 'searchName': 'category'},
     {'name': 'Locations', 'searchName': 'location'},
     {'name': 'Materials', 'searchName': 'material'}
   ];
+  static final List<String> fieldLabels = [
+    'name',
+    'sellPrice',
+    "date",
+    'category',
+    'brand',
+    'location',
+    'material',
+    'Gram',
+    'count',
+    'note',
+    'Package (Gaplama)',
+  ];
+
   static final List<String> apiFieldNames = [
     'name',
     'price',
-    'count',
+    'date',
     'category',
     'brends',
-    'materials',
     'location',
+    'materials',
     'gram',
+    'count',
     'description',
+    'gaplama',
   ];
+
   static List<Map<String, dynamic>> statusMapping2 = [
     {'name': 'Preparing', 'sortName': "1", 'size': ColumnSize.small.toString(), 'color': kPrimaryColor2},
     {'name': 'Ready to ship', 'sortName': "5", 'size': ColumnSize.small.toString(), 'color': Colors.purple},

@@ -4,6 +4,7 @@ import 'package:flutter_iconly/flutter_iconly.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:kartal/kartal.dart';
+import 'package:stock_managament_app/api_constants.dart';
 import 'package:stock_managament_app/app/modules/home/controllers/home_controller.dart';
 import 'package:stock_managament_app/app/modules/home/controllers/search_model.dart';
 import 'package:stock_managament_app/app/modules/product/views/product_profil_view.dart';
@@ -40,6 +41,12 @@ class _ProductCardState extends State<ProductCard> {
   }
 
   Widget counterWidget(BuildContext context) {
+    String url = '';
+    if (widget.product.img!.contains(ApiConstants.imageURL)) {
+      url = widget.product.img!;
+    } else {
+      url = ApiConstants.imageURL2 + widget.product.img!;
+    }
     return Container(
       margin: context.padding.onlyTopNormal,
       decoration: BoxDecoration(
@@ -63,7 +70,7 @@ class _ProductCardState extends State<ProductCard> {
               border: Border.all(color: kPrimaryColor2.withOpacity(.3), width: 1),
             ),
             width: 70,
-            child: imageView(imageURl: widget.product.img!)),
+            child: imageView(imageURl: url)),
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -125,6 +132,12 @@ class _ProductCardState extends State<ProductCard> {
   }
 
   GestureDetector noCounterWidget() {
+    String url = '';
+    if (widget.product.img!.contains(ApiConstants.imageURL)) {
+      url = widget.product.img!;
+    } else {
+      url = ApiConstants.imageURL2 + widget.product.img!;
+    }
     return GestureDetector(
       onTap: () {
         homeController.agreeButton.value = false;
@@ -140,7 +153,7 @@ class _ProductCardState extends State<ProductCard> {
                 height: WidgetSizes.normal2x.value,
                 margin: context.padding.onlyRightNormal,
                 decoration: BoxDecoration(borderRadius: borderRadius15, color: Colors.grey.shade200, border: Border.all(color: kPrimaryColor2.withOpacity(.2))),
-                child: imageView(imageURl: widget.product.img!)),
+                child: imageView(imageURl: url)),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,

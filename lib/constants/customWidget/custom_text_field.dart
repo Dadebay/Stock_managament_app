@@ -15,6 +15,7 @@ class CustomTextField extends StatelessWidget {
   final FocusNode requestfocusNode;
   final bool unFocus;
   final bool? readOnly;
+
   final bool? isNumber;
   final Function()? onTap;
 

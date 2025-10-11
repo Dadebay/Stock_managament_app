@@ -3,7 +3,6 @@ plugins {
     id "kotlin-android"
     id "dev.flutter.flutter-gradle-plugin"
     id 'com.google.gms.google-services'
-
 }
 
 def localProperties = new Properties()
@@ -26,10 +25,12 @@ if (flutterVersionName == null) {
 
 android {
     namespace "com.gurbanov.tous"
-    compileSdk 34
+    // The compileSdk should be 34 as you had it
+    compileSdkVersion 34
     ndkVersion flutter.ndkVersion
 
     compileOptions {
+        // Modern Android requires at least Java 1.8.
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
@@ -41,16 +42,18 @@ android {
     sourceSets {
         main.java.srcDirs += 'src/main/kotlin'
     }
- lintOptions {
+
+    lintOptions {
         disable 'InvalidPackage'
-        checkReleaseBuilds false //<- add this line
+        checkReleaseBuilds false
     }
+
     defaultConfig {
         applicationId "com.gurbanov.tous"
-        minSdkVersion localProperties.getProperty('flutter.minSdkVersion').toInteger()
-        targetSdkVersion localProperties.getProperty('flutter.targetSdkVersion').toInteger()
-        versionCode localProperties.getProperty('flutter.versionCode').toInteger()
-        versionName localProperties.getProperty('flutter.versionName')
+        minSdkVersion 21 // It's better to set a specific number, e.g., 21
+        targetSdkVersion 34 // Target SDK should also be 34
+        versionCode flutterVersionCode.toInteger()
+        versionName flutterVersionName
         multiDexEnabled true
     }
 
@@ -66,6 +69,12 @@ flutter {
 }
 
 dependencies {
-    implementation platform('com.google.firebase:firebase-bom:31.2.0')
-    implementation 'com.google.firebase:firebase-messaging:21.1.0'
+    // Import the Firebase BoM (Bill of Materials) for version management
+    implementation platform('com.google.firebase:firebase-bom:32.3.1')
+
+    // Declare the dependency for Firebase Cloud Messaging
+    implementation 'com.google.firebase:firebase-messaging'
+
+    // You can add other Firebase products without specifying versions
+    // For example: implementation 'com.google.firebase:firebase-analytics'
 }

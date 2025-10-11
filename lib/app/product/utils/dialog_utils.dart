@@ -24,7 +24,7 @@ class DialogUtils {
     required void Function(String id) onIdSelected,
   }) {
     Get.defaultDialog(
-      title: title,
+      title: title.tr,
       titleStyle: TextStyle(color: Colors.black, fontSize: 22.sp, fontWeight: FontWeight.bold),
       titlePadding: const EdgeInsets.only(top: 20),
       content: Container(
@@ -264,7 +264,7 @@ class DialogUtils {
                       onTap: onRetry,
                       text: 'noConnection3'.tr,
                     ),
-                    SizedBox(height: WidgetSizes.normal.value),
+                    const SizedBox(height: 20),
                   ],
                 ),
               ),

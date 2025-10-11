@@ -10,7 +10,6 @@ dependencies:
   # Core
   get:
   get_storage: 
-  restart_app:
   background_sms: ^0.0.4
   permission_handler: ^11.3.1
   path:
@@ -19,7 +18,7 @@ dependencies:
   image_picker:
   cached_network_image: ^3.3.1
   change_app_package_name: ^1.5.0
-  connectivity_plus: ^3.0.3
+  connectivity_plus: ^5.0.2 # Or a newer version
    
   # Utils
   flutter_iconly: 
@@ -27,8 +26,6 @@ dependencies:
   intl: ^0.19.0  
   cupertino_icons: 
   flutter_screenutil:
-
-
   flutter:
     sdk: flutter
 
@@ -36,7 +33,7 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   #Lints
-  very_good_analysis: ^7.0.0  
+  very_good_analysis: 
   flutter_lints: ^4.0.0
 
 flutter:

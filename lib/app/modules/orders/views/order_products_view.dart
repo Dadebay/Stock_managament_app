@@ -46,7 +46,6 @@ class _OrderProductsViewState extends State<OrderProductsView> {
       {'label': 'coupon', 'editable': true},
       {'label': 'description', 'editable': true},
       {'label': 'count', 'editable': false},
-      {'label': 'totalsum', 'editable': false},
       {'label': 'totalchykdajy', 'editable': false},
     ];
   }
@@ -73,7 +72,6 @@ class _OrderProductsViewState extends State<OrderProductsView> {
             padding: EdgeInsets.symmetric(horizontal: 10.w),
             itemBuilder: (context, index) {
               final productModel = products[index];
-              print(productModel.count);
               return ProductCard(
                 product: productModel.product!,
                 externalCount: productModel.count,
