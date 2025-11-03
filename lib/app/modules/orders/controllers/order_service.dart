@@ -9,6 +9,7 @@ import 'package:stock_managament_app/app/modules/home/controllers/search_model.d
 import 'package:stock_managament_app/app/modules/orders/controllers/order_controller.dart';
 import 'package:stock_managament_app/app/modules/orders/controllers/order_model.dart';
 import 'package:stock_managament_app/constants/customWidget/widgets.dart';
+import 'package:http/http.dart' as http;
 
 class OrderService {
   final OrderController orderController = Get.find();
@@ -82,11 +83,7 @@ class OrderService {
       'Content-Type': 'application/json; charset=UTF-8',
       'Authorization': 'Bearer $token',
     };
-    List<Map<String, int>> products = [];
-    for (var element in model.products) {
-      print(element.count);
-      products.add({'id': element.id, 'count': element.count});
-    }
+
     final body = json.encode({
       'status': int.parse(model.status),
       'gaplama': model.gaplama,
@@ -100,23 +97,23 @@ class OrderService {
       'coupon': model.coupon,
       'description': model.description,
       "count": model.count,
-      'products': products
+      "totalsum": model.totalsum,
+      "totalchykdajy": model.totalchykdajy,
     });
 
     print(body);
-    return null;
-    // print(response.body);
-    // print(response.statusCode);
-    // final response = await http.put(url, headers: headers, body: body);
 
-    // if (response.statusCode == 200 || response.statusCode == 201) {
-    //   final jsonResponse = json.decode(response.body);
-    //   final updatedOrder = OrderModel.fromJson(jsonResponse);
-    //   Get.back();
+    final response = await http.put(url, headers: headers, body: body);
+    print(response.body);
+    print(response.statusCode);
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      final jsonResponse = json.decode(response.body);
+      final updatedOrder = OrderModel.fromJson(jsonResponse);
+      Get.back();
 
-    //   return updatedOrder;
-    // } else {
-    //   return null;
-    // }
+      return updatedOrder;
+    } else {
+      return null;
+    }
   }
 }

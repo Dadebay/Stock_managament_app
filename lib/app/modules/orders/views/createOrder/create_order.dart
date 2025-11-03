@@ -36,6 +36,7 @@ class _OrderCreateViewState extends State<OrderCreateView> {
   String selectedStatus = "Preparing"; // Set an initial value
   List<TextEditingController> textControllers = List.generate(9, (_) => TextEditingController());
   RxList<ClientModel> allClients = <ClientModel>[].obs;
+  bool _isCreatingOrder = false;
   Future<void> fetchClients() async {
     allClients.value = await ClientsService().getClients();
   }
@@ -218,42 +219,50 @@ class _OrderCreateViewState extends State<OrderCreateView> {
   AgreeButton submitOrder() {
     return AgreeButton(
         onTap: () async {
-          int key = 0;
-          for (var status in ListConstants.statusMapping) {
-            if (status['name'] == selectedStatus) {
-              key = int.parse(status['sortName'].toString());
+          if (_isCreatingOrder) {
+            return;
+          }
+          _isCreatingOrder = true;
+          try {
+            int key = 0;
+            for (var status in ListConstants.statusMapping) {
+              if (status['name'] == selectedStatus) {
+                key = int.parse(status['sortName'].toString());
+              }
             }
-          }
-          List<Map<String, int>> products = [];
-          for (var element in _searchController.selectedProductsToOrder) {
-            products.add({'id': element['product'].id, 'count': element['count']});
-          }
+            List<Map<String, int>> products = [];
+            for (var element in _searchController.selectedProductsToOrder) {
+              products.add({'id': element['product'].id, 'count': element['count']});
+            }
 
-          final OrderModel model = OrderModel(
-            id: 0,
-            status: key.toString(),
-            date: textControllers[0].text.substring(0, 10),
-            gaplama: textControllers[1].text,
-            coupon: textControllers[5].text,
-            discount: textControllers[7].text,
-            description: textControllers[6].text,
-            name: "${textControllers[3].text} - ${textControllers[2].text}",
-            clientID: 0,
-            clientDetailModel: ClientDetailModel(
+            final OrderModel model = OrderModel(
               id: 0,
-              name: textControllers[3].text,
-              address: textControllers[4].text,
-              phone: textControllers[2].text,
+              status: key.toString(),
+              date: textControllers[0].text.substring(0, 10),
+              gaplama: textControllers[1].text,
+              coupon: textControllers[5].text,
+              discount: textControllers[7].text,
               description: textControllers[6].text,
-              ordercount: '',
-              sumprice: '',
-            ),
-            products: [],
-            count: _searchController.selectedProductsToOrder.length,
-            totalsum: '',
-            totalchykdajy: '',
-          );
-          await OrderService().createOrder(model: model, products: products);
+              name: "${textControllers[3].text} - ${textControllers[2].text}",
+              clientID: 0,
+              clientDetailModel: ClientDetailModel(
+                id: 0,
+                name: textControllers[3].text,
+                address: textControllers[4].text,
+                phone: textControllers[2].text,
+                description: textControllers[6].text,
+                ordercount: '',
+                sumprice: '',
+              ),
+              products: [],
+              count: _searchController.selectedProductsToOrder.length,
+              totalsum: '',
+              totalchykdajy: '',
+            );
+            await OrderService().createOrder(model: model, products: products);
+          } finally {
+            _isCreatingOrder = false;
+          }
         },
         text: 'agree');
   }
