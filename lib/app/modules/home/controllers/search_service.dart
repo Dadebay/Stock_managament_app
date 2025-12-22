@@ -26,6 +26,50 @@ class SearchService {
     }
   }
 
+  Future<SearchModel> createProductWithImage(
+      {required Map<String, String> fields,
+      Uint8List? imageBytes, // optional
+      String? imageFileName // optional
+      }) async {
+    final uri = Uri.parse(ApiConstants.products);
+    final request = http.MultipartRequest('POST', uri);
+    final token = await AuthStorage().getToken();
+    request.headers['Authorization'] = 'Bearer $token';
+    request.fields.addAll(fields);
+    if (imageBytes != null && imageFileName != null) {
+      String extension = imageFileName.split('.').last.toLowerCase();
+      extension = (extension == 'jpg') ? 'jpeg' : extension;
+
+      request.files.add(http.MultipartFile.fromBytes(
+        'img',
+        imageBytes,
+        filename: imageFileName,
+        contentType: MediaType('image', extension),
+      ));
+    }
+    print(token);
+    print(fields);
+    request.files.forEach((file) {
+      print(file.field);
+      print(file.filename);
+    });
+    print(request.files);
+    print(request);
+    final streamedResponse = await request.send();
+
+    final statusCode = streamedResponse.statusCode;
+    print(statusCode);
+    if (statusCode == 200 || statusCode == 201) {
+      final responseBody = await streamedResponse.stream.bytesToString();
+      final jsonData = jsonDecode(responseBody);
+      final updatedModel = SearchModel.fromJson(jsonData);
+      searchViewController.updateProductLocally(updatedModel);
+      return updatedModel;
+    } else {
+      throw Exception('Failed to create product');
+    }
+  }
+
   Future<SearchModel?> getProductByID(String id) async {
     final data = await ApiService().getRequest('${ApiConstants.products}/$id/', requiresToken: true);
     if (data != null && data['results'] != null) {

@@ -5,9 +5,11 @@ import 'package:flutter_iconly/flutter_iconly.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:kartal/kartal.dart';
+import 'package:stock_managament_app/app/modules/auth/views/auth_service.dart';
 import 'package:stock_managament_app/app/modules/home/controllers/home_controller.dart';
 import 'package:stock_managament_app/app/modules/orders/controllers/order_controller.dart';
 import 'package:stock_managament_app/app/modules/orders/views/createOrder/create_order.dart';
+import 'package:stock_managament_app/app/modules/product/views/web_add_product_page.dart';
 import 'package:stock_managament_app/app/modules/search/views/search_view.dart';
 import 'package:stock_managament_app/app/product/constants/list_constants.dart';
 import 'package:stock_managament_app/app/product/utils/dialog_utils.dart';
@@ -25,17 +27,36 @@ class _BottomNavBarState extends State<BottomNavBar> {
   final SearchViewController _searchViewController = Get.find();
   final storage = GetStorage();
   int selectedIndex = 0;
-  late final bool isAdmin;
+  late bool isAdmin;
 
   @override
   void initState() {
     super.initState();
     findAdmin();
+    checkAndUpdateAdminStatus();
   }
 
   findAdmin() async {
     isAdmin = storage.read('isAdmin') ?? false;
     setState(() {});
+  }
+
+  checkAndUpdateAdminStatus() async {
+    print('=== BOTTOM NAV BAR - isAdmin YOXLANILIR ===');
+    final credentials = await AuthStorage().getCredentials();
+    final username = credentials['username'];
+    final password = credentials['password'];
+
+    if (username != null && password != null) {
+      print('Username: $username');
+      await SignInService().getClients(username, password);
+      // Yenidən oxu
+      isAdmin = storage.read('isAdmin') ?? false;
+      print('Updated isAdmin: $isAdmin');
+      setState(() {});
+    } else {
+      print('Credentials tapilmadi!');
+    }
   }
 
   @override
@@ -44,7 +65,19 @@ class _BottomNavBarState extends State<BottomNavBar> {
       backgroundColor: Colors.white,
       appBar: buildAppBar(context),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => Get.to(() => const OrderCreateView()),
+        onPressed: () {
+          print(selectedIndex);
+          print(isAdmin);
+          if (isAdmin == true) {
+            if (selectedIndex == 0) {
+              Get.to(() => const WebAddProductPage());
+            } else {
+              Get.to(() => const OrderCreateView());
+            }
+          } else {
+            Get.to(() => const OrderCreateView());
+          }
+        },
         backgroundColor: kPrimaryColor2,
         child: const Icon(Icons.add, color: Colors.white),
       ),
@@ -57,8 +90,8 @@ class _BottomNavBarState extends State<BottomNavBar> {
         showUnselectedLabels: true,
         selectedItemColor: kPrimaryColor2,
         useLegacyColorScheme: true,
-        selectedLabelStyle: context.general.textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.bold),
-        unselectedLabelStyle: context.textTheme.bodyLarge,
+        selectedLabelStyle: context.general.textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.bold, fontSize: 12),
+        unselectedLabelStyle: context.textTheme.bodyLarge?.copyWith(fontSize: 12),
         currentIndex: selectedIndex,
         onTap: (index) {
           setState(() => selectedIndex = index);

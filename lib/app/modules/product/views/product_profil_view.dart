@@ -5,6 +5,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:kartal/kartal.dart';
 import 'package:stock_managament_app/app/modules/home/controllers/home_controller.dart';
@@ -46,6 +47,7 @@ class _ProductProfilViewState extends State<ProductProfilView> {
     textControllers = List.generate(fieldCount, (_) => TextEditingController());
     selectedIds = List<String?>.filled(fieldCount, null);
     _populateTextFields();
+    findAdmin();
   }
 
   @override
@@ -63,7 +65,8 @@ class _ProductProfilViewState extends State<ProductProfilView> {
   void _populateTextFields() {
     textControllers[0].text = currentProduct.name;
     textControllers[1].text = currentProduct.price;
-    textControllers[2].text = currentProduct.createdAT.length > 15 ? currentProduct.createdAT.toString().replaceAll("T", " ").substring(0, 16) : currentProduct.createdAT.toString().replaceAll("T", " ");
+    textControllers[2].text =
+        currentProduct.createdAT.length > 15 ? currentProduct.createdAT.toString().replaceAll("T", " ").substring(0, 16) : currentProduct.createdAT.toString().replaceAll("T", " ");
     textControllers[3].text = currentProduct.category?.name ?? '';
     textControllers[4].text = currentProduct.brend?.name ?? '';
     textControllers[5].text = currentProduct.location?.name ?? '';
@@ -116,8 +119,20 @@ class _ProductProfilViewState extends State<ProductProfilView> {
     );
   }
 
+  late final bool isAdmin;
+
+  final storage = GetStorage();
+
+  findAdmin() async {
+    isAdmin = storage.read('isAdmin') ?? false;
+    setState(() {});
+  }
+
   Widget _buildTextFields(BuildContext context) {
-    List editFields = [true, false, false, true, true, true, true, true, false, true, true];
+    print("---------------------------------------------=======================================");
+    print(isAdmin);
+
+    List editFields = isAdmin ? [true, true, true, true, true, true, true, true, true, true, true] : [true, false, false, true, true, true, true, true, false, true, true];
     return Column(
       children: List.generate(fieldCount, (index) {
         final label = ListConstants.fieldLabels[index];
@@ -177,11 +192,11 @@ class _ProductProfilViewState extends State<ProductProfilView> {
 
       setState(() {
         currentProduct = updatedProduct;
-        controller.updateProductLocally(widget.product.id, currentProduct);
+        controller.updateProductLocally(currentProduct);
         _populateTextFields();
         _photo = null;
       });
-
+      Get.back();
       showSnackBar("Success", "Product updated successfully", Colors.green);
     } catch (error) {
       showSnackBar("Error", "Failed to update product: $error", Colors.red);

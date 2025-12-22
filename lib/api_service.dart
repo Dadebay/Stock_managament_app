@@ -90,11 +90,16 @@ class ApiService {
         default:
           throw UnsupportedError('Unsupported HTTP method: $method');
       }
-      print(endpoint);
-      print(body);
-      print(response.statusCode);
 
-      print(response.body);
+      print('\n===== API REQUEST =====');
+      print('Method: $method');
+      print('Endpoint: $endpoint');
+      print('Request Body: $body');
+      print('\n===== API RESPONSE =====');
+      print('Status Code: ${response.statusCode}');
+      print('Response Body: ${response.body.length > 500 ? response.body.substring(0, 500) + "..." : response.body}');
+      print('======================\n');
+
       if ([200, 201, 204].contains(response.statusCode)) {
         if (response.statusCode == 204) {
           await handleSuccess!({"statusCode": response.statusCode});
@@ -106,20 +111,28 @@ class ApiService {
         }
         return responseJson ?? response.statusCode;
       } else {
-        final responseJson = response.body.isNotEmpty ? json.decode(response.body) : {};
-        String a = responseJson;
-        if (a.isEmpty) {
+        // Check if response is JSON before parsing
+        print('===== ERROR RESPONSE =====');
+        print('Status Code: ${response.statusCode}');
+        try {
+          final responseJson = response.body.isNotEmpty ? json.decode(response.body) : {};
+          print('Error Message: ${responseJson['message']}');
+          print('========================\n');
           _handleApiError(
             response.statusCode,
             responseJson['message']?.toString() ?? 'anErrorOccurred'.tr,
           );
-        } else {
+        } catch (e) {
+          // If parsing fails (e.g., HTML response), show the status code error
+          print('⚠️ Response is not JSON (possibly HTML error page)');
+          print('Parse Error: $e');
+          print('Response preview: ${response.body.substring(0, response.body.length > 200 ? 200 : response.body.length)}');
+          print('========================\n');
           _handleApiError(
             response.statusCode,
-            a.toString(),
+            'Server returned an error. Status: ${response.statusCode}',
           );
         }
-
         return null;
       }
     } on SocketException {

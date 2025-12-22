@@ -35,6 +35,7 @@ class OrderService {
   }
 
   Future createOrder({required OrderModel model, required List<Map<String, dynamic>> products}) async {
+    final discountValue = double.tryParse(model.discount.toString()) ?? 0.0;
     final body = <String, dynamic>{
       'status': model.status,
       'gaplama': model.gaplama,
@@ -44,14 +45,18 @@ class OrderService {
       'clientName': model.clientDetailModel!.name,
       'clientAddress': model.clientDetailModel!.address,
       'clientPhone': model.clientDetailModel!.phone,
-      'discount': double.tryParse(model.discount.toString()),
+      'discount': discountValue,
       'coupon': model.coupon,
       'description': model.description,
       "count": int.parse(model.count.toString()),
       'products': products,
     };
-    print(body);
-    print(products);
+    print('===== CREATE ORDER REQUEST =====');
+    print('Endpoint: ${ApiConstants.order}');
+    print('Discount value: $discountValue');
+    print('Request body: $body');
+    print('Products: $products');
+    print('==============================');
     return ApiService().handleApiRequest(
       endpoint: ApiConstants.order,
       method: 'POST',

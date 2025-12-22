@@ -51,6 +51,19 @@ class AuthStorage {
     await storage.remove('RefreshToken');
     return storage.read('RefreshToken') == null ? true : false;
   }
+
+  // Username və Password storage
+  Future<void> setCredentials(String username, String password) async {
+    await storage.write('username', username);
+    await storage.write('password', password);
+  }
+
+  Future<Map<String, String?>> getCredentials() async {
+    return {
+      'username': storage.read('username'),
+      'password': storage.read('password'),
+    };
+  }
 }
 
 class SignInService {
@@ -62,13 +75,22 @@ class SignInService {
       return (data['results'] as List).map((item) => EnterModel.fromJson(item)).toList();
     } else if (data is List) {
       List<EnterModel> list = [];
+      print('=== GET CLIENTS DATA ===');
       print(data);
       list = (data).map((item) => EnterModel.fromJson(item)).toList();
       for (var element in list) {
-        print(element.username);
+        print('Checking user: ${element.username}');
         if (element.username == userName && element.password == password) {
-          print("geldi Mana");
-          await _auth.setAdmin(true);
+          print('✓ User tapildi: ${element.username}');
+          // Check is_superuser from raw data
+          final userData = (data as List).firstWhere(
+            (item) => item['username'] == userName,
+            orElse: () => {},
+          );
+          final isSuperUser = userData['is_superuser'] ?? false;
+          print('is_superuser value: $isSuperUser');
+          await _auth.setAdmin(isSuperUser);
+          print('isAdmin storage-a yazildi: $isSuperUser');
         }
       }
       return list;
@@ -88,6 +110,10 @@ class SignInService {
   }
 
   Future login({required String username, required String password}) async {
+    print('=== LOGIN STARTED ===');
+    print('Username: $username');
+    print('Endpoint: ${ApiConstants.authUrl}');
+
     return ApiService().handleApiRequest(
       endpoint: ApiConstants.authUrl,
       method: 'POST',
@@ -97,10 +123,19 @@ class SignInService {
       },
       requiresToken: false,
       handleSuccess: (responseJson) async {
+        print('=== LOGIN RESPONSE ===');
+        print('Full Response: $responseJson');
+        print('Access Token: ${responseJson['access'] != null ? "Geldi ✓" : "Gelmedi ✗"}');
+        print('Refresh Token: ${responseJson['refresh'] != null ? "Geldi ✓" : "Gelmedi ✗"}');
+
         if (responseJson['access'] != null) {
           await _auth.setToken(responseJson['access']);
           await _auth.setRefreshToken(responseJson['refresh']);
+          await _auth.setCredentials(username, password);
+          print('Token-lar və credentials storage-a yazildi ✓');
         }
+
+        print('=== LOGIN COMPLETED ===');
         return responseJson;
       },
     );

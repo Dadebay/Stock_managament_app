@@ -1,8 +1,15 @@
+import 'dart:convert';
 import 'dart:typed_data';
-
+import 'package:http/http.dart' as http;
+import 'package:http_parser/http_parser.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:stock_managament_app/api_constants.dart';
+import 'package:stock_managament_app/app/modules/auth/views/auth_service.dart';
 import 'package:stock_managament_app/app/modules/home/controllers/search_model.dart';
 import 'package:stock_managament_app/app/modules/home/controllers/search_service.dart';
+import 'package:stock_managament_app/constants/customWidget/widgets.dart';
 
 class HomeController extends GetxController {
   RxBool agreeButton = false.obs;
@@ -25,6 +32,55 @@ class SearchViewController extends GetxController {
       selectedProductsToOrder.add({'product': product, 'count': count});
     }
     selectedProductsToOrder.refresh();
+  }
+
+  Future<void> addNewProduct({
+    required Map<String, String> productData,
+    required Uint8List? selectedImageBytes,
+    required String? selectedImageFileName,
+  }) async {
+    try {
+      final HomeController homeController = Get.find();
+      homeController.agreeButton.value = true;
+
+      final SearchModel newProduct = await SearchService().createProductWithImage(
+        fields: productData,
+        imageBytes: selectedImageBytes, // Controller'daki byte'ları kullan
+        imageFileName: selectedImageFileName, // Controller'daki dosya adını kullan
+      );
+      homeController.agreeButton.value = false;
+
+      if (newProduct != null) {
+        productsList.add(newProduct);
+        clearSelectedImage(); // Seçilen resmi ve dosya adını temizle
+        Get.back();
+        showSnackBar("Başarılı", "Ürün başarıyla eklendi", Colors.green);
+      } else {
+        showSnackBar("Hata", "Ürün eklenemedi. Sunucudan veri dönmedi.", Colors.red);
+      }
+    } catch (e) {
+      showSnackBar("Hata", "Ürün eklenemedi: $e", Colors.red);
+    }
+  }
+
+  Future<void> pickImage({ImageSource source = ImageSource.gallery}) async {
+    try {
+      final ImagePicker picker = ImagePicker();
+      final XFile? fileInfo = await picker.pickImage(
+        source: source,
+        imageQuality: 70, // Android için optimize edilmiş kalite
+        maxWidth: 1920,
+        maxHeight: 1920,
+      );
+      if (fileInfo != null) {
+        final bytes = await fileInfo.readAsBytes();
+        selectedImageBytes.value = bytes;
+        selectedImageFileName.value = fileInfo.name;
+        showSnackBar("Success", "Image selected: ${fileInfo.name}", Colors.green);
+      }
+    } catch (e) {
+      showSnackBar("Error", "Could not pick image: $e", Colors.red);
+    }
   }
 
   void decreaseCount(String id, int count) {
@@ -105,17 +161,21 @@ class SearchViewController extends GetxController {
     update();
   }
 
-  void updateProductLocally(int id, SearchModel model) {
-    print("Den geldi--------------------------------------------- $id");
-
-    for (var item in productsList) {
-      if (item.id.toString() == id.toString()) {
-        print("Den geldi--------------------------------------------- ");
-        productsList[productsList.indexOf(item)] = model;
-      }
+  void updateProductLocally(SearchModel updatedProduct) {
+    final indexInProducts = productsList.indexWhere((item) => item.id == updatedProduct.id);
+    if (indexInProducts != -1) {
+      productsList[indexInProducts] = updatedProduct;
     }
+
+    final indexInSearch = searchResult.indexWhere((item) => item.id == updatedProduct.id);
+    if (indexInSearch != -1) {
+      searchResult[indexInSearch] = updatedProduct;
+    }
+
     calculateTotals();
+
     productsList.refresh();
+    searchResult.refresh();
     update();
   }
 

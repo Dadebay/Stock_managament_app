@@ -46,7 +46,7 @@ class SettingsView extends GetView<SettingsController> {
           name: 'versia',
           onTap: () {},
           icon: Text(
-            '3.0.0',
+            '4.0.0',
             style: context.general.textTheme.bodyLarge!.copyWith(color: kPrimaryColor2, fontWeight: FontWeight.bold),
           ),
         ),
