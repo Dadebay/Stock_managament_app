@@ -26,7 +26,7 @@ if (flutterVersionName == null) {
 android {
     namespace "com.gurbanov.tous"
     // The compileSdk should be 34 as you had it
-    compileSdkVersion 34
+    compileSdkVersion 36
     ndkVersion flutter.ndkVersion
 
     compileOptions {
@@ -51,7 +51,7 @@ android {
     defaultConfig {
         applicationId "com.gurbanov.tous"
         minSdkVersion 21 // It's better to set a specific number, e.g., 21
-        targetSdkVersion 34 // Target SDK should also be 34
+        targetSdkVersion 36 // Target SDK should also be 34
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
         multiDexEnabled true

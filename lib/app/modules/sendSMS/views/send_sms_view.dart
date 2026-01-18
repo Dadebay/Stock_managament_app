@@ -9,8 +9,8 @@ import 'package:stock_managament_app/app/modules/sendSMS/controllers/clients_con
 import 'package:stock_managament_app/app/modules/sendSMS/controllers/clients_service.dart';
 import 'package:stock_managament_app/app/modules/sendSMS/views/client_card.dart';
 import 'package:stock_managament_app/app/modules/sendSMS/views/search_widget.dart';
-import 'package:stock_managament_app/app/product/constants/list_constants.dart';
 import 'package:stock_managament_app/constants/buttons/agree_button_view.dart';
+import 'package:stock_managament_app/constants/customWidget/constants.dart';
 import 'package:stock_managament_app/constants/customWidget/custom_text_field.dart';
 import 'package:stock_managament_app/constants/customWidget/widgets.dart';
 
@@ -41,7 +41,7 @@ class _SendSMSViewState extends State<SendSMSView> {
       //     color: Colors.white,
       //   ),
       // ),
-      backgroundColor: Colors.white,
+      backgroundColor: const Color(0xFFF7F8FA),
       body: FutureBuilder<List<ClientModel>>(
         future: ClientsService().getClients(),
         builder: (context, snapshot) {
@@ -59,32 +59,35 @@ class _SendSMSViewState extends State<SendSMSView> {
             final hasResult = clientsController.searchResult.isNotEmpty;
             final displayList = (isSearching && hasResult) ? clientsController.searchResult.toList() : clientsController.clients.toList();
 
-            return Column(
-              children: [
-                SearchWidget(
-                  controller: searchEditingController,
-                  onChanged: (value) => clientsController.onSearchTextChanged(value),
-                  onClear: () {
-                    searchEditingController.clear();
-                    clientsController.searchResult.clear();
-                  },
-                ),
-                Expanded(
-                  child: (searchEditingController.text.isNotEmpty && clientsController.searchResult.isEmpty)
-                      ? emptyData()
-                      : ListView.builder(
-                          padding: context.padding.onlyBottomHigh,
-                          itemCount: displayList.length,
-                          itemBuilder: (context, index) {
-                            return ClientCard(
-                              client: displayList[index],
-                              count: (displayList.length - index),
-                              topTextColumnSize: ListConstants.clientNames,
-                            );
-                          },
-                        ),
-                ),
-              ],
+            return SafeArea(
+              child: Column(
+                children: [
+                  SearchWidget(
+                    controller: searchEditingController,
+                    onChanged: (value) => clientsController.onSearchTextChanged(value),
+                    onClear: () {
+                      searchEditingController.clear();
+                      clientsController.searchResult.clear();
+                    },
+                  ),
+                  const SizedBox(height: 8),
+                  Expanded(
+                    child: (searchEditingController.text.isNotEmpty && clientsController.searchResult.isEmpty)
+                        ? emptyData()
+                        : ListView.separated(
+                            padding: context.padding.horizontalNormal + context.padding.onlyBottomHigh,
+                            itemCount: displayList.length,
+                            separatorBuilder: (context, index) => const SizedBox(height: 8),
+                            itemBuilder: (context, index) {
+                              return ClientCard(
+                                client: displayList[index],
+                                index: (displayList.length - index).toString(),
+                              );
+                            },
+                          ),
+                  ),
+                ],
+              ),
             );
           });
         },

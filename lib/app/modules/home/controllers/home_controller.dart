@@ -21,7 +21,40 @@ class SearchViewController extends GetxController {
   RxList<SearchModel> searchResult = <SearchModel>[].obs;
   RxList<Map<String, dynamic>> selectedProductsToOrder = <Map<String, dynamic>>[].obs;
   RxBool showInGrid = false.obs;
+  RxBool isGridView = false.obs;
   RxInt sumCount = 0.obs;
+
+  void toggleViewMode() {
+    isGridView.value = !isGridView.value;
+  }
+
+  void sortProductsByDate() {
+    productsList.sort((a, b) {
+      // Check if both have dates
+      final bool aHasDate = a.createdAT.isNotEmpty;
+      final bool bHasDate = b.createdAT.isNotEmpty;
+
+      // Products with dates come first
+      if (aHasDate && !bHasDate) return -1;
+      if (!aHasDate && bHasDate) return 1;
+
+      // Both have dates - sort by most recent first
+      if (aHasDate && bHasDate) {
+        try {
+          final dateA = DateTime.parse(a.createdAT);
+          final dateB = DateTime.parse(b.createdAT);
+          return dateB.compareTo(dateA); // Most recent first
+        } catch (e) {
+          return 0;
+        }
+      }
+
+      // Neither has dates - keep original order
+      return 0;
+    });
+    productsList.refresh();
+  }
+
   void addOrUpdateProduct({required SearchModel product, required int count}) {
     final index = selectedProductsToOrder.indexWhere(
       (element) => element['product'].id.toString() == product.id.toString(),

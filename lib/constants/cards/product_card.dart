@@ -113,7 +113,7 @@ class _ProductCardState extends State<ProductCard> {
                 ),
               ),
               IconButton(
-                icon: const Icon(CupertinoIcons.add_circled, color: Colors.black),
+                icon: const Icon(CupertinoIcons.add_circled, color: Colors.grey),
                 onPressed: () {
                   if (selectedCount >= widget.product.count) {
                     showSnackBar("Error", "Not in stock", Colors.red);
