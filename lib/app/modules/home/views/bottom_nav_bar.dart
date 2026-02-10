@@ -64,23 +64,25 @@ class _BottomNavBarState extends State<BottomNavBar> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: buildAppBar(context),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          print(selectedIndex);
-          print(isAdmin);
-          if (isAdmin == true) {
-            if (selectedIndex == 0) {
-              Get.to(() => const WebAddProductPage());
-            } else {
-              Get.to(() => const OrderCreateView());
-            }
-          } else {
-            Get.to(() => const OrderCreateView());
-          }
-        },
-        backgroundColor: kPrimaryColor2,
-        child: const Icon(Icons.add, color: Colors.white),
-      ),
+      floatingActionButton: selectedIndex == 2
+          ? null
+          : FloatingActionButton(
+              onPressed: () {
+                print(selectedIndex);
+                print(isAdmin);
+                if (isAdmin == true) {
+                  if (selectedIndex == 0) {
+                    Get.to(() => const WebAddProductPage());
+                  } else {
+                    Get.to(() => const OrderCreateView());
+                  }
+                } else {
+                  Get.to(() => const OrderCreateView());
+                }
+              },
+              backgroundColor: kPrimaryColor2,
+              child: const Icon(Icons.add, color: Colors.white),
+            ),
       bottomNavigationBar: BottomNavigationBar(
         backgroundColor: Colors.white,
         elevation: 5,
