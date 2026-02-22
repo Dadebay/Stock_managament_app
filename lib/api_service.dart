@@ -1,5 +1,6 @@
 // ignore_for_file: file_names, require_trailing_commas, avoid_void_async, avoid_bool_literals_in_conditional_expressions, depend_on_referenced_packages
 
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
@@ -12,22 +13,48 @@ import 'constants/customWidget/widgets.dart';
 
 class ApiService {
   final AuthStorage _auth = AuthStorage();
+
+  // Timeout süresi (saniye)
+  static const int REQUEST_TIMEOUT_SECONDS = 30;
+
   Future<dynamic> getRequest(
     String endpoint, {
     required bool requiresToken,
     Future<dynamic> Function(dynamic)? handleSuccess,
   }) async {
+    print('\n📡 [API] ===== GET Request =====');
+    print('📡 [API] Endpoint: $endpoint');
+    print('📡 [API] Requires Token: $requiresToken');
+    print('📡 [API] Timeout: ${REQUEST_TIMEOUT_SECONDS}s');
+
     try {
       final token = await _auth.getToken();
+      print('📡 [API] Token: ${token != null ? "✅ EXISTS (${token.substring(0, 20)}...)" : "❌ NULL"}');
+
       final headers = <String, String>{
         if (requiresToken && token != null) 'Authorization': 'Bearer $token',
       };
+      print('📡 [API] Headers: $headers');
 
-      final response = await http.get(
+      print('📡 [API] Sending request...');
+      final response = await http
+          .get(
         Uri.parse(endpoint),
         headers: headers,
+      )
+          .timeout(
+        Duration(seconds: REQUEST_TIMEOUT_SECONDS),
+        onTimeout: () {
+          print('⏰ [API] Request Timeout after ${REQUEST_TIMEOUT_SECONDS}s');
+          throw TimeoutException('Request timeout after ${REQUEST_TIMEOUT_SECONDS} seconds');
+        },
       );
+
+      print('📡 [API] Response Status: ${response.statusCode}');
+      print('📡 [API] Response Body Length: ${response.body.length} bytes');
+
       if (response.statusCode == 200) {
+        print('✅ [API] Success: Status 200');
         final decodedBody = utf8.decode(response.bodyBytes); // UTF-8 çözümleme burada
         final responseJson = decodedBody.isNotEmpty ? json.decode(decodedBody) : {};
 
@@ -36,14 +63,25 @@ class ApiService {
         }
         return responseJson;
       } else {
+        print('❌ [API] Error: Status ${response.statusCode}');
+        print('❌ [API] Error Body: ${response.body.substring(0, response.body.length > 200 ? 200 : response.body.length)}');
         final responseJson = response.body.isNotEmpty ? json.decode(response.body) : {};
         _handleApiError(response.statusCode, responseJson['message']?.toString() ?? 'anErrorOccurred'.tr);
         return null;
       }
-    } on SocketException {
+    } on TimeoutException catch (e) {
+      print('❌ [API] TimeoutException: $e');
+      print('❌ [API] Server did not respond within ${REQUEST_TIMEOUT_SECONDS} seconds');
+      showSnackBar('Timeout', 'Server response timeout. Please try again.', Colors.orange);
+      return null;
+    } on SocketException catch (e) {
+      print('❌ [API] SocketException: $e');
+      print('❌ [API] Network Error: No Internet or Server Unreachable');
       showSnackBar('networkError'.tr, 'noInternet'.tr, Colors.red);
       return null;
     } catch (e) {
+      print('❌ [API] Unknown Error: $e');
+      print('❌ [API] Error Type: ${e.runtimeType}');
       showSnackBar('unknownError'.tr, 'anErrorOccurred'.tr, Colors.red);
       return null;
     }
